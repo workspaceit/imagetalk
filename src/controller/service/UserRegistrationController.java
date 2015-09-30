@@ -1,8 +1,7 @@
 package controller.service;
 
-import model.LoginModel;
+import model.AdminLoginModel;
 import model.UserInfModel;
-import model.UserStatusModel;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -29,16 +28,15 @@ import java.util.regex.Pattern;
  */
 public class UserRegistrationController extends HttpServlet {
     private UserInfModel           userInfModel   = null;
-    private LoginModel             loginModel     = null;
-    private UserStatusModel        userStatusModel= null;
+    private AdminLoginModel adminLoginModel = null;
     private ImageTalkBaseController baseController = null;
     private PrintWriter            out            = null;
 
     @Override
     public void init() throws ServletException {
         userInfModel = new UserInfModel();
-        loginModel = new LoginModel();
-        userStatusModel  = new UserStatusModel();
+        adminLoginModel = new AdminLoginModel();
+
     }
 
     @Override
@@ -82,10 +80,10 @@ public class UserRegistrationController extends HttpServlet {
     private void activateUserAccount(HttpServletRequest req){
         String activation_code = req.getParameter("activation_code");
         System.out.println("activation_code "+activation_code);
-        LoginModel loginModel = new LoginModel();
-        loginModel.login.activation_code = activation_code;
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
+        adminLoginModel.login.activation_code = activation_code;
         String resp="";
-        if(loginModel.updateActiveToActivated()){
+        if(adminLoginModel.updateActiveToActivated()){
             resp = "Account is activated";
         }else{
             resp = "Error 404";
@@ -107,7 +105,7 @@ public class UserRegistrationController extends HttpServlet {
             Matcher matcher = pattern.matcher(testString);
 
             if(matcher.matches()){
-                this.loginModel.email = req.getParameter("email");
+                this.adminLoginModel.email = req.getParameter("email");
             }else{
                 this.baseController.serviceResponse.responseStat.msg = "Email is not valid";
                 this.baseController.serviceResponse.responseStat.status = false;
@@ -124,8 +122,8 @@ public class UserRegistrationController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("password",req,true)) {
-            this.loginModel.password = req.getParameter("password");
-            if(this.loginModel.password.length() < 6){
+            this.adminLoginModel.password = req.getParameter("password");
+            if(this.adminLoginModel.password.length() < 6){
                 this.baseController.serviceResponse.responseStat.msg = "Password at least 6 digit required";
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.out.print(this.baseController.getResponse());
@@ -166,14 +164,14 @@ public class UserRegistrationController extends HttpServlet {
         }
 
 
-        if(loginModel.isEmailExist(loginModel.email)){
+        if(adminLoginModel.isEmailExist(adminLoginModel.email)){
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Email already used";
             this.out.println(this.baseController.getResponse());
             return;
         }
 
-        this.loginModel.type = 3;
+        this.adminLoginModel.type = 3;
         int userId = userInfModel.insertData();
         if (!this.checkId(userId)) {
             this.userInfModel.deleteData(userId);
@@ -181,8 +179,8 @@ public class UserRegistrationController extends HttpServlet {
             return;
         }
 
-        this.loginModel.u_id = userId;
-        int loginId = loginModel.insertData(userId);
+        this.adminLoginModel.u_id = userId;
+        int loginId = adminLoginModel.insertData(userId);
 
         if (!this.checkId(loginId)) {
             this.userInfModel.deleteData(userId);
@@ -190,18 +188,11 @@ public class UserRegistrationController extends HttpServlet {
             return;
         }
 
-        userStatusModel.status_id = 1;
-        userStatusModel.login_id = loginId;
 
-        int userStatusId =userStatusModel.insert();
 
-        if (!this.checkId(userStatusId)) {
-            this.userInfModel.deleteData(userId);
-            this.out.println(this.baseController.getResponse());
-            return;
-        }
 
-        String activationToken = loginModel.getActivationCodeByEmail(this.loginModel.email);
+
+        String activationToken = adminLoginModel.getActivationCodeByEmail(this.adminLoginModel.email);
 
         if(activationToken == null){
             this.baseController.serviceResponse.responseStat.status = false;
@@ -209,7 +200,7 @@ public class UserRegistrationController extends HttpServlet {
             this.out.println(this.baseController.getResponse());
             return;
         }
-        if(!this.sendRegistrationMail(this.loginModel.email,activationToken,this.baseController.getBaseUrl(req))){
+        if(!this.sendRegistrationMail(this.adminLoginModel.email,activationToken,this.baseController.getBaseUrl(req))){
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Unable to send activation mail";
             this.out.println(this.baseController.getResponse());
@@ -232,7 +223,7 @@ public class UserRegistrationController extends HttpServlet {
         return status;
     }
     private boolean sendRegistrationMail(String email,String activationCode,String baseUrl){
-        LoginModel loginModel = new LoginModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
 
 
         String to = email;

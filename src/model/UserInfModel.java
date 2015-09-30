@@ -33,8 +33,8 @@ public class UserInfModel extends ImageTalkBaseModel {
         try {
             while (this.resultSet.next()) {
                 User user = new User();
-                user.f_name = this.resultSet.getString("f_name");
-                user.l_name = this.resultSet.getString("l_name");
+                user.firstName = this.resultSet.getString("f_name");
+                user.lastName = this.resultSet.getString("l_name");
                 userList.add(user);
             }
         } catch (SQLException e) {
@@ -58,10 +58,9 @@ public class UserInfModel extends ImageTalkBaseModel {
                 User user = new User();
 
                 user.id = this.resultSet.getInt("id");
-                user.f_name = this.resultSet.getString("f_name");
-                user.l_name = this.resultSet.getString("l_name");
-                user.address = this.resultSet.getString("address");
-                user.created_date = this.resultSet.getString("created_date");
+                user.firstName = this.resultSet.getString("f_name");
+                user.lastName = this.resultSet.getString("l_name");
+                user.createdDate = this.resultSet.getString("created_date");
                 userList.add(user);
             }
         } catch (SQLException e) {
@@ -109,10 +108,9 @@ public class UserInfModel extends ImageTalkBaseModel {
                 Login login = new Login();
 
                 user.id = this.resultSet.getInt("id");
-                user.f_name = this.resultSet.getString("f_name");
-                user.l_name = this.resultSet.getString("l_name");
-                user.address = this.resultSet.getString("address");
-                user.created_date = this.resultSet.getString("user_inf_created_date");
+                user.firstName = this.resultSet.getString("f_name");
+                user.lastName = this.resultSet.getString("l_name");
+                user.createdDate = this.resultSet.getString("user_inf_created_date");
 
 
                 login.id = this.resultSet.getInt("login_id");
@@ -141,10 +139,10 @@ public class UserInfModel extends ImageTalkBaseModel {
         try {
             while (this.resultSet.next()) {
                 user.id = this.resultSet.getInt("id");
-                user.f_name = this.resultSet.getString("f_name");
-                user.l_name = this.resultSet.getString("l_name");
-                user.address = this.resultSet.getString("address");
-                user.created_date = this.resultSet.getString("created_date");
+                user.firstName = this.resultSet.getString("f_name");
+                user.lastName = this.resultSet.getString("l_name");
+
+                user.createdDate = this.resultSet.getString("created_date");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -187,10 +185,9 @@ public class UserInfModel extends ImageTalkBaseModel {
                 login.u_id = this.resultSet.getInt("u_id");
 
                 login.user.id = this.resultSet.getInt("u_id");
-                login.user.f_name = this.resultSet.getString("user_f_name");
-                login.user.l_name = this.resultSet.getString("user_l_name");
-                login.user.address = this.resultSet.getString("user_address");
-                login.user.created_date = this.resultSet.getString("user_c_date");
+                login.user.firstName = this.resultSet.getString("user_f_name");
+                login.user.lastName = this.resultSet.getString("user_l_name");
+                login.user.createdDate = this.resultSet.getString("user_c_date");
 
             }
         } catch (SQLException e) {

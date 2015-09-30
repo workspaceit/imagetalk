@@ -1,6 +1,6 @@
 package controller.service;
 
-import model.LoginModel;
+import model.AdminLoginModel;
 import model.UserInfModel;
 import model.datamodel.Login;
 
@@ -127,7 +127,7 @@ public class ProfileController extends HttpServlet {
     public void changePassword(HttpServletRequest req,HttpServletResponse res)
             throws ServletException,IOException
     {
-        LoginModel loginModel =  new LoginModel();
+        AdminLoginModel adminLoginModel =  new AdminLoginModel();
 
         if (!this.baseController.checkParam("new_password",req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Password empty";
@@ -135,7 +135,7 @@ public class ProfileController extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }else{
-            loginModel.password = req.getParameter("new_password").trim();
+            adminLoginModel.password = req.getParameter("new_password").trim();
         }
         String confirmPassword  = null;
         if (!this.baseController.checkParam("confirm_password",req,true)) {
@@ -146,22 +146,22 @@ public class ProfileController extends HttpServlet {
         }else{
             confirmPassword = req.getParameter("confirm_password").trim();
         }
-        if(!loginModel.password.equals(confirmPassword)){
+        if(!adminLoginModel.password.equals(confirmPassword)){
             this.baseController.serviceResponse.responseStat.msg = "Password miss matched";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
-        loginModel.login = this.login;
+        adminLoginModel.login = this.login;
 
-        if(!loginModel.updatePassword()){
+        if(!adminLoginModel.updatePassword()){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
 
-        Login tmpLogin = loginModel.getAllById(this.login.id);
+        Login tmpLogin = adminLoginModel.getAllById(this.login.id);
         this.login.access_token = tmpLogin.access_token;
         this.login.type = tmpLogin.type;
 

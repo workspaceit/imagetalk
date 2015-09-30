@@ -9,7 +9,7 @@ import java.util.Random;
 /**
  * Created by mi on 8/21/15.
  */
-public class LoginModel extends ImageTalkBaseModel {
+public class AdminLoginModel extends ImageTalkBaseModel {
 
     public Login login;
 
@@ -21,10 +21,10 @@ public class LoginModel extends ImageTalkBaseModel {
     public int type = 3;
     public int u_id;
 
-    public LoginModel() {
+    public AdminLoginModel() {
         super();
         this.login = new Login();
-        this.tableName = "login";
+        this.tableName = "admin_login";
     }
     public String getActivationCodeByEmail(String email) {
         String sql = "select activation_code from "+this.tableName+" where email = '" + email + "' limit 1";

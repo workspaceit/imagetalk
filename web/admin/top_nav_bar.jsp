@@ -8,9 +8,9 @@
   <!-- Logo -->
   <a href="index2.html" class="logo">
     <!-- mini logo for sidebar mini 50x50 pixels -->
-    <span class="logo-mini"><b>A</b>LT</span>
+    <span class="logo-mini"><b>I</b>TALK</span>
     <!-- logo for regular state and mobile devices -->
-    <span class="logo-lg"><b>Image</b>Talk</span>
+    <span class="logo-lg">Talk</span>
   </a>
 
   <!-- Header Navbar: style can be found in header.less -->
@@ -25,7 +25,7 @@
 
         <li class="dropdown user user-menu">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <span class="hidden-xs"><%=login.user.f_name+" "+login.user.l_name%></span>
+            <span class="hidden-xs"><%=login.user.firstName+" "+login.user.lastName%></span>
           </a>
           <ul class="dropdown-menu">
             <!-- User image -->

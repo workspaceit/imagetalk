@@ -4,12 +4,8 @@ package controller.service;
  * Created by mi on 8/20/15.
  */
 
-import gps_socket.CabGuardServerSocket;
-import gps_socket.CentralSocketController;
-import model.LoginModel;
-import model.UserStatusModel;
+import model.AdminLoginModel;
 import model.datamodel.Login;
-import model.datamodel.Status;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -24,12 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class LoginController extends HttpServlet {
     ImageTalkBaseController baseController;
@@ -40,10 +31,8 @@ public class LoginController extends HttpServlet {
     }
     public class LoginRespose{
         Login login;
-        Status status;
         public LoginRespose(){
             this.login =new Login();
-            this.status = new Status();
         }
     }
     @Override
@@ -86,74 +75,7 @@ public class LoginController extends HttpServlet {
 
 
     }
-    public void doGet(HttpServletRequest req,HttpServletResponse res)
-            throws ServletException,IOException
-    {
-        int portNumber = 9091;
-        PrintWriter pw = res.getWriter();
-        try {
-            CentralSocketController.serverSocket = new ServerSocket(portNumber);
 
-            class ServerAuthThread extends Thread{
-                public CabGuardServerSocket echoSocket;
-                public  Socket socket;
-
-                @Override
-                public void run(){
-                    CabGuardServerSocket echoSocket = new CabGuardServerSocket(this.socket);
-                    if(echoSocket.isAuthentic()){
-                        System.out.println("SOCKET Auth COMPLETED :");
-                        CentralSocketController.clientSocketList.put(echoSocket.sLogin.u_id,echoSocket);
-                        echoSocket.setLive();
-                    }else{
-                        System.out.println("SOCKET Auth Failed :");
-                        try {
-                            this.socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    Set<Integer> keys = CentralSocketController.clientSocketList.keySet();  //get all keys
-                    for(Integer i: keys)
-                    {
-                        System.out.println("KEYS :"+i);
-                    }
-                }
-            }
-            class ServerThread extends Thread{
-                ServerAuthThread serverAuthThread;
-                @Override
-                public void run(){
-                    int u_d=0;
-
-                    while(true){
-                        try {
-
-                            Socket socket =  CentralSocketController.serverSocket.accept();
-                            this.serverAuthThread = new ServerAuthThread();
-                            this.serverAuthThread.socket = socket;
-                            this.serverAuthThread.start();
-
-                            u_d++;
-                        } catch (IOException ex) {
-                            Logger.getLogger(CentralSocketController.class.getName()).log(Level.SEVERE, null, ex);
-                            try {
-                                CentralSocketController.serverSocket.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-
-            new ServerThread().start();
-            System.out.println("Socket Server Started");
-        }catch(Exception e) {
-
-        }
-        pw.println("<div>Socket started</div>");
-    }
     private void testSession(HttpServletRequest req,HttpServletResponse res)
         throws ServletException,IOException{
         Login login = new Login();
@@ -173,20 +95,20 @@ public class LoginController extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
-        LoginModel loginModel = new LoginModel();
-        if(loginModel.isValidLogin(email,password)){
-            UserStatusModel userStatusModel = new UserStatusModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
+        if(adminLoginModel.isValidLogin(email,password)){
+
             LoginRespose loginResponse = new LoginRespose();
-            if(!loginModel.isActive()){
+            if(!adminLoginModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
-            loginResponse.login = loginModel.login;
-            loginResponse.status = userStatusModel.getByLoginId(loginModel.login.id);
+            loginResponse.login = adminLoginModel.login;
+
             this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req,loginModel.login);
+            this.baseController.setSession(req, adminLoginModel.login);
 
             System.out.println("AUTH DONE");
         }else{
@@ -205,15 +127,13 @@ public class LoginController extends HttpServlet {
         String email = req.getParameter("email");
         String password = req.getParameter("password");
 
-        LoginModel loginModel = new LoginModel();
-        if(loginModel.isValidAdminLogin(email, password)){
-            UserStatusModel userStatusModel = new UserStatusModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
+        if(adminLoginModel.isValidAdminLogin(email, password)){
             LoginRespose loginResponse = new LoginRespose();
 
-            loginResponse.login = loginModel.login;
-            loginResponse.status = userStatusModel.getByLoginId(loginModel.login.id);
+            loginResponse.login = adminLoginModel.login;
             this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req,loginModel.login);
+            this.baseController.setSession(req, adminLoginModel.login);
             this.baseController.serviceResponse.responseStat.msg = "Successfull login";
         }else{
             this.baseController.serviceResponse.responseStat.status = false;
@@ -227,23 +147,23 @@ public class LoginController extends HttpServlet {
     {
 
         String accessToken = req.getParameter("access_token");
-        LoginModel loginModel = new LoginModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
 
-        if(loginModel.isValidLoginByAccessToken(accessToken)){
-            UserStatusModel userStatusModel = new UserStatusModel();
+        if(adminLoginModel.isValidLoginByAccessToken(accessToken)){
+
             LoginRespose loginResponse = new LoginRespose();
-            loginResponse.login = loginModel.login;
+            loginResponse.login = adminLoginModel.login;
 
-            if(!loginModel.isActive()){
+            if(!adminLoginModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
 
-            loginResponse.status = userStatusModel.getByLoginId(loginModel.login.id);
+
             this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req, loginModel.login);
+            this.baseController.setSession(req, adminLoginModel.login);
         }else{
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Access token is wrong";
@@ -253,9 +173,9 @@ public class LoginController extends HttpServlet {
     }
     private void forgetPasword(HttpServletRequest req,HttpServletResponse res){
 
-        LoginModel loginModel = new LoginModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
         String email = req.getParameter("email");
-        String password  = loginModel.getPasswordByEmail(email);
+        String password  = adminLoginModel.getPasswordByEmail(email);
 
         if (password==null){
             this.baseController.serviceResponse.responseStat.status=false;

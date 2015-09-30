@@ -1,6 +1,6 @@
 <%@ page import="controller.service.ImageTalkBaseController" %>
 <%@ page import="model.datamodel.Login" %>
-<%@ page import="model.LoginModel" %>
+<%@ page import="model.AdminLoginModel" %>
 <%@ page import="java.util.ArrayList" %>
 <%
     ImageTalkBaseController imageTalkBaseController = new ImageTalkBaseController();
@@ -10,8 +10,8 @@
     }else{
         response.sendRedirect("/admin/login");
     }
-    LoginModel  loginModel = new LoginModel();
-    ArrayList<Login> loginsList = loginModel.getAllExceptMe(login.u_id);
+    AdminLoginModel adminLoginModel = new AdminLoginModel();
+    ArrayList<Login> loginsList = adminLoginModel.getAllExceptMe(login.u_id);
 
 %>
 <!DOCTYPE html>
@@ -30,11 +30,11 @@
     <section class="content-header">
       <h1>
       App user
-        <small>all app user list</small>
+        <small>all admin user list</small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="<%=imageTalkBaseController.getBaseUrl(request)+"admin"%>"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li>App user management</li>
+        <li>Admin user management</li>
       </ol>
     </section>
 
@@ -65,7 +65,7 @@
                     %>
 
                     <tr>
-                        <td><%=temLogin.user.f_name+" "+temLogin.user.l_name%></td>
+                        <td><%=temLogin.user.firstName+" "+temLogin.user.lastName%></td>
                         <td><%=temLogin.email%></td>
                         <%
                             String userType="";

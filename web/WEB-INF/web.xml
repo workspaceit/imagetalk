@@ -32,31 +32,14 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Team</servlet-name>
-        <servlet-class>controller.service.TeamController</servlet-class>
+        <servlet-name>FileUploader</servlet-name>
+        <servlet-class>controller.service.UploadImage</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Team</servlet-name>
-        <url-pattern>/team/*</url-pattern>
+        <servlet-name>FileUploader</servlet-name>
+        <url-pattern>/upload/*</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>Search</servlet-name>
-        <servlet-class>controller.service.SearchController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Search</servlet-name>
-        <url-pattern>/search/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>JoinRequest</servlet-name>
-        <servlet-class>controller.service.JoinTeamController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>JoinRequest</servlet-name>
-        <url-pattern>/join_team/*</url-pattern>
-    </servlet-mapping>
 
 
     <servlet>
@@ -68,14 +51,7 @@
         <url-pattern>/admin/user/*</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>SocketUI</servlet-name>
-        <jsp-file>/socket_test/clientUi.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>SocketUI</servlet-name>
-        <url-pattern>/socket</url-pattern>
-    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>ADMIN_OPERATION</servlet-name>
@@ -88,7 +64,7 @@
 
     <servlet>
         <servlet-name>ADMIN_DASHBOARD</servlet-name>
-        <jsp-file>/admin/index.jsp</jsp-file>
+        <jsp-file>/admin/dashboard.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>ADMIN_DASHBOARD</servlet-name>
@@ -123,48 +99,7 @@
     </servlet-mapping>
 
 
-    <servlet>
-        <servlet-name>ADMIN_TEAM_CREATE</servlet-name>
-        <jsp-file>/admin/team_add.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ADMIN_TEAM_CREATE</servlet-name>
-        <url-pattern>/admin/team/add</url-pattern>
-    </servlet-mapping>
 
-    <servlet>
-        <servlet-name>ADMIN_TEAM_MANAGEMENT</servlet-name>
-        <jsp-file>/admin/team_management.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ADMIN_TEAM_MANAGEMENT</servlet-name>
-        <url-pattern>/admin/team/management</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ADMIN_GPS_STATUS</servlet-name>
-        <jsp-file>/admin/gps_status.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ADMIN_GPS_STATUS</servlet-name>
-        <url-pattern>/admin/gps/status</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ADMIN_GPS_SETTINGS</servlet-name>
-        <jsp-file>/admin/gps_settings.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ADMIN_GPS_SETTINGS</servlet-name>
-        <url-pattern>/admin/gps/settings</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>ADMIN_TEAM_EDIT</servlet-name>
-        <jsp-file>/admin/team_update.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ADMIN_TEAM_EDIT</servlet-name>
-        <url-pattern>/admin/team/update/*</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>

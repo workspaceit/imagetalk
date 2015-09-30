@@ -5,16 +5,18 @@ package model.datamodel;
  */
 public class User {
     public int    id;
-    public String f_name;
-    public String l_name;
-    public String address;
-    public String created_date;
+    public String firstName;
+    public String lastName;
+    public String picPath;
+    public Location address;
+    public String createdDate;
 
     public User() {
         this.id = 0;
-        this.f_name = null;
-        this.l_name = null;
-        this.address = null;
-        this.created_date = null;
+        this.firstName = null;
+        this.lastName = null;
+        this.address = new Location();
+        this.picPath = "";
+        this.createdDate = "";
     }
 }

@@ -25,9 +25,7 @@ public class CountryModel extends ImageTalkBaseModel{
                 Country country = new Country();
                 country.id = this.resultSet.getInt("id");
                 country.name =  this.resultSet.getString("name");
-                country.isoCode2  =this.resultSet.getString("iso_code_2");
-                country.isoCode2  =this.resultSet.getString("iso_code_3");
-
+                country.niceName =  this.resultSet.getString("nicename");
                 Byte typeByte = this.resultSet.getByte("status");
                 country.status =(typeByte.intValue()==1)?true:false;
                 countryList.add(country);

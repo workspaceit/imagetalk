@@ -1,6 +1,6 @@
 <%@ page import="controller.service.ImageTalkBaseController" %>
 <%@ page import="model.datamodel.Login" %>
-<%@ page import="model.LoginModel" %>
+<%@ page import="model.AdminLoginModel" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="model.UserInfModel" %>
 <%@ page import="model.datamodel.User" %>
@@ -15,9 +15,9 @@
 	}else{
 		response.sendRedirect("/admin/login");
 	}
-	LoginModel loginModel = new LoginModel();
+	AdminLoginModel adminLoginModel = new AdminLoginModel();
 	CountryModel countryModel = new CountryModel();
-	ArrayList<Login> loginList = loginModel.getAllTeamLead();
+	ArrayList<Login> loginList = adminLoginModel.getAllTeamLead();
 	ArrayList<Country> countries = countryModel.getAll();
 
 %>

@@ -1,6 +1,6 @@
 package controller.service;
 
-import model.LoginModel;
+import model.AdminLoginModel;
 import model.datamodel.Login;
 
 import javax.servlet.ServletException;
@@ -54,7 +54,7 @@ public class UserController extends HttpServlet {
         this.pw.close();
     }
     public void makeTeamLead(HttpServletRequest req){
-        LoginModel loginModel = new LoginModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
         if (!this.baseController.checkParam("login_id", req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Id required";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -62,7 +62,7 @@ public class UserController extends HttpServlet {
             return;
         }else{
             try{
-                loginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
+                adminLoginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
             }catch (NumberFormatException e){
                 this.baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
                 this.baseController.serviceResponse.responseStat.status = false;
@@ -70,7 +70,7 @@ public class UserController extends HttpServlet {
                 return;
             }
         }
-        if(!loginModel.updateTypeToTeamLead()){
+        if(!adminLoginModel.updateTypeToTeamLead()){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
@@ -82,7 +82,7 @@ public class UserController extends HttpServlet {
 
     }
     public void makeUser(HttpServletRequest req){
-        LoginModel loginModel = new LoginModel();
+        AdminLoginModel adminLoginModel = new AdminLoginModel();
         if (!this.baseController.checkParam("login_id",req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Id required";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -90,7 +90,7 @@ public class UserController extends HttpServlet {
             return;
         }else{
             try{
-                loginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
+                adminLoginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
             }catch (NumberFormatException e){
                 this.baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
                 this.baseController.serviceResponse.responseStat.status = false;
@@ -98,7 +98,7 @@ public class UserController extends HttpServlet {
                 return;
             }
         }
-        if(!loginModel.updateTypeToUser()){
+        if(!adminLoginModel.updateTypeToUser()){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());

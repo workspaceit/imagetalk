@@ -1,8 +1,6 @@
 <%@ page import="controller.service.ImageTalkBaseController" %>
 <%@ page import="model.datamodel.Login" %>
-<%@ page import="model.LoginModel" %>
-<%@ page import="model.TeamModel" %>
-<%@ page import="gps_socket.CentralSocketController" %>
+<%@ page import="model.AdminLoginModel" %>
 <%
   ImageTalkBaseController imageTalkBaseController = new ImageTalkBaseController();
   Login login = new Login();
@@ -11,10 +9,9 @@
   }else{
     response.sendRedirect("/admin/login");
   }
-  String gpsServerStatusStr = (CentralSocketController.serverSocket!=null)?"Server is live":"Server is close";
-  String divClass =  (CentralSocketController.serverSocket!=null)?"alert alert-success alert-dismissable":"alert alert-warning alert-dismissable";
-  String iconClass =  (CentralSocketController.serverSocket!=null)?"icon fa fa-check":"icon fa fa-warning";
-  String alert =  (CentralSocketController.serverSocket!=null)?"Live":"Close";
+  AdminLoginModel adminLoginModel = new AdminLoginModel();
+
+  int totalAdminUser  =  adminLoginModel.getCountOfAdminUser();
 
 %>
 <!DOCTYPE html>
@@ -33,13 +30,11 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        GPS
+        Dashboard
         <small>Pre-Alpha 1.0.0</small>
       </h1>
       <ol class="breadcrumb">
-        <li><a href="<%=imageTalkBaseController.getBaseUrl(request)+"admin"%>" ><i class="fa fa-dashboard active"></i> Dashboard</a></li>
-        <li   >GPS</li>
-        <li  class="active" >Status</li>
+        <li><a href="#"><i class="fa fa-dashboard active"></i> Dashboard</a></li>
       </ol>
     </section>
 
@@ -49,12 +44,25 @@
       <div class="row">
 
 
-        <div class="<%=divClass%>">
-          <h4>	<i class="<%=iconClass%>"></i><%=alert%></h4>
-          <%=gpsServerStatusStr%>
-        </div>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+          <div class="info-box">
+            <span class="info-box-icon bg-yellow"><i class="fa fa-fw fa-user"></i></span>
+            <div class="info-box-content">
+              <span class="info-box-text">Admin User</span>
+              <span class="info-box-number"><%=totalAdminUser%></span>
+            </div><!-- /.info-box-content -->
+          </div><!-- /.info-box -->
+        </div><!-- /.col -->
       </div><!-- /.row -->
-
+      <%--<div class="col-md-3 col-sm-6 col-xs-12">--%>
+        <%--<div class="info-box">--%>
+          <%--<span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>--%>
+          <%--<div class="info-box-content">--%>
+            <%--<span class="info-box-text">Team</span>--%>
+            <%--<span class="info-box-number">0</span>--%>
+          <%--</div><!-- /.info-box-content -->--%>
+        <%--</div><!-- /.info-box -->--%>
+      <%--</div><!-- /.col -->--%>
 
 
       <!-- Main row -->
@@ -62,7 +70,7 @@
     </section><!-- /.content -->
   </div><!-- /.content-wrapper -->
 
-  <%@include file="footer.jsp"%>
+ <%@include file="footer.jsp"%>
 
   <!-- Control Sidebar -->
   <!-- Add the sidebar's background. This div must be placed
