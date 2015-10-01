@@ -17,7 +17,7 @@ public class ImageTalkBaseModel {
     protected Connection con  = null;
     protected Statement  stmt = null;
 
-    protected String    query       = null;
+    private String    query       = null;
     public  ResultSet resultSet = null;
     public static String errorMsg = null;
     public ImageTalkBaseModel() {
@@ -29,20 +29,32 @@ public class ImageTalkBaseModel {
             ex.printStackTrace();
         }
     }
-
-    protected ResultSet getData(String sql) {
+    public void setQuery(String query){
+        this.query = query;
+    }
+    protected void getData() {
         this.dbConnectionRecheck();
         try {
-            this.query = sql;
             this.resultSet = stmt.executeQuery(this.query);
 
         } catch (SQLException ex) {
             ex.printStackTrace();
         }finally {
         }
-
-        return this.resultSet;
     }
+//    protected ResultSet getData(String sql) {
+//        this.dbConnectionRecheck();
+//        try {
+//            this.query = sql;
+//            this.resultSet = stmt.executeQuery(this.query);
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }finally {
+//        }
+//
+//        return this.resultSet;
+//    }
     public void dbConnectionRecheck(){
         if(this.con==null){
             try {

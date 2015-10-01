@@ -39,7 +39,23 @@
         <servlet-name>FileUploader</servlet-name>
         <url-pattern>/upload/*</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>Utility</servlet-name>
+        <servlet-class>controller.service.UtilityController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Utility</servlet-name>
+        <url-pattern>/utility/*</url-pattern>
+    </servlet-mapping>
 
+    <servlet>
+        <servlet-name>AppRegister</servlet-name>
+        <servlet-class>controller.service.Registration</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppRegister</servlet-name>
+        <url-pattern>/app/register/*</url-pattern>
+    </servlet-mapping>
 
 
     <servlet>

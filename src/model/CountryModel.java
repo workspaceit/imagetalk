@@ -17,17 +17,22 @@ public class CountryModel extends ImageTalkBaseModel{
     }
     public ArrayList<Country> getAll() {
         ArrayList<Country> countryList = new ArrayList<>();
-        String sql = "select * from "+this.tableName+" where status = 1";
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where status = 1";
+
+        this.setQuery(query);
+        this.getData();
 
         try {
             while (this.resultSet.next()) {
                 Country country = new Country();
                 country.id = this.resultSet.getInt("id");
+                country.iso = this.resultSet.getString("iso");
                 country.name =  this.resultSet.getString("name");
                 country.niceName =  this.resultSet.getString("nicename");
-                Byte typeByte = this.resultSet.getByte("status");
-                country.status =(typeByte.intValue()==1)?true:false;
+                country.iso3 = this.resultSet.getString("iso3");
+                country.phoneCode = this.resultSet.getInt("phonecode");
+                country.numcode = (this.resultSet.getObject("numcode")!=null)? this.resultSet.getInt("numcode") : 0;
+                country.status = (this.resultSet.getInt("status")==1)?true:false;
                 countryList.add(country);
             }
         } catch (SQLException e) {

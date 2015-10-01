@@ -26,8 +26,9 @@ public class UserInfModel extends ImageTalkBaseModel {
     }
 
     public ArrayList<User> getAll() {
-        this.query = "select * from " + super.tableName;
-        this.getData(this.query);
+        String query = "select * from " + super.tableName;
+        this.setQuery(query);
+        this.getData();
         ArrayList<User> userList = new ArrayList<User>();
 
         try {
@@ -45,14 +46,16 @@ public class UserInfModel extends ImageTalkBaseModel {
         return userList;
     }
     public ArrayList<User> getAllByKeyword(String keyword) {
-
+        String query="";
         if(keyword==null || keyword ==""){
-            this.query = "select * from " + super.tableName  +" where id !=  "+this.id;
+            query = "select * from " + super.tableName  +" where id !=  "+this.id;
         }else{
-            this.query = "select * from " + super.tableName+" where ( f_name like '%"+keyword+"%' or l_name like '%"+keyword+"%' )  and id !=  "+this.id;
+            query = "select * from " + super.tableName+" where ( f_name like '%"+keyword+"%' or l_name like '%"+keyword+"%' )  and id !=  "+this.id;
         }
+
+        this.setQuery(query);
         ArrayList<User> userList = new ArrayList<User>();
-        this.getData( this.query);
+        this.getData( );
         try {
             while (this.resultSet.next()) {
                 User user = new User();
@@ -71,9 +74,9 @@ public class UserInfModel extends ImageTalkBaseModel {
         return userList;
     }
     public ArrayList<Login> getAllUserLoginByKeyword(String keyword) {
-
+        String query = "";
         if(keyword==null || keyword ==""){
-            this.query = "select user_inf.id," +
+            query = "select user_inf.id," +
                     "user_inf.f_name," +
                     "user_inf.l_name," +
                     "user_inf.address," +
@@ -86,7 +89,7 @@ public class UserInfModel extends ImageTalkBaseModel {
                     "from " + super.tableName  +" join login on login.u_id = user_inf.id " +
                     "where user_inf.id !=  "+this.id;
         }else{
-            this.query =  "select user_inf.id," +
+            query =  "select user_inf.id," +
                     "user_inf.f_name," +
                     "user_inf.l_name," +
                     "user_inf.address," +
@@ -99,9 +102,10 @@ public class UserInfModel extends ImageTalkBaseModel {
                     "from " + super.tableName  +" join login on login.u_id = user_inf.id " +
                     " where ( f_name like '%"+keyword+"%' or l_name like '%"+keyword+"%' )  and user_inf.id !=  "+this.id;
         }
-        System.out.println(this.query);
+
         ArrayList<Login> loginList = new ArrayList<Login>();
-        this.getData( this.query);
+        this.setQuery(query);
+        this.getData( );
         try {
             while (this.resultSet.next()) {
                 User user = new User();
@@ -132,8 +136,10 @@ public class UserInfModel extends ImageTalkBaseModel {
         return loginList;
     }
     public User getById(int id) {
-        this.query ="select * from " + super.tableName+" where id="+id+" limit 1 ";
-        this.getData( this.query);
+        String query ="select * from " + super.tableName+" where id="+id+" limit 1 ";
+
+        this.setQuery(query);
+        this.getData();
         User user = new User();
 
         try {
@@ -163,7 +169,7 @@ public class UserInfModel extends ImageTalkBaseModel {
     }
     public Login getProfileInformation(int u_id){
         Login login = new Login();
-        String sql = "SELECT login.id as login_id,\n" +
+        String query = "SELECT login.id as login_id,\n" +
                         " login.email as email,\n" +
                         " login.type as user_type,\n" +
                         " login.u_id as u_id,\n" +
@@ -174,8 +180,8 @@ public class UserInfModel extends ImageTalkBaseModel {
                         " user_inf.created_date as user_c_date\n" +
                         " FROM `login`join user_inf on login.u_id = user_inf.id " +
                         " where user_inf.id = "+u_id+" limit 1";
-
-        this.getData(sql);
+        this.setQuery(query);
+        this.getData();
         try {
             while (this.resultSet.next()) {
                 login.id = this.resultSet.getInt("login_id");

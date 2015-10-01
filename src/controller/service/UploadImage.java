@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import helper.ImageHelper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -42,9 +43,8 @@ public class UploadImage extends HttpServlet {
         //processRequest(request, response);
 
         String s = request.getParameter("img");
-        System.out.println(s);
-        File file = new File("/home/mi/pic/a.jpg") ;
-        ImageIO.write(decodeToImage(s),"jpg",file);
+        ImageHelper.saveFile(s,null,1);
+        ImageHelper.saveFile(ImageHelper.decodeToImage(s),null,2);
     }
 
     private void writeBtesToFile(byte[] bytes, File file) {

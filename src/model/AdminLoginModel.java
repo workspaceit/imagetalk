@@ -27,8 +27,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         this.tableName = "admin_login";
     }
     public String getActivationCodeByEmail(String email) {
-        String sql = "select activation_code from "+this.tableName+" where email = '" + email + "' limit 1";
-        this.getData(sql);
+        String query = "select activation_code from "+this.tableName+" where email = '" + email + "' limit 1";
+        this.setQuery(query);
+        this.getData();
 
         try {
             while (this.resultSet.next()) {
@@ -42,8 +43,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return null;
     }
     public String getPasswordByEmail(String email) {
-        String sql = "select password from "+this.tableName+" where email = '" + email + "' limit 1";
-        this.getData(sql);
+        String query = "select password from "+this.tableName+" where email = '" + email + "' limit 1";
+        this.setQuery(query);
+        this.getData();
 
         try {
             while (this.resultSet.next()) {
@@ -57,9 +59,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return null;
     }
     public int getCount() {
-        String sql = "select count(id) as count from "+this.tableName+" ";
+        String query = "select count(id) as count from "+this.tableName+" ";
         int count = 0;
-        this.resultSet = this.getData(sql);
+        this.setQuery(query);
+        this.getData();
         try {
             while (this.resultSet.next()) {
                 count = this.resultSet.getInt("count");
@@ -72,9 +75,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return count;
     }
     public int getCountOfAdminUser() {
-        String sql = "select count(id) as count from "+this.tableName+" where type=1";
+        String query = "select count(id) as count from "+this.tableName+" where type=1";
         int count = 0;
-        this.resultSet = this.getData(sql);
+        this.setQuery(query);
+        this.getData();
         try {
             while (this.resultSet.next()) {
                 count = this.resultSet.getInt("count");
@@ -87,9 +91,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return count;
     }
     public Login getAllById(int id) {
-        String sql = "select id,email,password,u_id,access_token,type,created_date from "+this.tableName+" where id = " + id + " limit 1";
+        String query = "select id,email,password,u_id,access_token,type,created_date from "+this.tableName+" where id = " + id + " limit 1";
         Login login = new Login();
-        this.getData(sql);
+        this.setQuery(query);
+        this.getData();
         try {
             while (this.resultSet.next()) {
                 login.id = this.resultSet.getInt("id");
@@ -109,8 +114,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
     }
 
     public ArrayList<Login> getAllExceptMe(int u_id) {
-        String sql = "select * from "+this.tableName+" where u_id !="+u_id;
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where u_id !="+u_id;
+        this.setQuery(query);
+        this.getData();
         ArrayList<Login> loginsList = new ArrayList<Login>();
         try {
             while (this.resultSet.next()) {
@@ -137,8 +143,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
     }
     public ArrayList<Login> getAllTeamLead() {
-        String sql = "select * from "+this.tableName+" where type = 2";
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where type = 2";
+        this.setQuery(query);
+        this.getData();
         ArrayList<Login> loginsList = new ArrayList<Login>();
         try {
             while (this.resultSet.next()) {
@@ -165,8 +172,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
     }
     public boolean isValidLogin(String email, String password) {
-        String sql = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type > 1 limit 1";
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type > 1 limit 1";
+        this.setQuery(query);
+        this.getData();
 
         try {
             while (this.resultSet.next()) {
@@ -191,8 +199,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return false;
     }
     public boolean isValidAdminLogin(String email, String password) {
-        String sql = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type = 1 limit 1";
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type = 1 limit 1";
+        this.setQuery(query);
+        this.getData();
 
         try {
             while (this.resultSet.next()) {
@@ -217,8 +226,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return false;
     }
     public boolean isValidLoginByAccessToken(String accessToken) {
-        String sql = "select * from "+this.tableName+" where access_token = '" + accessToken + "' limit 1";
-        this.getData(sql);
+        String query = "select * from "+this.tableName+" where access_token = '" + accessToken + "' limit 1";
+        this.setQuery(query);
+        this.getData();
         try {
             while (this.resultSet.next()) {
                 this.login.id = this.resultSet.getInt("id");
@@ -241,9 +251,11 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return false;
     }
     public boolean isActive() {
-        String sql = "select active from "+this.tableName+" where id = " + this.login.id + " limit 1";
-        System.out.println(sql);
-        this.getData(sql);
+        String query = "select active from "+this.tableName+" where id = " + this.login.id + " limit 1";
+
+        this.setQuery(query);
+        this.getData();
+
         try {
             while (this.resultSet.next()) {
                 int active = this.resultSet.getInt("active");
@@ -262,8 +274,11 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return false;
     }
     public boolean isEmailExist(String email) {
-        String sql = "select email from "+this.tableName+" where email = '" + email + "'  limit 1";
-        this.getData(sql);
+        String query = "select email from "+this.tableName+" where email = '" + email + "'  limit 1";
+
+        this.setQuery(query);
+        this.getData();
+
         try {
             while (this.resultSet.next()) {
                 return true;
@@ -276,8 +291,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return false;
     }
     public boolean isTeamLead() {
-        String sql = "select id from "+this.tableName+" where id = "+this.id+" and type = 2 limit 1";
-        this.getData(sql);
+        String query = "select id from "+this.tableName+" where id = "+this.id+" and type = 2 limit 1";
+
+        this.getData();
+        this.setQuery(query);
 
         try {
             while (this.resultSet.next()) {
