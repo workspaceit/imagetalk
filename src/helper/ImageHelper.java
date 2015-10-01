@@ -26,14 +26,15 @@ public class ImageHelper {
             }
         }
     }
-   public static boolean saveFile(Object imgObj,String path,int uId){
+   public static String saveFile(Object imgObj,String path,int uId){
        if(path==null){
            path = "/home/mi/pic/";
        }
-
+       String fileName ="";
        try{
+           fileName = +System.nanoTime()+".jpg";
            createDirIfNotExist(path+uId);
-           path += uId+"/"+System.nanoTime()+".jpg";
+           path += uId+"/"+fileName;
            File file = new File(path);
 
            long startTime = System.nanoTime();
@@ -45,9 +46,9 @@ public class ImageHelper {
 
        }catch (Exception ex){
            System.out.println(ex);
-           return false;
+           return fileName;
        }
-       return true;
+       return fileName;
    }
 
     public static BufferedImage decodeToImage(String imageString)

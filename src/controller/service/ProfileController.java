@@ -81,7 +81,7 @@ public class ProfileController extends HttpServlet {
 
         UserInfModel userInfModel = new UserInfModel();
 
-        userInfModel.id = this.login.user.id;
+        userInfModel.setId(this.login.user.id);
 
         if (!this.baseController.checkParam("f_name",req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "First name required";
@@ -89,7 +89,7 @@ public class ProfileController extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }else{
-            userInfModel.f_name = req.getParameter("f_name").trim();
+            userInfModel.setF_name(req.getParameter("f_name").trim());
         }
         if (!this.baseController.checkParam("l_name",req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Last name required";
@@ -98,7 +98,7 @@ public class ProfileController extends HttpServlet {
             return;
         }
         else{
-            userInfModel.l_name = req.getParameter("l_name").trim();
+            userInfModel.setL_name(req.getParameter("l_name").trim());
         }
 
         if (!this.baseController.checkParam("address",req,true)) {
@@ -107,7 +107,7 @@ public class ProfileController extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }else{
-            userInfModel.address = req.getParameter("address").trim();
+            userInfModel.setAddress(req.getParameter("address").trim());
         }
 
         if(!userInfModel.update()){

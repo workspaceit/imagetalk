@@ -34,6 +34,24 @@ public class ActivationModel extends ImageTalkBaseModel{
 
         return false;
     }
+    public boolean isTokenValid(){
+        String query ="select * from " + super.tableName+" where phone_number='"+this.phone_number+"' and activation_code='" +this.activation_code+"' limit 1";
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                this.id  = this.resultSet.getInt("id");
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+        return false;
+    }
     public boolean assignToken(){
         int rand = (int)(Math.random()*9000)+1000;
         this.activation_code = String.valueOf(rand);
@@ -75,6 +93,13 @@ public class ActivationModel extends ImageTalkBaseModel{
     public boolean setActivationCode(String activation_code){
         this.activation_code =activation_code;
         return true;
+    }
+
+    public String getPhoneNumber(){
+        return this.phone_number;
+    }
+    public String getActivationCode(){
+        return this.activation_code;
     }
     public int getId(){
         return this.id;

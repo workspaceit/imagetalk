@@ -50,7 +50,7 @@
 
     <servlet>
         <servlet-name>AppRegister</servlet-name>
-        <servlet-class>controller.service.Registration</servlet-class>
+        <servlet-class>controller.service.AppUserRegistration</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AppRegister</servlet-name>

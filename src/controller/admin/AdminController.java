@@ -75,7 +75,7 @@ public class AdminController extends HttpServlet {
         UserInfModel userInfModel = new UserInfModel();
 
         if (this.baseController.checkParam("f_name",req,true)) {
-            userInfModel.f_name = req.getParameter("f_name");
+            userInfModel.setF_name(req.getParameter("f_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "First name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -84,7 +84,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("l_name",req,true)) {
-            userInfModel.l_name = req.getParameter("l_name");
+            userInfModel.setL_name(req.getParameter("l_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "Last name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -93,7 +93,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("address",req,true)) {
-            userInfModel.address = req.getParameter("address");
+            userInfModel.setAddress(req.getParameter("address"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "Address empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -199,7 +199,7 @@ public class AdminController extends HttpServlet {
         UserInfModel userInfModel = new UserInfModel();
 
         if (this.baseController.checkParam("f_name",req,true)) {
-            userInfModel.f_name = req.getParameter("f_name");
+            userInfModel.setF_name(req.getParameter("f_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "First name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -208,7 +208,7 @@ public class AdminController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("l_name",req,true)) {
-            userInfModel.l_name = req.getParameter("l_name");
+            userInfModel.setL_name(req.getParameter("l_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "Last name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -344,7 +344,7 @@ public class AdminController extends HttpServlet {
 
 
         adminLoginModel.login.id = login_id;
-        userInfModel.id = u_id;
+        userInfModel.setId(u_id);
 
 
         if(adminLoginModel.deleteById()<=0){

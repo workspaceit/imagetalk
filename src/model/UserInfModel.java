@@ -10,19 +10,75 @@ import java.util.ArrayList;
  * Created by mi on 8/20/15.
  */
 public class UserInfModel extends ImageTalkBaseModel {
-    public int    id;
-    public String f_name;
-    public String l_name;
-    public String address;
-    public String created_date;
+    private int    id;
+    private String f_name;
+    private String l_name;
+    private String address;
+    private String created_date;
+    private String picPath;
+
     public UserInfModel() {
         super.tableName = "user_inf";
 
         this.id = 0;
-        this.f_name = null;
-        this.l_name = null;
-        this.address = null;
-        this.created_date = null;
+        this.f_name = "";
+        this.l_name = "";
+        this.address = "";
+        this.created_date = "";
+        this.picPath = "";
+    }
+
+    public String getPicPath() {
+        return picPath;
+    }
+
+    public boolean setPicPath(String picPath) {
+        this.picPath = picPath;
+        return true;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean setId(int id) {
+        this.id = id;
+        return true;
+    }
+
+    public String getF_name() {
+        return f_name;
+    }
+
+    public boolean setF_name(String f_name) {
+        this.f_name = f_name;
+        return true;
+    }
+
+    public String getL_name() {
+        return l_name;
+    }
+
+    public boolean setL_name(String l_name) {
+        this.l_name = l_name;
+        return true;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getCreated_date() {
+        return created_date;
+    }
+
+    public boolean setCreated_date(String created_date) {
+        this.created_date = created_date;
+        return true;
     }
 
     public ArrayList<User> getAll() {
@@ -159,11 +215,18 @@ public class UserInfModel extends ImageTalkBaseModel {
         return user;
     }
     public int insertData() {
-        String query = "INSERT INTO " + tableName + " VALUES (null, '" + f_name + "', '" + l_name + "', '" + address + "', SYSDATE())";
-        return this.insertData(query);
+        String query = "INSERT INTO " + tableName + " (f_name,l_name) VALUES ('" + this.f_name + "', '" + this.l_name + "')";
+        this.id = this.insertData(query);
+        return  this.id;
     }
+
     public boolean update(){
         String query = "UPDATE " + this.tableName + " SET `f_name`='" + this.f_name + "',`l_name`='" + this.l_name + "',`address`='" + this.address + "' WHERE `id`="+this.id;
+
+        return this.updateData(query);
+    }
+    public boolean updatePicPath(){
+        String query = "UPDATE " + this.tableName + " SET `pic_path`='" + this.picPath + "' WHERE `id`="+this.id;
 
         return this.updateData(query);
     }

@@ -137,7 +137,7 @@ public class UserRegistrationController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("f_name",req,true)) {
-            this.userInfModel.f_name = req.getParameter("f_name");
+            this.userInfModel.setF_name(req.getParameter("f_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "First name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -146,7 +146,7 @@ public class UserRegistrationController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("l_name",req,true)) {
-            this.userInfModel.l_name = req.getParameter("l_name");
+            this.userInfModel.setL_name(req.getParameter("l_name"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "Last name empty";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -155,7 +155,7 @@ public class UserRegistrationController extends HttpServlet {
         }
 
         if (this.baseController.checkParam("address",req,true)) {
-            this.userInfModel.address = req.getParameter("address");
+            this.userInfModel.setAddress(req.getParameter("address"));
         } else {
             this.baseController.serviceResponse.responseStat.msg = "Address empty";
             this.baseController.serviceResponse.responseStat.status = false;
