@@ -26,6 +26,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         this.login = new Login();
         this.tableName = "admin_login";
     }
+
     public String getActivationCodeByEmail(String email) {
         String query = "select activation_code from "+this.tableName+" where email = '" + email + "' limit 1";
         this.setQuery(query);
@@ -42,6 +43,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return null;
     }
+
     public String getPasswordByEmail(String email) {
         String query = "select password from "+this.tableName+" where email = '" + email + "' limit 1";
         this.setQuery(query);
@@ -58,6 +60,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return null;
     }
+
     public int getCount() {
         String query = "select count(id) as count from "+this.tableName+" ";
         int count = 0;
@@ -74,6 +77,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return count;
     }
+
     public int getCountOfAdminUser() {
         String query = "select count(id) as count from "+this.tableName+" where type=1";
         int count = 0;
@@ -90,6 +94,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return count;
     }
+
     public Login getAllById(int id) {
         String query = "select id,email,password,u_id,access_token,type,created_date from "+this.tableName+" where id = " + id + " limit 1";
         Login login = new Login();
@@ -142,6 +147,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return loginsList;
 
     }
+
     public ArrayList<Login> getAllTeamLead() {
         String query = "select * from "+this.tableName+" where type = 2";
         this.setQuery(query);
@@ -171,6 +177,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         return loginsList;
 
     }
+
     public boolean isValidLogin(String email, String password) {
         String query = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type > 1 limit 1";
         this.setQuery(query);
@@ -198,6 +205,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return false;
     }
+
     public boolean isValidAdminLogin(String email, String password) {
         String query = "select * from "+this.tableName+" where email = '" + email + "' and password ='" + password + "' and type = 1 limit 1";
         this.setQuery(query);
@@ -225,6 +233,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return false;
     }
+
     public boolean isValidLoginByAccessToken(String accessToken) {
         String query = "select * from "+this.tableName+" where access_token = '" + accessToken + "' limit 1";
         this.setQuery(query);
@@ -250,6 +259,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return false;
     }
+
     public boolean isActive() {
         String query = "select active from "+this.tableName+" where id = " + this.login.id + " limit 1";
 
@@ -273,6 +283,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return false;
     }
+
     public boolean isEmailExist(String email) {
         String query = "select email from "+this.tableName+" where email = '" + email + "'  limit 1";
 
@@ -290,6 +301,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
         }
         return false;
     }
+
     public boolean isTeamLead() {
         String query = "select id from "+this.tableName+" where id = "+this.id+" and type = 2 limit 1";
 
@@ -309,6 +321,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return false;
     }
+
     public int insertData(int userId) {
         this.u_id = userId;
         Random ran = new Random();
@@ -323,6 +336,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 "VALUES ('" + this.email + "','" + this.password +"','" + this.u_id + "', md5('" + this.accessToken + "'),md5('" + this.activationCode + "')," + this.type +", SYSDATE())";
         return this.insertData(sql);
     }
+
     public boolean updatePassword(){
         // Need `login` object to perform oparation
         if(this.login.id<=0){
@@ -333,6 +347,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public boolean updateTypeToTeamLead(){
         // Need `login` object to perform oparation
         if(this.login.id<=0){
@@ -343,6 +358,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public boolean updateTypeToUser(){
         // Need `login` object to perform oparation
         if(this.login.id<=0){
@@ -353,6 +369,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public boolean updateActiveToActivated(){
         // Need `login` object to perform oparation
         if(this.login.activation_code==""){
@@ -363,6 +380,7 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public boolean updateActiveToDeactivated(){
         // Need `login` object to perform oparation
         if(this.login.activation_code==""){
@@ -373,10 +391,12 @@ public class AdminLoginModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public int deleteData(){
         String sql = "DELETE FROM " + this.tableName + " WHERE id = '"+ this.login.id +"'";
         return  this.deleteData(sql);
     }
+
     public int deleteById(){
         String sql = "DELETE FROM " + this.tableName + " WHERE id = '"+ this.login.id +"'";
         return  this.deleteData(sql);

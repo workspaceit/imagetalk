@@ -1,3 +1,9 @@
+/**
+ * Author           : Abu Bakar Siddique
+ * Email            : absiddique.live@gmail.com
+ * Created Date     : 8/21/15
+ */
+
 package controller.service;
 
 import model.AdminLoginModel;
@@ -19,13 +25,6 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Application Name : Cab Guard
- * Package Name     : controller.service
- * Author           : Abu Bakar Siddique
- * Email            : absiddique.live@gmail.com
- * Created Date     : 8/21/15
- */
 public class UserRegistrationController extends HttpServlet {
     private UserInfModel           userInfModel   = null;
     private AdminLoginModel adminLoginModel = null;
@@ -63,6 +62,7 @@ public class UserRegistrationController extends HttpServlet {
         }
         this.out.close();
     }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -77,6 +77,7 @@ public class UserRegistrationController extends HttpServlet {
         this.activateUserAccount(req);
         this.out.close();
     }
+
     private void activateUserAccount(HttpServletRequest req){
         String activation_code = req.getParameter("activation_code");
         System.out.println("activation_code "+activation_code);
@@ -90,10 +91,12 @@ public class UserRegistrationController extends HttpServlet {
         }
         this.out.print(resp);
     }
+
     @Override
     public void destroy() {
         super.destroy();
     }
+
     private void doRegistration(HttpServletRequest req){
 
         if (this.baseController.checkParam( "email",req, true)) {
@@ -211,6 +214,7 @@ public class UserRegistrationController extends HttpServlet {
         this.out.println(this.baseController.getResponse());
         return;
     }
+
     private boolean checkParam(HttpServletRequest req, String paramName) {
         boolean status = true;
 
@@ -222,6 +226,7 @@ public class UserRegistrationController extends HttpServlet {
 
         return status;
     }
+
     private boolean sendRegistrationMail(String email,String activationCode,String baseUrl){
         AdminLoginModel adminLoginModel = new AdminLoginModel();
 
