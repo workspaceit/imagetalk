@@ -14,6 +14,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>AppLogin</servlet-name>
+        <servlet-class>controller.service.AppLoginController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppLogin</servlet-name>
+        <url-pattern>/app/login/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>AdminLogin</servlet-name>
         <servlet-class>controller.admin.AdminLoginController</servlet-class>
     </servlet>
@@ -37,6 +46,14 @@
     <servlet-mapping>
         <servlet-name>FileUploader</servlet-name>
         <url-pattern>/upload/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>WallPost</servlet-name>
+        <servlet-class>controller.service.WallPostController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WallPost</servlet-name>
+        <url-pattern>/app/wallpost/*</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>Utility</servlet-name>
