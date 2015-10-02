@@ -192,7 +192,7 @@ public class AppUserRegistration extends HttpServlet {
 
          /*  transaction started */
 
-        userInfModel.startTransaction();
+      //  userInfModel.startTransaction();
         userInfModel.insertData();
         System.out.println("01");
         if(userInfModel.getId()==0){
@@ -201,7 +201,7 @@ public class AppUserRegistration extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }
-        appLoginCredentialModel.startTransaction();
+      //  appLoginCredentialModel.startTransaction();
         appLoginCredentialModel.setU_id(userInfModel.getId());
         appLoginCredentialModel.setPhone_number(activationModel.getPhoneNumber());
         if(appLoginCredentialModel.isNumberExist()){
@@ -253,8 +253,8 @@ public class AppUserRegistration extends HttpServlet {
         }
         /* Commit database transaction */
 
-        userInfModel.commitTransaction();
-        appLoginCredentialModel.commitTransaction();
+      //  userInfModel.commitTransaction();
+       // appLoginCredentialModel.commitTransaction();
 
 
         this.baseController.serviceResponse.responseStat.msg = "Registration success";
