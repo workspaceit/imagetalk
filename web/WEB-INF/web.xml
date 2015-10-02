@@ -140,7 +140,7 @@
 
    <servlet>
         <servlet-name>App User</servlet-name>
-       <jsp-file>/admin/adminuser_add.jsp</jsp-file>
+       <jsp-file>/admin/appUserView.jsp</jsp-file>
    </servlet>
 
    <servlet-mapping>
