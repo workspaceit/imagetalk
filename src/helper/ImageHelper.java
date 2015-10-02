@@ -11,8 +11,8 @@ import java.io.*;
  * Created by mi on 10/1/15.
  */
 public class ImageHelper {
-    public static
-    void createDirIfNotExist(String path){
+    private  static String GLOBAL_PATH = "/home/mi/pic/";
+    public static void createDirIfNotExist(String path){
         File theDir = new File(path);
 
 // if the directory does not exist, create it
@@ -50,6 +50,34 @@ public class ImageHelper {
        }
        return fileName;
    }
+    public static String saveProfilePicture(Object imgObj,int uId){
+        String path = GLOBAL_PATH;
+        String fileName ="";
+        try{
+            fileName = +System.nanoTime()+".jpg";
+            path +=uId;
+            createDirIfNotExist(path);
+            path +="/profile";
+            createDirIfNotExist(path);
+            path +="/"+fileName;
+            System.out.println(path);
+            File file = new File(path);
+
+            long startTime = System.nanoTime();
+            if(imgObj.getClass().equals(BufferedImage.class) ){
+                ImageIO.write((BufferedImage)imgObj,"jpg",file);
+            }else if(imgObj.getClass().equals(String.class)){
+                ImageIO.write(decodeToImage((String)imgObj),"jpg",file);
+            }
+
+            fileName = uId+"/profile/"+fileName;
+
+        }catch (Exception ex){
+            System.out.println(ex);
+            return fileName;
+        }
+        return fileName;
+    }
 
     public static BufferedImage decodeToImage(String imageString)
     {

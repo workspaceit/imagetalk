@@ -42,6 +42,12 @@ public class SearchController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
+        if(!this.baseController.isAppSessionValid(this.req)){
+            this.pw.print(this.baseController.getResponse());
+            this.pw.close();
+            return;
+        }
+
         switch (url) {
             case "/app/search/user/fortag":
                 this.getUserForTag();
@@ -53,15 +59,14 @@ public class SearchController extends HttpServlet {
     }
     private void getUserForTag(){
 
-
         String keyword="";
         if(this.baseController.checkParam("keyword", this.req, true)) {
             keyword = this.req.getParameter("keyword").trim();
-            return;
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        ArrayList<AuthCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
+        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+        ArrayList<AppCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
 
         if(this.baseController.checkParam("limit", this.req, true)) {
             try{
@@ -73,11 +78,16 @@ public class SearchController extends HttpServlet {
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
-
-            return;
         }
-        if(this.baseController.checkParam("offset", this.req, true)) {
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
             try{
+
                 appLoginCredentialModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
@@ -86,16 +96,16 @@ public class SearchController extends HttpServlet {
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
-
-
-            return;
         }
         if(appCredentialsList.size()==0){
             this.baseController.serviceResponse.responseStat.msg = "No record found";
             this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
         }
 
         this.baseController.serviceResponse.responseData = appCredentialsList;
         this.pw.print(this.baseController.getResponse());
+        return;
     }
 }

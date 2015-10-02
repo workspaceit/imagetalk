@@ -53,13 +53,13 @@ public class AppLoginController extends HttpServlet {
 
         switch (url) {
 
-            case "/login/authenticate/accesstoken":
+            case "/app/login/authenticate/accesstoken":
                 this.loginByAccessToken(req, res);
                 break;
-            case "/login/sendpassword":
+            case "/app/login/sendpassword":
                 this.forgetPasword(req, res);
                 break;
-            case "/login/test_session":
+            case "/app/login/test_session":
                 this.testSession(req, res);
                 break;
             default:

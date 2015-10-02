@@ -189,15 +189,19 @@ public class AppUserRegistration extends HttpServlet {
 
         userInfModel.setF_name(this.req.getParameter("first_name"));
         userInfModel.setL_name(this.req.getParameter("last_name"));
-        userInfModel.insertData();
 
+         /*  transaction started */
+
+        userInfModel.startTransaction();
+        userInfModel.insertData();
+        System.out.println("01");
         if(userInfModel.getId()==0){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
-
+        appLoginCredentialModel.startTransaction();
         appLoginCredentialModel.setU_id(userInfModel.getId());
         appLoginCredentialModel.setPhone_number(activationModel.getPhoneNumber());
         if(appLoginCredentialModel.isNumberExist()){
@@ -206,10 +210,13 @@ public class AppUserRegistration extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }
+         /*  transaction started */
+
 
         appLoginCredentialModel.insert();
-
+        System.out.println("02");
         if(appLoginCredentialModel.getId()==0){
+            userInfModel.rollBack();
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
@@ -217,10 +224,14 @@ public class AppUserRegistration extends HttpServlet {
         }
         if(this.baseController.checkParam("photo",this.req,true)) {
             imgBase64 = this.req.getParameter("photo");
-            String fileName = ImageHelper.saveFile(imgBase64,null,userInfModel.getId());
-            if(fileName == ""){
+            String fileName = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
+            if(fileName==null || fileName == ""){
 
-                // Need roll back
+                 /* All transaction rollback */
+
+                userInfModel.rollBack();
+                appLoginCredentialModel.rollBack();
+
                 this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.pw.print(this.baseController.getResponse());
@@ -229,15 +240,21 @@ public class AppUserRegistration extends HttpServlet {
 
             userInfModel.setPicPath(fileName);
             if(!userInfModel.updatePicPath()){
+                /* All transaction rollback */
+
+                userInfModel.rollBack();
+                appLoginCredentialModel.rollBack();
+
                 this.baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
         }
+        /* Commit database transaction */
 
-
-
+        userInfModel.commitTransaction();
+        appLoginCredentialModel.commitTransaction();
 
 
         this.baseController.serviceResponse.responseStat.msg = "Registration success";

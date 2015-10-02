@@ -16,7 +16,7 @@ public class ImageTalkBaseModel {
 
     protected Connection con  = null;
     protected Statement  stmt = null;
-
+    protected boolean autoCommit = true;
     private String    query       = null;
     public  ResultSet resultSet = null;
     public static String errorMsg = null;
@@ -27,6 +27,35 @@ public class ImageTalkBaseModel {
             stmt = con.createStatement();
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public void startTransaction(){
+        this.dbConnectionRecheck();
+        try {
+            this.con.setAutoCommit(false);
+            autoCommit = false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void commitTransaction(){
+        try {
+            this.con.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+    }
+    public void rollBack(){
+        try {
+            this.autoCommit = true;
+            this.con.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
         }
     }
     public void setQuery(String query){
@@ -56,10 +85,12 @@ public class ImageTalkBaseModel {
 //        return this.resultSet;
 //    }
     public void dbConnectionRecheck(){
-        if(this.con==null){
+
             try {
-                Class.forName(DBDriver);
-                this.con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+                if(this.con==null) {
+                    Class.forName(DBDriver);
+                    this.con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+                }
                 if(this.stmt==null){
                     this.stmt = this.con.createStatement();
                 }
@@ -68,7 +99,7 @@ public class ImageTalkBaseModel {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }
+
     }
     protected int insertData(String query) {
         this.dbConnectionRecheck();
@@ -88,8 +119,6 @@ public class ImageTalkBaseModel {
         }finally {
             this.closeConnection();
         }
-
-
         return id;
     }
     protected boolean updateData(String query) {
@@ -113,6 +142,12 @@ public class ImageTalkBaseModel {
         return  0;
     }
     public void closeConnection(){
+        if(!autoCommit) {
+            System.out.println("Auto Commit False Connection is open ");
+            System.out.print(this.con);
+            System.out.println(" ");
+            return;
+        }
         try {
 
             if(this.resultSet!=null) {
@@ -124,7 +159,9 @@ public class ImageTalkBaseModel {
             }
             if(this.con!=null) {
                 this.con.close();
-                this.con =null;
+                System.out.println("Connection is closed ");
+                System.out.print(this.con);
+                System.out.println(" ");
             }
 
         } catch (SQLException e) {
