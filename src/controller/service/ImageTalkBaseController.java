@@ -12,12 +12,14 @@ import javax.servlet.http.HttpSession;
  */
 public class ImageTalkBaseController {
     public ServiceResponse serviceResponse = null;
+    public AppCredential appCredential;
     private Gson gson            = null;
 
 
     public ImageTalkBaseController() {
         this.gson = new Gson();
         this.serviceResponse = new ServiceResponse();
+        this.appCredential = new AppCredential();
     }
 
     public String getResponse() {
@@ -28,6 +30,12 @@ public class ImageTalkBaseController {
         this.serviceResponse = new ServiceResponse();
     }
     public Login getUserLoginFromSession(HttpServletRequest req){
+        Login login = new Login();
+        HttpSession session = req.getSession();
+        login = (Login)session.getAttribute("userSession");
+        return login;
+    }
+    public Login getAppCredentialFromSession(HttpServletRequest req){
         Login login = new Login();
         HttpSession session = req.getSession();
         login = (Login)session.getAttribute("userSession");
@@ -46,11 +54,10 @@ public class ImageTalkBaseController {
         return true;
     }
     public boolean isAppSessionValid(HttpServletRequest req){
-        AppCredential appCredential = new AppCredential();
         HttpSession session = req.getSession();
-        appCredential = (AppCredential)session.getAttribute("userSession");
+        this.appCredential = (AppCredential)session.getAttribute("userSession");
 
-        if(appCredential==null){
+        if(appCredential==null ||  this.appCredential.id==0){
             this.serviceResponse.responseStat.msg ="Your session expired";
             this.serviceResponse.responseStat.status =false;
             return false;

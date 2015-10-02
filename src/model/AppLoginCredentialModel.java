@@ -1,5 +1,6 @@
 package model;
 
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.OperAppCredential;
 
@@ -140,6 +141,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
     public AuthCredential getAuthincatedByAccessToken() {
         AuthCredential authCredential = new AuthCredential();
+
         String query = "select user_inf.id as user_inf_id," +
                        " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                        " location.id as location_id,location.lat,location.lon,location.formatted_address,location.country,location.created_date as location_c_date," +
@@ -147,7 +149,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                        " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                        " join user_inf on user_inf.id = app_login_credential.u_id  " +
                        " left join location on location.id = user_inf.address_id " +
-                       " where app_login_credential.id=" + this.id + " and app_login_credential.access_token = '" + this.access_token + "' limit 1";
+                       " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
+        System.out.println(query);
 
         this.setQuery(query);
         this.getData();
@@ -243,43 +246,43 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         return authCredential;
     }
 
-    public ArrayList<AuthCredential> getAppCredentialByKeyword(String keyword) {
-        ArrayList<AuthCredential> authCredentialList = new ArrayList<AuthCredential>();
+    public ArrayList<AppCredential> getAppCredentialByKeyword(String keyword) {
+        ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
         String query = "select user_inf.id as user_inf_id," +
                        " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                        " location.id as location_id,location.lat,location.lon,location.formatted_address,location.country,location.created_date as location_c_date," +
                        " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                        " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                        " join user_inf on user_inf.id = app_login_credential.u_id  " +
-                       " left join location on location.id = user_inf.address_id ";
+                       " left join location on location.id = user_inf.address_id " +
+                       " where app_login_credential.id !=" + this.id;
 
         if (keyword != null && keyword != "") {
-            query += " where user_inf.f_name like '%" + keyword + "%'";
+            query += " and user_inf.f_name like '%" + keyword + "%'";
         }
         System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
             while (this.resultSet.next()) {
-                AuthCredential authCredential = new AuthCredential();
-                authCredential.id = this.resultSet.getInt("app_login_credential_id");
-                authCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
-                authCredential.accessToken = this.resultSet.getString("access_token");
-                authCredential.phoneNumber = this.resultSet.getString("phone_number");
-                authCredential.user.id = this.resultSet.getInt("user_inf_id");
-                authCredential.user.firstName = this.resultSet.getString("f_name");
-                authCredential.user.lastName = this.resultSet.getString("l_name");
-                authCredential.user.picPath = this.resultSet.getString("pic_path");
-                authCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+                AppCredential appCredential = new AppCredential();
+                appCredential.id = this.resultSet.getInt("app_login_credential_id");
+                appCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                appCredential.phoneNumber = this.resultSet.getString("phone_number");
+                appCredential.user.id = this.resultSet.getInt("user_inf_id");
+                appCredential.user.firstName = this.resultSet.getString("f_name");
+                appCredential.user.lastName = this.resultSet.getString("l_name");
+                appCredential.user.picPath = this.resultSet.getString("pic_path");
+                appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
 
-                authCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
-                authCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
-                authCredential.user.address.lon = (this.resultSet.getObject("lon") == null) ? 0 : this.resultSet.getDouble("lon");
-                authCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
-                authCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
-                authCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+                appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                appCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                appCredential.user.address.lon = (this.resultSet.getObject("lon") == null) ? 0 : this.resultSet.getDouble("lon");
+                appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                appCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
-                authCredentialList.add(authCredential);
+                appCredentialList.add(appCredential);
 
             }
         } catch (SQLException e) {
@@ -288,7 +291,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
 
-        return authCredentialList;
+        return appCredentialList;
     }
 
     public int insert() {
