@@ -60,9 +60,9 @@
                                 <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Type</th>
-                                    <th>Action</th>
+                                    <th>Phone</th>
+                                    <th>Banned</th>
+                                    <th>Active</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -76,10 +76,13 @@
                                         <%=appUserData.user.firstName + " " + appUserData.user.lastName%>
                                     </td>
                                     <td>
-                                        <%= (appUserData.banned) ? "Banned" : "Not Banned" %>
+                                        <%=appUserData.phoneNumber%>
                                     </td>
                                     <td>
-                                        <%= (appUserData.active) ? "Active" : "Inactive" %>
+                                        <%=(appUserData.banned) ? "Banned" : "Not Banned"%>
+                                    </td>
+                                    <td>
+                                        <%=(appUserData.active) ? "Active" : "Inactive"%>
                                     </td>
                                 </tr>
 
