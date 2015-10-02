@@ -114,8 +114,14 @@
         <url-pattern>/admin/admin_user/add</url-pattern>
     </servlet-mapping>
 
-
-
+    <servlet>
+        <servlet-name>App User</servlet-name>
+        <jsp-file>/admin/adminuser_add.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>App User</servlet-name>
+        <url-pattern>/admin/app/user</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>
