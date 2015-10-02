@@ -89,7 +89,7 @@
 <script>
   function doLogout(){
 
-    var url = $("#base_url").val()+"login/admin/logout";
+    var url = $("#base_url").val()+"admin/logout";
     $.ajax({
       url: url,
       method: "POST",

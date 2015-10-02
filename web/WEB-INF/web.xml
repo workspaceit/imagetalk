@@ -14,21 +14,20 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>Login</servlet-name>
-        <servlet-class>controller.service.LoginController</servlet-class>
+        <servlet-name>AdminLogin</servlet-name>
+        <servlet-class>controller.admin.AdminLoginController</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Login</servlet-name>
-        <url-pattern>/login/*</url-pattern>
+        <servlet-name>AdminLogin</servlet-name>
+        <url-pattern>/admin/authenticate</url-pattern>
     </servlet-mapping>
-
     <servlet>
-        <servlet-name>Profile</servlet-name>
-        <servlet-class>controller.service.ProfileController</servlet-class>
+        <servlet-name>AdminLogout</servlet-name>
+        <servlet-class>controller.admin.AdminLoginController</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Profile</servlet-name>
-        <url-pattern>/profile/*</url-pattern>
+        <servlet-name>AdminLogout</servlet-name>
+        <url-pattern>/admin/logout</url-pattern>
     </servlet-mapping>
 
     <servlet>
@@ -57,6 +56,14 @@
         <url-pattern>/app/register/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>SearchUser</servlet-name>
+        <servlet-class>controller.service.SearchController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SearchUser</servlet-name>
+        <url-pattern>/app/search/*</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>Admin_User</servlet-name>
@@ -114,14 +121,17 @@
         <url-pattern>/admin/admin_user/add</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+   <servlet>
         <servlet-name>App User</servlet-name>
-        <jsp-file>/admin/adminuser_add.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>App User</servlet-name>
-        <url-pattern>/admin/app/user</url-pattern>
-    </servlet-mapping>
+       <jsp-file>/admin/adminuser_add.jsp</jsp-file>
+   </servlet>
+
+   <servlet-mapping>
+       <servlet-name>App User</servlet-name>
+       <url-pattern>/admin/app/user</url-pattern>
+   </servlet-mapping>
+
+
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>

@@ -60,7 +60,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel{
     }
 
     public boolean setText_status(String text_status) {
-        this.text_status = text_status;
+        this.text_status = text_status.trim();
         return true;
     }
 
@@ -69,7 +69,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel{
     }
 
     public boolean setPhone_number(String phone_number) {
-        this.phone_number = phone_number;
+        this.phone_number = phone_number.trim();
         return true;
     }
 
@@ -78,7 +78,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel{
     }
 
     public boolean setAccess_token(String access_token) {
-        this.access_token = access_token;
+        this.access_token = access_token.trim();
         return true;
     }
 
@@ -105,7 +105,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel{
     }
 
     public boolean setCreated_date(String created_date) {
-        this.created_date = created_date;
+        this.created_date = created_date.trim();
         return true;
     }
     public boolean isNumberExist(){

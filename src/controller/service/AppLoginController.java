@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
-public class LoginController extends HttpServlet {
+public class AppLoginController extends HttpServlet {
     ImageTalkBaseController baseController;
     PrintWriter pw;
     @Override

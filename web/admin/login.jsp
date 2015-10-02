@@ -87,7 +87,7 @@
 		var email =$("#exampleInputEmail").val();
 		var password = $("#exampleInputPassword").val()	;
 		var url = "";
-		url = "/login/admin/authenticate";
+		url = "/admin/authenticate";
 		enablDisableAll(false);
 		$.ajax({
 			url: url,
