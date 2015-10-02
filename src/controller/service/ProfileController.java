@@ -2,7 +2,7 @@ package controller.service;
 
 import model.AdminLoginModel;
 import model.UserInfModel;
-import model.datamodel.Login;
+import model.datamodel.app.Login;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

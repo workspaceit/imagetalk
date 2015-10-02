@@ -5,7 +5,7 @@ package controller.service;
  */
 
 import model.AdminLoginModel;
-import model.datamodel.Login;
+import model.datamodel.app.Login;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;

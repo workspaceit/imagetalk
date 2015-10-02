@@ -4,7 +4,6 @@ import helper.ImageHelper;
 import model.ActivationModel;
 import model.AppLoginCredentialModel;
 import model.UserInfModel;
-import model.datamodel.Login;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

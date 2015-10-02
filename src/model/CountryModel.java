@@ -1,7 +1,6 @@
 package model;
 
-import model.datamodel.Country;
-import model.datamodel.Login;
+import model.datamodel.app.Country;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

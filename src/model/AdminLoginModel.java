@@ -1,6 +1,6 @@
 package model;
 
-import model.datamodel.Login;
+import model.datamodel.app.Login;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -1,5 +1,5 @@
 <%@ page import="controller.service.ImageTalkBaseController" %>
-<%@ page import="model.datamodel.Login" %>
+<%@ page import="model.datamodel.app.Login" %>
 <%@ page import="model.AdminLoginModel" %>
 <%
   ImageTalkBaseController imageTalkBaseController = new ImageTalkBaseController();

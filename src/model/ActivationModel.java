@@ -1,7 +1,5 @@
 package model;
 
-import model.datamodel.User;
-
 import java.sql.SQLException;
 
 /**

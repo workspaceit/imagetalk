@@ -1,4 +1,4 @@
-package model.datamodel;
+package model.datamodel.app;
 
 /**
  * Created by mi on 10/1/15.

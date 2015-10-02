@@ -1,7 +1,6 @@
 package model;
 
-import model.datamodel.AppCredential;
-import model.datamodel.AuthCredential;
+import model.datamodel.app.AuthCredential;
 
 import java.sql.SQLException;
 

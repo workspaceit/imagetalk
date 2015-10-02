@@ -1,7 +1,7 @@
 package controller.service;
 
 import com.google.gson.Gson;
-import model.datamodel.Login;
+import model.datamodel.app.Login;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

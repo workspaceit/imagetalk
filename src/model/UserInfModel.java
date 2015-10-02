@@ -1,7 +1,7 @@
 package model;
 
-import model.datamodel.Login;
-import model.datamodel.User;
+import model.datamodel.app.Login;
+import model.datamodel.app.User;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
