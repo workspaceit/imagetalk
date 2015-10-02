@@ -1,6 +1,7 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.Login;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +45,18 @@ public class ImageTalkBaseController {
         }
         return true;
     }
+    public boolean isAppSessionValid(HttpServletRequest req){
+        AppCredential appCredential = new AppCredential();
+        HttpSession session = req.getSession();
+        appCredential = (AppCredential)session.getAttribute("userSession");
+
+        if(appCredential==null){
+            this.serviceResponse.responseStat.msg ="Your session expired";
+            this.serviceResponse.responseStat.status =false;
+            return false;
+        }
+        return true;
+    }
     public boolean checkParam(String param,HttpServletRequest req,boolean emptyVal){
         if(emptyVal && req.getParameter(param) == null || req.getParameter(param).trim() == ""){
             return false;
@@ -53,9 +66,13 @@ public class ImageTalkBaseController {
         }
         return true;
     }
-    public void setSession(HttpServletRequest req,Login login){
+    public void setAdminSession(HttpServletRequest req,Login login){
         HttpSession session = req.getSession();
         session.setAttribute("userSession",login);
+    }
+    public void setAppSession(HttpServletRequest req,AppCredential appCredential){
+        HttpSession session = req.getSession();
+        session.setAttribute("userSession",appCredential);
     }
     public void removeSession(HttpServletRequest req){
         HttpSession session = req.getSession();

@@ -5,6 +5,8 @@ package controller.service;
  */
 
 import model.AdminLoginModel;
+import model.AppLoginCredentialModel;
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.Login;
 
 import javax.mail.Message;
@@ -50,23 +52,15 @@ public class AppLoginController extends HttpServlet {
         }
 
         switch (url) {
-            case "/login/authenticate":
-                this.loginByEmailAndPassword(req,res);
-                break;
+
             case "/login/authenticate/accesstoken":
-                this.loginByAccessToken(req,res);
+                this.loginByAccessToken(req, res);
                 break;
             case "/login/sendpassword":
-                this.forgetPasword(req,res);
+                this.forgetPasword(req, res);
                 break;
             case "/login/test_session":
                 this.testSession(req, res);
-                break;
-            case "/login/admin/authenticate":
-                this.adminLoginByEmailAndPassword(req, res);
-                break;
-            case "/login/admin/logout":
-                this.adminLogout(req);
                 break;
             default:
                 break;
@@ -86,75 +80,22 @@ public class AppLoginController extends HttpServlet {
         this.pw.print(this.baseController.getResponse());
 
     }
-    private void loginByEmailAndPassword(HttpServletRequest req,HttpServletResponse res)
-            throws ServletException,IOException
-    {
 
 
-
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
-
-        AdminLoginModel adminLoginModel = new AdminLoginModel();
-        if(adminLoginModel.isValidLogin(email,password)){
-
-            LoginRespose loginResponse = new LoginRespose();
-            if(!adminLoginModel.isActive()){
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
-                this.pw.print(this.baseController.getResponse());
-                return;
-            }
-            loginResponse.login = adminLoginModel.login;
-
-            this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req, adminLoginModel.login);
-
-            System.out.println("AUTH DONE");
-        }else{
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Email or password is wrong";
-        }
-
-        this.pw.print(this.baseController.getResponse());
-    }
-    private void adminLoginByEmailAndPassword(HttpServletRequest req,HttpServletResponse res)
-            throws ServletException,IOException
-    {
-
-
-
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
-
-        AdminLoginModel adminLoginModel = new AdminLoginModel();
-        if(adminLoginModel.isValidAdminLogin(email, password)){
-            LoginRespose loginResponse = new LoginRespose();
-
-            loginResponse.login = adminLoginModel.login;
-            this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req, adminLoginModel.login);
-            this.baseController.serviceResponse.responseStat.msg = "Successfull login";
-        }else{
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Email or password is wrong";
-        }
-
-        this.pw.print(this.baseController.getResponse());
-    }
     private void loginByAccessToken(HttpServletRequest req,HttpServletResponse res)
             throws ServletException,IOException
     {
 
         String accessToken = req.getParameter("access_token");
-        AdminLoginModel adminLoginModel = new AdminLoginModel();
 
-        if(adminLoginModel.isValidLoginByAccessToken(accessToken)){
 
-            LoginRespose loginResponse = new LoginRespose();
-            loginResponse.login = adminLoginModel.login;
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setAccess_token(accessToken);
+        AppCredential appCredential = appLoginCredentialModel.getAuthincatedByAccessToken();
+        if(appCredential.id>0){
+            appLoginCredentialModel.setId(appCredential.id);
 
-            if(!adminLoginModel.isActive()){
+            if(!appLoginCredentialModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
                 this.pw.print(this.baseController.getResponse());
@@ -162,8 +103,8 @@ public class AppLoginController extends HttpServlet {
             }
 
 
-            this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req, adminLoginModel.login);
+            this.baseController.serviceResponse.responseData = appCredential;
+            this.baseController.setAppSession(req, appCredential);
         }else{
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Access token is wrong";

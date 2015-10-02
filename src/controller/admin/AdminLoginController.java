@@ -80,7 +80,7 @@ public class AdminLoginController extends HttpServlet {
 
             loginResponse.login = adminLoginModel.login;
             this.baseController.serviceResponse.responseData = loginResponse;
-            this.baseController.setSession(req, adminLoginModel.login);
+            this.baseController.setAdminSession(req, adminLoginModel.login);
             this.baseController.serviceResponse.responseStat.msg = "Successfull login";
         }else{
             this.baseController.serviceResponse.responseStat.status = false;
