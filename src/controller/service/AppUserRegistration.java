@@ -50,6 +50,9 @@ public class AppUserRegistration extends HttpServlet {
             case "/app/register/verifytoken":
                 this.verifyToken();
                 break;
+            case "/app/register/test":
+                this.test();
+                break;
             default:
                 break;
         }
@@ -130,6 +133,14 @@ public class AppUserRegistration extends HttpServlet {
         this.baseController.serviceResponse.responseStat.msg = "Phone number is verified";
         this.pw.print(this.baseController.getResponse());
         return;
+    }
+    private void test(){
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+
+        this.baseController.serviceResponse.responseStat.msg = "";
+        this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialByKeyword("");
+        this.pw.print(this.baseController.getResponse());
     }
     private void registerUser(){
 

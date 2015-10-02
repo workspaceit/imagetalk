@@ -15,11 +15,13 @@ public class Location {
     public double lon;
     public String formattedAddress;
     public String countryName;
+    public String createdDate;
     public Location(){
         this.id = 0;
         this.lat = 0;
         this.lon = 0;
         this.formattedAddress = "";
         this.countryName = "";
+        this.createdDate = "";
     }
 }
