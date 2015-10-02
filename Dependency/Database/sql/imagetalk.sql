@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 01, 2015 at 04:04 PM
+-- Generation Time: Oct 02, 2015 at 11:05 AM
 -- Server version: 5.5.44-0ubuntu0.14.04.1
 -- PHP Version: 5.5.9-1ubuntu4.11
 
@@ -80,14 +80,21 @@ INSERT INTO `admin_login` (`id`, `email`, `password`, `u_id`, `active`, `access_
 CREATE TABLE IF NOT EXISTS `app_login_credential` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `u_id` int(11) NOT NULL,
-  `text_status` text NOT NULL,
+  `text_status` text,
   `phone_number` varchar(50) NOT NULL,
-  `access_token` int(11) NOT NULL,
-  `active` int(11) NOT NULL,
-  `baned` tinyint(1) NOT NULL,
+  `access_token` varchar(100) NOT NULL,
+  `active` tinyint(11) NOT NULL,
+  `banned` tinyint(1) NOT NULL,
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `app_login_credential`
+--
+
+INSERT INTO `app_login_credential` (`id`, `u_id`, `text_status`, `phone_number`, `access_token`, `active`, `banned`, `created_date`) VALUES
+(1, 1, NULL, '12345678', 'f21222a011db065b5436841ae452058c', 1, 0, '2015-10-01 13:39:35');
 
 -- --------------------------------------------------------
 
@@ -486,19 +493,18 @@ CREATE TABLE IF NOT EXISTS `user_inf` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `f_name` varchar(50) NOT NULL,
   `l_name` varchar(50) NOT NULL,
-  `pic_path` varchar(500) NOT NULL,
-  `address_id` int(11) NOT NULL,
+  `pic_path` varchar(500) DEFAULT NULL,
+  `address_id` int(11) DEFAULT NULL,
   `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `user_inf`
 --
 
 INSERT INTO `user_inf` (`id`, `f_name`, `l_name`, `pic_path`, `address_id`, `created_date`) VALUES
-(1, 'Developer', 'Wsit', '', 0, '2015-09-20 09:28:17'),
-(8, 'asd', 'asd', '', 0, '2015-09-30 10:08:26');
+(1, 'image', 'talk', '24677050902961.jpg', NULL, '2015-10-01 13:39:35');
 
 -- --------------------------------------------------------
 
