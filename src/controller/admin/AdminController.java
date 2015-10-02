@@ -21,10 +21,12 @@ public class AdminController extends HttpServlet {
     Login login;
     ImageTalkBaseController baseController;
     PrintWriter pw;
+
     @Override
     public void init() throws ServletException {
         super.init();
     }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
@@ -191,6 +193,7 @@ public class AdminController extends HttpServlet {
         this.pw.println(this.baseController.getResponse());
         return;
     }
+
     public void addAdminUser(HttpServletRequest req, HttpServletResponse resp){
         resp.setContentType("application/json");
 
@@ -302,7 +305,6 @@ public class AdminController extends HttpServlet {
         this.pw.println(this.baseController.getResponse());
         return;
     }
-
 
     private void deleteAdminUser(HttpServletRequest req){
         int u_id=0;

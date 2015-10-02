@@ -28,11 +28,11 @@
           <i class="fa fa-angle-left pull-right"></i>
         </a>
         <ul class="treeview-menu">
-          <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> All member</a></li>
+          <li><a href="<%=baseUrl%>admin/app/user"><i class="fa fa-circle-o"></i> All member</a></li>
           <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Add new user</a></li>
 
           <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Active user</a></li>
-          <li><a href="javascript:void(0)>"><i class="fa fa-circle-o"></i> Add new user</a></li>
+          <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Add new user</a></li>
           <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Inactive user</a></li>
           <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Banned user</a></li>
         </ul>

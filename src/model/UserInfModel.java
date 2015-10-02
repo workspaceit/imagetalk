@@ -101,6 +101,7 @@ public class UserInfModel extends ImageTalkBaseModel {
         }
         return userList;
     }
+
     public ArrayList<User> getAllByKeyword(String keyword) {
         String query="";
         if(keyword==null || keyword ==""){
@@ -129,6 +130,7 @@ public class UserInfModel extends ImageTalkBaseModel {
         }
         return userList;
     }
+
     public ArrayList<Login> getAllUserLoginByKeyword(String keyword) {
         String query = "";
         if(keyword==null || keyword ==""){
@@ -191,6 +193,7 @@ public class UserInfModel extends ImageTalkBaseModel {
         }
         return loginList;
     }
+
     public User getById(int id) {
         String query ="select * from " + super.tableName+" where id="+id+" limit 1 ";
 
@@ -214,6 +217,7 @@ public class UserInfModel extends ImageTalkBaseModel {
 
         return user;
     }
+
     public int insertData() {
         String query = "INSERT INTO " + tableName + " (f_name,l_name) VALUES ('" + this.f_name + "', '" + this.l_name + "')";
         this.id = this.insertData(query);
@@ -225,11 +229,13 @@ public class UserInfModel extends ImageTalkBaseModel {
 
         return this.updateData(query);
     }
+
     public boolean updatePicPath(){
         String query = "UPDATE " + this.tableName + " SET `pic_path`='" + this.picPath + "' WHERE `id`="+this.id;
 
         return this.updateData(query);
     }
+
     public Login getProfileInformation(int u_id){
         Login login = new Login();
         String query = "SELECT login.id as login_id,\n" +
@@ -268,11 +274,13 @@ public class UserInfModel extends ImageTalkBaseModel {
 
         return login;
     }
+
     public int deleteData(int userId) {
         this.id = userId;
         String sql = "DELETE FROM " + this.tableName + " WHERE id = '" + this.id + "'";
         return this.deleteData(sql);
     }
+
     public int deleteById() {
         String sql = "DELETE FROM " + this.tableName + " WHERE id = '" + this.id + "'";
         return this.deleteData(sql);
