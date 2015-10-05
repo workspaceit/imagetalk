@@ -12,8 +12,11 @@
         response.sendRedirect("/admin/login");
     }
 
+    String type = request.getParameter("type");
+    type = (type != null) ? type : "all";
+
     AppLoginCredentialModel appUser = new AppLoginCredentialModel();
-    ArrayList<OperAppCredential> appUserList = appUser.getAppUser("all");
+    ArrayList<OperAppCredential> appUserList = appUser.getAppUser(type);
 
 %>
 <!DOCTYPE html>
@@ -63,6 +66,7 @@
                                     <th>Phone</th>
                                     <th>Banned</th>
                                     <th>Active</th>
+                                    <%--<th>Action</th>--%>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -79,11 +83,36 @@
                                         <%=appUserData.phoneNumber%>
                                     </td>
                                     <td>
-                                        <%=(appUserData.banned) ? "Banned" : "Not Banned"%>
+                                        <% if (appUserData.banned) { %>
+                                        <button class="btn btn-block btn-danger" data-user="<%=appUserData.id%>" id="permit">Banned</button>
+                                        <% } else { %>
+                                        <button class="btn btn-block btn-success"data-user="<%=appUserData.id%>"  id="banned">Not Banned</button>
+                                        <% } %>
                                     </td>
                                     <td>
                                         <%=(appUserData.active) ? "Active" : "Inactive"%>
                                     </td>
+                                    <!--<td>
+                                        <div class="btn-group" style="min-width: 90px;">
+                                            <button type="button" class="btn btn-success btn-flat">Action</button>
+                                            <button type="button" class="btn btn-success btn-flat dropdown-toggle"
+                                                    data-toggle="dropdown" aria-expanded="false">
+                                                <span class="caret"></span>
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li>
+                                                    <a href="javascript:void(0)" onclick=""
+                                                       class="de-active">Dispute</a>
+                                                    <a href="javascript:void(0)" onclick="" class="active">Enrolled</a>
+                                                </li>
+                                                <li><a href="">Send Code</a></li>
+                                                <li><a href="">View</a></li>
+                                                <li><a href="">Edit</a></li>
+                                                <li><a href="">Delete</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>-->
                                 </tr>
 
 
@@ -139,14 +168,6 @@
 <script>
     $(function () {
         $("#example1").DataTable();
-//    $('#example2').DataTable({
-//      "paging": true,
-//      "lengthChange": false,
-//      "searching": false,
-//      "ordering": true,
-//      "info": true,
-//      "autoWidth": false
-//    });
     });
 
     function makeTeamLead(elem, login_id) {
@@ -200,11 +221,11 @@
         return false;
     }
 
-    function deleteAppUer(elem, user_id, login_id) {
+    function deleteAppUer(user_id) {
         $("#errorMsgDiv").html("");
         var r = confirm("Are you sure ?");
         if (r) {
-            var loadingImg = $(elem).parents("td").first().find(".loadingImg").first();
+            /*var loadingImg = $(elem).parents("td").first().find(".loadingImg").first();
             var url = $("#base_url").val() + "admin/operation/admin_user/delete";
             $(loadingImg).show();
             $.ajax({
@@ -232,7 +253,7 @@
 
                     console.log(data);
                 }
-            });
+            });*/
         } else {
 
         }
