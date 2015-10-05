@@ -19,7 +19,17 @@ public class ImageTalkBaseModel {
     protected boolean autoCommit = true;
     private String    query       = null;
     public  ResultSet resultSet = null;
-    public static String errorMsg = null;
+    public  BaseErrorManager errorObj;
+
+    public class BaseErrorManager{
+        public String msg;
+        public boolean errStatus;
+
+        public BaseErrorManager() {
+            this.msg = "";
+            this.errStatus = false;
+        }
+    }
     public ImageTalkBaseModel() {
         try {
             Class.forName(DBDriver);
@@ -28,6 +38,7 @@ public class ImageTalkBaseModel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        this.errorObj = new BaseErrorManager();
     }
 
     public void startTransaction(){

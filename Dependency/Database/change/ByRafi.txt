@@ -1,0 +1,10 @@
+ALTER TABLE  `location` CHANGE  `lat`  `lat` DOUBLE NOT NULL ;
+ALTER TABLE  `location` CHANGE  `lon`  `lon` DOUBLE NOT NULL ;
+ALTER TABLE  `wall_post` CHANGE  `location_id`  `location_id` INT( 11 ) NULL ;
+ALTER TABLE  `wall_post` CHANGE  `picture_path`  `picture_path` VARCHAR( 200 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL ;
+ALTER TABLE  `wall_post` CHANGE  `descrption`  `description` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
+
+#Date of change 5 octobor
+ALTER TABLE  `post_like` DROP  `app_login_id` ;
+ALTER TABLE  `post_comment` ADD  `pic_path` VARCHAR( 200 ) NULL AFTER  `comment` ;
+ALTER TABLE  `tag_list` CHANGE  `tag_id`  `tag_id` INT( 11 ) NOT NULL COMMENT  'person app_credintial id';

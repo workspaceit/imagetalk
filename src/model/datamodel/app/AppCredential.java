@@ -8,10 +8,12 @@ public class AppCredential {
     public String textStatus;
     public String phoneNumber;
     public User user;
+    public String createdDate;
     public AppCredential(){
         this.id = 0;
         this.textStatus = "";
         this.phoneNumber = "";
         this.user = new User();
+        this.createdDate = "";
     }
 }

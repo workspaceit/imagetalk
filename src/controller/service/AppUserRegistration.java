@@ -216,7 +216,7 @@ public class AppUserRegistration extends HttpServlet {
         appLoginCredentialModel.insert();
         System.out.println("02");
         if(appLoginCredentialModel.getId()==0){
-            userInfModel.rollBack();
+     //       userInfModel.rollBack();
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
@@ -229,8 +229,8 @@ public class AppUserRegistration extends HttpServlet {
 
                  /* All transaction rollback */
 
-                userInfModel.rollBack();
-                appLoginCredentialModel.rollBack();
+            //    userInfModel.rollBack();
+            //    appLoginCredentialModel.rollBack();
 
                 this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
                 this.baseController.serviceResponse.responseStat.status = false;
@@ -242,8 +242,8 @@ public class AppUserRegistration extends HttpServlet {
             if(!userInfModel.updatePicPath()){
                 /* All transaction rollback */
 
-                userInfModel.rollBack();
-                appLoginCredentialModel.rollBack();
+            //    userInfModel.rollBack();
+            //    appLoginCredentialModel.rollBack();
 
                 this.baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
                 this.baseController.serviceResponse.responseStat.status = false;
