@@ -92,7 +92,6 @@
     </servlet-mapping>
 
 
-
     <servlet>
         <servlet-name>ADMIN_OPERATION</servlet-name>
         <servlet-class>controller.admin.AdminController</servlet-class>
@@ -138,17 +137,15 @@
         <url-pattern>/admin/admin_user/add</url-pattern>
     </servlet-mapping>
 
-   <servlet>
+    <servlet>
         <servlet-name>App User</servlet-name>
-       <jsp-file>/admin/appUserView.jsp</jsp-file>
-   </servlet>
+        <jsp-file>/admin/appUserView.jsp</jsp-file>
+    </servlet>
 
-   <servlet-mapping>
-       <servlet-name>App User</servlet-name>
-       <url-pattern>/admin/app/user</url-pattern>
-   </servlet-mapping>
-
-
+    <servlet-mapping>
+        <servlet-name>App User</servlet-name>
+        <url-pattern>/admin/app/user</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>default</servlet-name>

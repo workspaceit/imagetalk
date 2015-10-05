@@ -312,12 +312,27 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
 
     public ArrayList<OperAppCredential> getAppUser(String type) {
+        String where;
+        switch (type.toLowerCase()) {
+            case "active":
+                where = "WHERE active = 1";
+                break;
+            case "inactive":
+                where = "WHERE active = 0";
+                break;
+            case "banned":
+                where = "WHERE banned = 1";
+                break;
+            default:
+                where = "";
+        }
+
         this.appUserList = new ArrayList<>();
         String sql = "SELECT * FROM " + this.tableName + " AS ul " +
                      "JOIN user_inf AS ui " +
                      "ON ul.u_id = ui.id " +
                      "LEFT JOIN location AS l " +
-                     "ON ui.address_id = l.id";
+                     "ON ui.address_id = l.id " + where;
         this.setQuery(sql);
         this.getData();
 
