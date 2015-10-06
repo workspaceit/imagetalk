@@ -63,7 +63,14 @@
         <servlet-name>Utility</servlet-name>
         <url-pattern>/utility/*</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+        <servlet-name>PictureAccessRequest</servlet-name>
+        <servlet-class>controller.service.PictureAndFileController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PictureAccessRequest</servlet-name>
+        <url-pattern>/app/media/access/pictures</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>AppRegister</servlet-name>
         <servlet-class>controller.service.AppUserRegistration</servlet-class>
@@ -149,7 +156,7 @@
 
     <servlet>
         <servlet-name>Change User Status</servlet-name>
-        <jsp-file></jsp-file>
+        <jsp-file>/admin/appUserView.jsp</jsp-file>
     </servlet>
 
     <servlet-mapping>

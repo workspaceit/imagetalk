@@ -11,7 +11,10 @@ import java.io.*;
  * Created by mi on 10/1/15.
  */
 public class ImageHelper {
-    private  static String GLOBAL_PATH = "/home/mi/pic/";
+    private  final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
+    public static String getGlobalPath(){
+        return GLOBAL_PATH;
+    }
     public static void createDirIfNotExist(String path){
         File theDir = new File(path);
 
