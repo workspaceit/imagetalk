@@ -73,7 +73,16 @@ public class AppUserRegistration extends HttpServlet {
         }
 
         if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
-            this.baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
+            this.baseController.serviceResponse.responseStat.msg = "Phone number format incorrect";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setPhone_number(activationModel.getPhoneNumber());
+        if(appLoginCredentialModel.isNumberExist()){
+            this.baseController.serviceResponse.responseStat.msg = "Number already used";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;

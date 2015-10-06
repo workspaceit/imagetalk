@@ -170,7 +170,11 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " where wall_post.owner_id = "+this.owner_id;
 
 
-        System.out.println(query);
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        }
+
         this.setQuery(query);
         this.getData();
         try {

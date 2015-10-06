@@ -1,11 +1,12 @@
 package controller.service;
 
 import com.google.gson.*;
-import controller.thirdparty.api.GoogleGeoApi;
+import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
 import model.TagListModel;
 import model.WallPostModel;
 import model.datamodel.app.Location;
+import model.datamodel.app.WallPost;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -54,6 +56,12 @@ public class WallPostController extends HttpServlet {
         switch (url) {
             case "/app/wallpost/create":
                 this.create();
+                break;
+            case "/app/wallpost/get/own":
+                this.getOwnPost();
+                break;
+            case "/app/wallpost/get/others":
+                this.getOthersPost();
                 break;
             case "/app/wallpost/test":
                 this.test();
@@ -157,6 +165,113 @@ public class WallPostController extends HttpServlet {
         this.pw.print(this.baseController.getResponse());
         return;
     }
+    private void getOwnPost(){
+
+        WallPostModel wallPostModel = new WallPostModel();
+
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            wallPostModel.limit = 3;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        ArrayList<WallPost> wallPostList =  wallPostModel.getByOwner_id();
+
+        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  wallPostList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getOthersPost(){
+
+        WallPostModel wallPostModel = new WallPostModel();
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            wallPostModel.limit = 3;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
+        if(!this.baseController.checkParam("other_app_credential_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "other_app_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            try{
+                wallPostModel.setOwner_id(Integer.parseInt(this.req.getParameter("other_app_credential_id")));
+            }catch (Exception ex){
+                this.baseController.serviceResponse.responseStat.msg = "other_app_credential_id not integer required";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        ArrayList<WallPost> wallPostList =  wallPostModel.getByOwner_id();
+        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  wallPostList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
     private void test(){
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
         googleGeoApi.setKeyWord(this.req.getParameter("location"));
@@ -165,42 +280,13 @@ public class WallPostController extends HttpServlet {
 
         WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setOwner_id(1);
-//        this.baseController.serviceResponse.responseData = wallPostModel.getByOwner_id();
+//
 
-        String str =  googleGeoApi.FireHttpsAction();
+        ArrayList<Location> addressList = googleGeoApi.getLocationByKeyword();
 
-        Gson gson = new Gson();
-        JsonParser jsonParser = new JsonParser();
-        JsonObject response =  jsonParser.parse(str).getAsJsonObject();
-        String status = jsonParser.parse(response.get("status").toString()).getAsString() ;
-        Location address = new Location();
-        if(status.equals("OK")){
-            JsonArray result = jsonParser.parse(response.get("results").toString()).getAsJsonArray();
-            if(result==null || result.size()==0){
-                this.baseController.serviceResponse.responseStat.msg ="No record found";
-                this.pw.print(this.baseController.getResponse());
-                return;
-            }
-            JsonObject location = gson.toJsonTree(result.get(0)).getAsJsonObject();
-
-            JsonArray addressComponents = location.getAsJsonArray("address_components");
-            for(JsonElement addressElement : addressComponents){
-                JsonObject addressObject = addressElement.getAsJsonObject();
-                if(addressObject.getAsJsonArray("types").get(0).getAsString().equals("country")){
-                    address.countryName = addressObject.get("long_name").getAsString();
-                }
-            }
-            address.formattedAddress = location.get("formatted_address").getAsString();
-            address.lat = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lat").getAsDouble();
-            address.lng = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lng").getAsDouble();
-
-        }else{
-            this.baseController.serviceResponse.responseStat.msg ="No record found";
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-
-        this.baseController.serviceResponse.responseData =  address;
+        this.baseController.serviceResponse.responseStat.msg =(addressList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (addressList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  addressList;
         this.pw.print(this.baseController.getResponse());
         return;
     }

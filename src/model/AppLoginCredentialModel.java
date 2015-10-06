@@ -21,8 +21,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     private int    banned;
     private String created_date;
     public  String token;
-    public  int    limit;
-    public  int    offset;
+
 
     private ArrayList<OperAppCredential> appUserList;
 
@@ -39,8 +38,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         this.banned = 0;
         this.created_date = "";
         this.token = "";
-        this.limit = -1;
-        this.offset = -1;
+
     }
 
     public int getId() {
@@ -150,7 +148,6 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
-        System.out.println(query);
 
         this.setQuery(query);
         this.getData();
@@ -213,7 +210,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " where app_login_credential.id=" + this.id + " limit 1";
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try {
@@ -259,6 +256,10 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         if (keyword != null && keyword != "") {
             query += " and user_inf.f_name like '%" + keyword + "%'";
+        }
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         }
         System.out.println(query);
         this.setQuery(query);
@@ -306,7 +307,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         String query = "INSERT INTO `app_login_credential` " +
                 "(`u_id`, `phone_number`, `access_token`, `active`, `banned`)" +
                 " VALUES (" + this.u_id + ",'" + this.phone_number + "',md5('" + this.access_token + "')," + this.active + "," + this.banned + ")";
-        System.out.println(query);
+
         this.id = this.insertData(query);
         return this.id;
     }

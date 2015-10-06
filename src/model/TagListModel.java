@@ -73,7 +73,6 @@ public class TagListModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " where "+this.tableName+".post_id= "+this.post_id;
 
-        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {

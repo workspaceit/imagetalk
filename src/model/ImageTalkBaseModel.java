@@ -21,6 +21,9 @@ public class ImageTalkBaseModel {
     public  ResultSet resultSet = null;
     public  BaseErrorManager errorObj;
 
+    public  int    limit;
+    public  int    offset;
+
     public class BaseErrorManager{
         public String msg;
         public boolean errStatus;
@@ -39,6 +42,9 @@ public class ImageTalkBaseModel {
             ex.printStackTrace();
         }
         this.errorObj = new BaseErrorManager();
+
+        this.limit = -1;
+        this.offset = -1;
     }
 
     public void startTransaction(){

@@ -1,8 +1,11 @@
 package controller.service;
 
+import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import model.AppLoginCredentialModel;
+import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
+import model.datamodel.app.Location;
 import model.datamodel.app.Login;
 
 import javax.servlet.ServletException;
@@ -52,6 +55,9 @@ public class SearchController extends HttpServlet {
             case "/app/search/user/fortag":
                 this.getUserForTag();
                 break;
+            case "/app/search/location/by/keyword":
+                this.getLocationByKeyword();
+                break;
             default:
                 break;
         }
@@ -65,8 +71,6 @@ public class SearchController extends HttpServlet {
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        appLoginCredentialModel.setId(this.baseController.appCredential.id);
-        ArrayList<AppCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
 
         if(this.baseController.checkParam("limit", this.req, true)) {
             try{
@@ -78,7 +82,10 @@ public class SearchController extends HttpServlet {
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
+        }else{
+            appLoginCredentialModel.limit = 10;
         }
+
         if(!this.baseController.checkParam("offset", this.req, true)){
 
             this.baseController.serviceResponse.responseStat.msg = "offset required";
@@ -87,7 +94,6 @@ public class SearchController extends HttpServlet {
             return;
         }else {
             try{
-
                 appLoginCredentialModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
@@ -97,6 +103,11 @@ public class SearchController extends HttpServlet {
                 return;
             }
         }
+
+
+        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+        ArrayList<AppCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
+
         if(appCredentialsList.size()==0){
             this.baseController.serviceResponse.responseStat.msg = "No record found";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -107,5 +118,29 @@ public class SearchController extends HttpServlet {
         this.baseController.serviceResponse.responseData = appCredentialsList;
         this.pw.print(this.baseController.getResponse());
         return;
+    }
+    private void getLocationByKeyword(){
+        String keyword="";
+        if(!this.baseController.checkParam("keyword", this.req, true)) {
+            this.baseController.serviceResponse.responseStat.msg = "keyword required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            keyword = this.req.getParameter("keyword").trim();
+        }
+
+
+        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+        googleGeoApi.setKeyWord(keyword);
+
+        ArrayList<Location> addressList = googleGeoApi.getLocationByKeyword();
+
+        this.baseController.serviceResponse.responseStat.msg =(addressList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (addressList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  addressList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
 }
