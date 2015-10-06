@@ -84,9 +84,13 @@
                                     </td>
                                     <td>
                                         <% if (appUserData.banned) { %>
-                                        <button class="btn btn-block btn-danger" data-user="<%=appUserData.id%>" id="permit">Banned</button>
+                                        <button class="btn btn-block btn-danger" data-user-id="<%=appUserData.id%>"
+                                                data-user-status="<%=appUserData.banned%>" id="status">Banned
+                                        </button>
                                         <% } else { %>
-                                        <button class="btn btn-block btn-success"data-user="<%=appUserData.id%>"  id="banned">Not Banned</button>
+                                        <button class="btn btn-block btn-success" data-user-id="<%=appUserData.id%>"
+                                                data-user-status="<%=appUserData.banned%>" id="status">Not Banned
+                                        </button>
                                         <% } %>
                                     </td>
                                     <td>
@@ -225,7 +229,7 @@
         $("#errorMsgDiv").html("");
         var r = confirm("Are you sure ?");
         if (r) {
-            /*var loadingImg = $(elem).parents("td").first().find(".loadingImg").first();
+            var loadingImg = $(elem).parents("td").first().find(".loadingImg").first();
             var url = $("#base_url").val() + "admin/operation/admin_user/delete";
             $(loadingImg).show();
             $.ajax({
@@ -253,11 +257,35 @@
 
                     console.log(data);
                 }
-            });*/
+            });
         } else {
 
         }
     }
+
+    jQuery(document).ready(function () {
+        var $selector = $("#status");
+
+        $selector.click(function () {
+            var userId = $selector.data('user-id');
+            var userStatus = $selector.data('user-status');
+            var r = confirm("Are you sure ?");
+
+            if (r) {
+                $.ajax({
+                    url: "",
+                    method: "POST",
+                    data: {
+                        user_id: userId,
+                        user_status: userStatus
+                    },
+                    success: function (data) {
+
+                    }
+                });
+            }
+        });
+    });
 </script>
 </body>
 </html>
