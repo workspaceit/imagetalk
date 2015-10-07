@@ -12,3 +12,5 @@ ALTER TABLE  `tag_list` CHANGE  `tag_id`  `tag_id` INT( 11 ) NOT NULL COMMENT  '
 #Date of change 7th Oct 2015
 
 ALTER TABLE  `location` CHANGE  `lon`  `lng` DOUBLE NOT NULL ;
+ALTER TABLE  `wall_post` CHANGE  `picture_path`  `picture_path` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;
+ALTER TABLE  `user_inf` CHANGE  `pic_path`  `pic_path` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;

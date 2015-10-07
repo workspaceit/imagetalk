@@ -1,9 +1,12 @@
 package helper;
 
+import model.datamodel.photo.PictureDetails;
+import model.datamodel.photo.Pictures;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 
@@ -53,7 +56,8 @@ public class ImageHelper {
        }
        return fileName;
    }
-    public static String saveProfilePicture(Object imgObj,int uId){
+    public static Pictures saveProfilePicture(Object imgObj,int uId){
+        Pictures pictures = new Pictures();
         String path = GLOBAL_PATH;
         String fileName ="";
         try{
@@ -66,22 +70,49 @@ public class ImageHelper {
             System.out.println(path);
             File file = new File(path);
 
-            long startTime = System.nanoTime();
+
             if(imgObj.getClass().equals(BufferedImage.class) ){
-                ImageIO.write((BufferedImage)imgObj,"jpg",file);
+                ImageIO.write((BufferedImage) imgObj, "jpg", file);
+
+                PictureDetails thumb1 = new  PictureDetails();
+                thumb1.type = "thumbnail";
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 200, 200,uId);
+                pictures.thumb.add(thumb1);
+
+                PictureDetails thumb2 = new  PictureDetails();
+                thumb2.type = "thumbnail";
+                thumb2.path = createThumbnail((BufferedImage)imgObj, 300, 300,uId);
+                pictures.thumb.add(thumb2);
+
             }else if(imgObj.getClass().equals(String.class)){
                 ImageIO.write(decodeToImage((String)imgObj),"jpg",file);
+
+                PictureDetails thumb1 = new  PictureDetails();
+                thumb1.type = "thumbnail";
+                thumb1.path = createThumbnail(decodeToImage((String)imgObj), 200, 200,uId);
+                pictures.thumb.add(thumb1);
+
+                PictureDetails thumb2 = new  PictureDetails();
+                thumb2.type = "thumbnail";
+                thumb2.path = createThumbnail(decodeToImage((String)imgObj), 300, 300,uId);
+                pictures.thumb.add(thumb2);
             }
 
             fileName = uId+"/profile/"+fileName;
+            pictures.original.size.height = 0;
+            pictures.original.size.width = 0;
+            pictures.original.path =fileName;
+
+
 
         }catch (Exception ex){
             System.out.println(ex);
-            return fileName;
+            return pictures;
         }
-        return fileName;
+        return pictures;
     }
-    public static String saveWallPostPicture(Object imgObj,int uId){
+    public static Pictures saveWallPostPicture(Object imgObj,int uId){
+        Pictures pictures = new Pictures();
         String path = GLOBAL_PATH;
         String fileName ="";
         try{
@@ -94,20 +125,36 @@ public class ImageHelper {
             System.out.println(path);
             File file = new File(path);
 
-            long startTime = System.nanoTime();
+
             if(imgObj.getClass().equals(BufferedImage.class) ){
-                ImageIO.write((BufferedImage)imgObj,"jpg",file);
+                ImageIO.write((BufferedImage) imgObj, "jpg", file);
+
+                PictureDetails thumb1 = new  PictureDetails();
+                thumb1.type = "thumbnail";
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId);
+                pictures.thumb.add(thumb1);
             }else if(imgObj.getClass().equals(String.class)){
-                ImageIO.write(decodeToImage((String)imgObj),"jpg",file);
+                ImageIO.write(decodeToImage((String) imgObj), "jpg", file);
+
+                PictureDetails thumb1 = new  PictureDetails();
+                thumb1.type = "thumbnail";
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId);
+                pictures.thumb.add(thumb1);
             }
 
-            fileName = uId+"/profile/"+fileName;
+            fileName = uId+"/wallpost/"+fileName;
+            pictures.original.size.height = 0;
+            pictures.original.size.width = 0;
+            pictures.original.path =fileName;
+
+
+
 
         }catch (Exception ex){
             System.out.println(ex);
-            return fileName;
+            return pictures;
         }
-        return fileName;
+        return pictures;
     }
     public static BufferedImage decodeToImage(String imageString)
     {
@@ -148,6 +195,26 @@ public class ImageHelper {
         }
         return imageString;
     }
+    public static String createThumbnail( BufferedImage img, int width, int height,int uId) {
+        String path = GLOBAL_PATH;
+        path +=uId;
+        String fileName = +System.nanoTime()+".jpg";
+        Image scaledImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage thumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        thumbnail.createGraphics().drawImage(scaledImg, 0, 0, null);
+        createDirIfNotExist(path);
+        path+="/thumbnail";
+        createDirIfNotExist(path);
+        path+="/"+fileName;
+        try {
+            ImageIO.write(thumbnail, "jpg", new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        fileName = uId+"/wallpost/"+fileName;
+        return  fileName;
+    }
+
 }
 
 

@@ -1,9 +1,11 @@
 package controller.service;
 
+import com.google.gson.Gson;
 import helper.ImageHelper;
 import model.ActivationModel;
 import model.AppLoginCredentialModel;
 import model.UserInfModel;
+import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -203,7 +205,6 @@ public class AppUserRegistration extends HttpServlet {
 
       //  userInfModel.startTransaction();
         userInfModel.insertData();
-        System.out.println("01");
         if(userInfModel.getId()==0){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -233,7 +234,9 @@ public class AppUserRegistration extends HttpServlet {
         }
         if(this.baseController.checkParam("photo",this.req,true)) {
             imgBase64 = this.req.getParameter("photo");
-            String fileName = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
+            Pictures pictures = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
+            Gson gson = new Gson();
+            String fileName =gson.toJson(pictures);
             if(fileName==null || fileName == ""){
 
                  /* All transaction rollback */

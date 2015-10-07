@@ -3,11 +3,14 @@ package controller.service;
 import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
+import model.AppLoginCredentialModel;
 import model.LocationModel;
 import model.TagListModel;
 import model.WallPostModel;
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.Location;
 import model.datamodel.app.WallPost;
+import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -89,7 +92,11 @@ public class WallPostController extends HttpServlet {
         if(this.baseController.checkParam("photo", this.req, true)){
             if(this.baseController.checkParam("photo",this.req,true)) {
                 imgBase64 = this.req.getParameter("photo");
-                fileRelativePath = ImageHelper.saveFile(imgBase64, null, this.baseController.appCredential.id);
+                fileRelativePath = "";
+
+                Pictures pictures = ImageHelper.saveWallPostPicture(imgBase64, this.baseController.appCredential.id);
+                Gson gson = new Gson();
+                System.out.println(gson.toJson(pictures));
                 if (fileRelativePath == "") {
 
                     // Need roll back
@@ -109,8 +116,14 @@ public class WallPostController extends HttpServlet {
             Gson gson = new Gson();
             try{
                 int[] tempTaggedList = gson.fromJson(tagged_listStr,int[].class);
+                AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
                 for(int tempTaggedId : tempTaggedList){
-                    taggedList.add(tempTaggedId);
+                    appLoginCredentialModel.setId(tempTaggedId);
+                    if(appLoginCredentialModel.isIdExist()){
+                        taggedList.add(tempTaggedId);
+                    }else{
+                        System.out.println("Trying to tag a non exit app_credential_id "+tempTaggedId);
+                    }
                 }
             }catch (Exception ex){
                 System.out.println(ex);

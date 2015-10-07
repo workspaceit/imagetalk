@@ -1,8 +1,10 @@
 package model;
 
+import com.google.gson.Gson;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.OperAppCredential;
+import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     private int    banned;
     private String created_date;
     public  String token;
-
+    private Gson gson;
 
     private ArrayList<OperAppCredential> appUserList;
 
@@ -38,6 +40,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         this.banned = 0;
         this.created_date = "";
         this.token = "";
+
+        this.gson = new Gson();
 
     }
 
@@ -176,7 +180,14 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
-                authCredential.user.picPath = this.resultSet.getString("pic_path");
+                try{
+                    authCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                }catch (Exception ex){
+                    System.out.println("Parse error on picture appCid "+ authCredential.id);
+                    authCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
+                    ex.printStackTrace();
+                }
+
                 authCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
 
                 authCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
@@ -238,7 +249,14 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
-                authCredential.user.picPath = this.resultSet.getString("pic_path");
+                try{
+                    authCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                }catch (Exception ex){
+                    authCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
+                    System.out.println("Parse error on picture appCid "+ authCredential.id);
+                    ex.printStackTrace();
+                }
+
                 authCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
 
                 authCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
@@ -289,7 +307,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 appCredential.user.id = this.resultSet.getInt("user_inf_id");
                 appCredential.user.firstName = this.resultSet.getString("f_name");
                 appCredential.user.lastName = this.resultSet.getString("l_name");
-                appCredential.user.picPath = this.resultSet.getString("pic_path");
+                try{
+                    appCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                }catch (Exception ex){
+                    appCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
+                    System.out.println("Parse error on picture appCid "+ appCredential.id);
+                    ex.printStackTrace();
+                }
                 appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
 
                 appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
@@ -312,6 +336,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
 
     public int insert() {
+
         if (this.isNumberExist()) {
             return 0;
         }
@@ -363,7 +388,14 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 appUser.phoneNumber = resultSet.getString("ul.phone_number");
                 appUser.user.firstName = resultSet.getString("ui.f_name");
                 appUser.user.lastName = resultSet.getString("ui.l_name");
-                appUser.user.picPath = resultSet.getString("ui.pic_path");
+                try{
+                    appUser.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                }catch (Exception ex){
+                    appUser.user.picPath.original.path = this.resultSet.getString("pic_path");
+                    System.out.println("Parse error on picture appCid "+ appUser.id);
+                    ex.printStackTrace();
+                }
+
                 appUser.user.createdDate = resultSet.getString("ui.created_date");
                 appUser.user.address.id = resultSet.getInt("l.id");
                 appUser.user.address.lat = resultSet.getDouble("l.lat");

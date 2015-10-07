@@ -1,7 +1,9 @@
 package model;
 
-import model.datamodel.TagList;
+
+import com.google.gson.Gson;
 import model.datamodel.app.AppCredential;
+import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ public class TagListModel extends ImageTalkBaseModel{
     private int tag_id;
     private int post_id;
     private String created_date;
+    private Gson gson;
 
     public TagListModel(){
         super();
@@ -23,6 +26,8 @@ public class TagListModel extends ImageTalkBaseModel{
         this.tag_id = 0;
         this.post_id = 0;
         this.created_date = "";
+
+        this.gson = new Gson();
     }
 
     public int getId() {
@@ -87,8 +92,14 @@ public class TagListModel extends ImageTalkBaseModel{
                 appCredential.user.id = this.resultSet.getInt("user_infId");
                 appCredential.user.firstName = this.resultSet.getString("f_name");
                 appCredential.user.lastName = this.resultSet.getString("l_name");
-                appCredential.user.picPath = this.resultSet.getString("pic_path");
 
+                try{
+                    appCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                }catch (Exception ex){
+                    appCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
+                    System.out.println("Parse error on picture appCid "+ appCredential.id);
+                    ex.printStackTrace();
+                }
 
                 appCredential.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 appCredential.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");

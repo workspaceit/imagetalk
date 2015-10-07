@@ -1,9 +1,11 @@
-package model.datamodel;
+package model;
 
+import com.google.gson.Gson;
 import model.ImageTalkBaseModel;
 import model.TagListModel;
 import model.datamodel.app.PostComment;
 import model.datamodel.app.WallPost;
+import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ public class PostCommentModel extends ImageTalkBaseModel {
     public int post_id;
     public int  commenter_id;
     public String created_date;
+
+    private Gson gson;
     public PostCommentModel() {
         super();
         super.tableName = "post_comment";
@@ -30,6 +34,8 @@ public class PostCommentModel extends ImageTalkBaseModel {
         this.post_id = 0;
         this.commenter_id=0;
         this.created_date = "";
+
+        this.gson = new Gson();
     }
 
     public int getId() {
@@ -118,9 +124,14 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.user.id = this.resultSet.getInt("user_infId");
                 postComment.commenter.user.firstName = this.resultSet.getString("f_name");
                 postComment.commenter.user.lastName = this.resultSet.getString("l_name");
-                postComment.commenter.user.picPath = this.resultSet.getString("proPic");
 
+                try{
+                    postComment.commenter.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
+                }catch (Exception ex){
+                    postComment.commenter.user.picPath.original.path  = this.resultSet.getString("proPic");
 
+                    ex.printStackTrace();
+                }
                 postComment.commenter.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 postComment.commenter.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
                 postComment.commenter.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");

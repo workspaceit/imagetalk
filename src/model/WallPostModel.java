@@ -1,8 +1,8 @@
 package model;
 
-import model.datamodel.PostCommentModel;
-import model.datamodel.app.PostComment;
+import com.google.gson.Gson;
 import model.datamodel.app.WallPost;
+import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
@@ -21,6 +21,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     private int location_id;
     private String created_date;
 
+    private Gson gson;
     public WallPostModel(){
         super();
         super.tableName = "wall_post";
@@ -32,6 +33,8 @@ public class WallPostModel extends ImageTalkBaseModel{
         this.picture_path=null;
         this.location_id=0;
         this.created_date="";
+
+        this.gson = new Gson();
 
     }
 
@@ -114,7 +117,7 @@ public class WallPostModel extends ImageTalkBaseModel{
             while (this.resultSet.next()) {
                 wallPost.id = this.resultSet.getInt("wall_post_id");
                 wallPost.description = this.resultSet.getString("description");
-                wallPost.picPath = this.resultSet.getString("proPic");
+                wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
                 wallPost.createdDate = this.resultSet.getString("wall_postCdate");
 
@@ -127,8 +130,14 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.id = this.resultSet.getInt("user_infId");
                 wallPost.owner.user.firstName = this.resultSet.getString("f_name");
                 wallPost.owner.user.lastName = this.resultSet.getString("l_name");
-                wallPost.owner.user.picPath = this.resultSet.getString("proPic");
 
+                try{
+                    wallPost.owner.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
+                }catch (Exception ex){
+                    wallPost.owner.user.picPath.original.path = this.resultSet.getString("proPic");
+
+                    ex.printStackTrace();
+                }
 
                 wallPost.owner.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 wallPost.owner.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
@@ -193,7 +202,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 WallPost wallPost = new WallPost();
                 wallPost.id = this.resultSet.getInt("wall_post_id");
                 wallPost.description = this.resultSet.getString("description");
-                wallPost.picPath = this.resultSet.getString("proPic");
+                wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.createdDate = this.resultSet.getString("wall_postCdate");
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
@@ -204,9 +213,14 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.id = this.resultSet.getInt("user_infId");
                 wallPost.owner.user.firstName = this.resultSet.getString("f_name");
                 wallPost.owner.user.lastName = this.resultSet.getString("l_name");
-                wallPost.owner.user.picPath = this.resultSet.getString("proPic");
 
+                try{
+                    wallPost.owner.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
+                }catch (Exception ex){
+                    wallPost.owner.user.picPath.original.path = this.resultSet.getString("proPic");
 
+                    ex.printStackTrace();
+                }
                 wallPost.owner.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 wallPost.owner.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
                 wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
