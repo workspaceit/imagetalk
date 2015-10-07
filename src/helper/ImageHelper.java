@@ -142,17 +142,17 @@ public class ImageHelper {
             if(imgObj.getClass().equals(BufferedImage.class) ){
                 ImageIO.write((BufferedImage) imgObj, "jpg", file);
 
-                PictureDetails thumb1 = new  PictureDetails();
-                thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId+"/profile");
-                pictures.thumb.add(thumb1);
+//                PictureDetails thumb1 = new  PictureDetails();
+//                thumb1.type = "thumbnail";
+//                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId+"/wallpost");
+//                pictures.thumb.add(thumb1);
             }else if(imgObj.getClass().equals(String.class)){
                 ImageIO.write(decodeToImage((String) imgObj), "jpg", file);
 
-                PictureDetails thumb1 = new  PictureDetails();
-                thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId+"/profile");
-                pictures.thumb.add(thumb1);
+//                PictureDetails thumb1 = new  PictureDetails();
+//                thumb1.type = "thumbnail";
+//                thumb1.path = createThumbnail(decodeToImage((String) imgObj), 100, 50,uId+"/wallpost");
+//                pictures.thumb.add(thumb1);
             }
 
             fileName = uId+"/wallpost/"+fileName;

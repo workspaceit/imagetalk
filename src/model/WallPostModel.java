@@ -109,12 +109,12 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id ";
 
-        query += " where order by wall_post_id DESC ";
+        query += " order by wall_post_id DESC ";
         if(this.limit >0){
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         }
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
@@ -255,6 +255,22 @@ public class WallPostModel extends ImageTalkBaseModel{
             this.closeConnection();
         }
         return wallPost;
+
+    }
+    public boolean isIdExist(){
+        String query = "SELECT id FROM wall_post where id = "+this.id+" limit 1";
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+               return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return false;
 
     }
     public ArrayList<WallPost> getByOwner_id(){
