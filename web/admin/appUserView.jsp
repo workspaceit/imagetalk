@@ -264,11 +264,9 @@
     }
 
     jQuery(document).ready(function () {
-        var $selector = $("#status");
-
-        $selector.click(function () {
-            var userId = $selector.data('user-id');
-            var userStatus = $selector.data('user-status');
+        $("#status").click(function () {
+            var userId = $("#status").data('user-id');
+            var userStatus = ($("#status").data('user-status')) ? 0 : 1;
             var r = confirm("Are you sure ?");
 
             if (r) {
@@ -280,6 +278,21 @@
                         user_status: userStatus
                     },
                     success: function (data) {
+                        if (data.responseStat.status) {
+                            $selector = $("#status");
+
+                            if (userStatus == 1) {
+                                $selector.removeClass("btn-success");
+                                $selector.html("Banned");
+                                $selector.addClass("btn-danger");
+                                $selector.data("user-status", true);
+                            } else {
+                                $selector.removeClass("btn-danger");
+                                $selector.html("Not Banned");
+                                $selector.addClass("btn-success");
+                                $selector.data("user-status", false);
+                            }
+                        }
                         console.log(data);
                     }
                 });
