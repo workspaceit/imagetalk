@@ -76,12 +76,18 @@ public class ImageHelper {
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 200, 200,uId);
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 200, 200,uId+"/profile");
+                thumb1.size.width = 200;
+                thumb1.size.height = 200;
                 pictures.thumb.add(thumb1);
 
                 PictureDetails thumb2 = new  PictureDetails();
                 thumb2.type = "thumbnail";
-                thumb2.path = createThumbnail((BufferedImage)imgObj, 300, 300,uId);
+                thumb2.path = createThumbnail((BufferedImage)imgObj, 300, 300,uId+"/profile");
+
+                thumb2.size.width = 300;
+                thumb2.size.height = 300;
+
                 pictures.thumb.add(thumb2);
 
             }else if(imgObj.getClass().equals(String.class)){
@@ -89,18 +95,25 @@ public class ImageHelper {
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail(decodeToImage((String)imgObj), 200, 200,uId);
+                thumb1.path = createThumbnail(decodeToImage((String)imgObj), 200, 200,uId+"/profile");
+
+                thumb1.size.width = 200;
+                thumb1.size.height = 200;
+
                 pictures.thumb.add(thumb1);
 
                 PictureDetails thumb2 = new  PictureDetails();
                 thumb2.type = "thumbnail";
-                thumb2.path = createThumbnail(decodeToImage((String)imgObj), 300, 300,uId);
+                thumb2.path = createThumbnail(decodeToImage((String)imgObj), 300, 300,uId+"/profile");
+                thumb2.size.width = 300;
+                thumb2.size.height = 300;
                 pictures.thumb.add(thumb2);
             }
 
             fileName = uId+"/profile/"+fileName;
             pictures.original.size.height = 0;
             pictures.original.size.width = 0;
+            pictures.original.type ="original";
             pictures.original.path =fileName;
 
 
@@ -131,14 +144,14 @@ public class ImageHelper {
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId);
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId+"/profile");
                 pictures.thumb.add(thumb1);
             }else if(imgObj.getClass().equals(String.class)){
                 ImageIO.write(decodeToImage((String) imgObj), "jpg", file);
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId);
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 100, 50,uId+"/profile");
                 pictures.thumb.add(thumb1);
             }
 
@@ -195,24 +208,26 @@ public class ImageHelper {
         }
         return imageString;
     }
-    public static String createThumbnail( BufferedImage img, int width, int height,int uId) {
-        String path = GLOBAL_PATH;
-        path +=uId;
-        String fileName = +System.nanoTime()+".jpg";
+    public static String createThumbnail( BufferedImage img, int width, int height,String path) {
+
+
         Image scaledImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         BufferedImage thumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         thumbnail.createGraphics().drawImage(scaledImg, 0, 0, null);
-        createDirIfNotExist(path);
+
+        String fileName = System.nanoTime()+".jpg";
+
         path+="/thumbnail";
-        createDirIfNotExist(path);
+        createDirIfNotExist(GLOBAL_PATH+path);
         path+="/"+fileName;
+
         try {
-            ImageIO.write(thumbnail, "jpg", new File(path));
+            ImageIO.write(thumbnail, "jpg", new File(GLOBAL_PATH+path));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        fileName = uId+"/wallpost/"+fileName;
-        return  fileName;
+
+        return  path;
     }
 
 }

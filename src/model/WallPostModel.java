@@ -93,6 +93,91 @@ public class WallPostModel extends ImageTalkBaseModel{
         this.created_date = created_date;
         return true;
     }
+    public ArrayList<WallPost> getAllRecent(){
+        ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
+
+        String query = "SELECT wall_post.id as wall_post_id,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+
+                " (select count(id) from post_like where post_like.post_id = wall_post_id ) as likeCount," +
+                " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
+                " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate," +
+                " postLoc.*" +
+                " FROM wall_post " +
+                " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
+                " join user_inf on user_inf.id = app_login_credential.u_id " +
+                " left join location on location.id = user_inf.address_id " +
+                " left join location as postLoc on postLoc.id = wall_post.location_id ";
+
+        query += " where order by wall_post_id DESC ";
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        }
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                WallPost wallPost = new WallPost();
+                wallPost.id = this.resultSet.getInt("wall_post_id");
+                wallPost.description = this.resultSet.getString("description");
+                wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
+                wallPost.createdDate = this.resultSet.getString("wall_postCdate");
+
+                wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
+                wallPost.owner.textStatus = this.resultSet.getString("text_status");
+                wallPost.owner.phoneNumber = this.resultSet.getString("phone_number");
+                wallPost.owner.createdDate = this.resultSet.getString("app_lCdate");
+
+                wallPost.owner.user.id = this.resultSet.getInt("user_infId");
+                wallPost.owner.user.firstName = this.resultSet.getString("f_name");
+                wallPost.owner.user.lastName = this.resultSet.getString("l_name");
+
+                try{
+                    wallPost.owner.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
+                }catch (Exception ex){
+                    wallPost.owner.user.picPath.original.path = this.resultSet.getString("proPic");
+
+                    ex.printStackTrace();
+                }
+                wallPost.owner.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
+                wallPost.owner.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
+                wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
+                wallPost.owner.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
+                wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
+                wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
+
+                wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
+                wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
+                wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
+                wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
+                wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
+                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
+
+
+                TagListModel tagListModel = new TagListModel();
+                tagListModel.setPost_id( wallPost.id);
+                wallPost.taglist = tagListModel.getByPostId();
+                wallPost.tagCount = wallPost.taglist.size();
+
+                PostCommentModel postCommentModel = new PostCommentModel();
+                postCommentModel.setPost_id(wallPost.id);
+                wallPost.comments = postCommentModel.getByPostId();
+                wallPost.commentCount = wallPost.comments.size();
+
+                wallPostList.add(wallPost);
+
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return wallPostList;
+
+    }
     public WallPost getById(){
         WallPost wallPost = new WallPost();
         String query = "SELECT wall_post.id as wall_post_id,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
