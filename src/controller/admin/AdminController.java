@@ -63,7 +63,7 @@ public class AdminController extends HttpServlet {
                 this.deleteAdminUser(req);
                 break;
 
-            case "/change/user/status":
+            case "/admin/operation/change/user/status":
                 this.changeUserStatus(req);
                 break;
 
@@ -372,6 +372,9 @@ public class AdminController extends HttpServlet {
         int userId        = Integer.parseInt(req.getParameter("user_id"));
         int status        = Integer.parseInt(req.getParameter("user_status"));
         int currentStatus = appModel.getUserStatusById(userId);
+
+        System.out.println(status);
+        System.out.println(currentStatus);
 
         if (status == currentStatus) {
             String statusName = "Banned";
