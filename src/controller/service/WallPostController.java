@@ -3,10 +3,7 @@ package controller.service;
 import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
-import model.AppLoginCredentialModel;
-import model.LocationModel;
-import model.TagListModel;
-import model.WallPostModel;
+import model.*;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Location;
 import model.datamodel.app.WallPost;
@@ -64,16 +61,72 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/get/own":
                 this.getOwnPost();
                 break;
+            case "/app/wallpost/get/recent":
+                this.getRecentPost();
+                break;
             case "/app/wallpost/get/others":
                 this.getOthersPost();
                 break;
             case "/app/wallpost/test":
                 this.test();
                 break;
+            case "/app/wallpost/post/comment":
+                this.creatComment();
+                break;
             default:
                 break;
         }
         this.pw.close();
+    }
+    public void creatComment(){
+        if(!this.baseController.checkParam("post_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        if(!this.baseController.checkParam("comment", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "comment required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+        postCommentModel.setComment(this.req.getParameter("comment"));
+        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
+
+        try{
+            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(postCommentModel.getPost_id());
+
+        if(!wallPostModel.isIdExist()){
+            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        if(postCommentModel.insert()==0){
+            this.baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "Comment posted";
+        this.baseController.serviceResponse.responseData = postCommentModel.getById();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
     public void create(){
         if(!this.baseController.checkParam("description", this.req, true)){
@@ -95,6 +148,7 @@ public class WallPostController extends HttpServlet {
                 fileRelativePath = "";
 
                 Pictures pictures = ImageHelper.saveWallPostPicture(imgBase64, this.baseController.appCredential.id);
+                fileRelativePath= pictures.original.path;
                 Gson gson = new Gson();
                 System.out.println(gson.toJson(pictures));
                 if (fileRelativePath == "") {
@@ -204,6 +258,51 @@ public class WallPostController extends HttpServlet {
         /*===================================================*/
         this.baseController.serviceResponse.responseStat.msg = "Wall post created";
         this.baseController.serviceResponse.responseData = wallPostModel.getById();
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getRecentPost(){
+
+        WallPostModel wallPostModel = new WallPostModel();
+
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            wallPostModel.limit = 3;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        ArrayList<WallPost> wallPostList =  wallPostModel.getAllRecent();
+
+        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  wallPostList;
         this.pw.print(this.baseController.getResponse());
         return;
     }
