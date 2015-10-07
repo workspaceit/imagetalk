@@ -154,16 +154,6 @@
         <url-pattern>/admin/app/user</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>Change User Status</servlet-name>
-        <jsp-file>/admin/appUserView.jsp</jsp-file>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Change User Status</servlet-name>
-        <url-pattern>/admin/change/user</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/assets/*</url-pattern>

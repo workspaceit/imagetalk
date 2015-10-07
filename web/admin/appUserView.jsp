@@ -273,14 +273,14 @@
 
             if (r) {
                 $.ajax({
-                    url: "",
+                    url: $("#base_url").val() + "admin/operation/change/user/status",
                     method: "POST",
                     data: {
                         user_id: userId,
                         user_status: userStatus
                     },
                     success: function (data) {
-
+                        console.log(data);
                     }
                 });
             }

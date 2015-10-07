@@ -23,7 +23,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     private int    banned;
     private String created_date;
     public  String token;
-    private Gson gson;
+    private Gson   gson;
 
     private ArrayList<OperAppCredential> appUserList;
 
@@ -140,6 +140,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
         return false;
     }
+
     public boolean isIdExist() {
         String query = "select active from " + this.tableName + " where id = " + this.id + " limit 1";
 
@@ -157,17 +158,18 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
         return false;
     }
+
     public AuthCredential getAuthincatedByAccessToken() {
         AuthCredential authCredential = new AuthCredential();
 
         String query = "select user_inf.id as user_inf_id," +
-                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
-                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
-                " join user_inf on user_inf.id = app_login_credential.u_id  " +
-                " left join location on location.id = user_inf.address_id " +
-                " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
+                       " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                       " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                       " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                       " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
+                       " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                       " left join location on location.id = user_inf.address_id " +
+                       " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
 
         this.setQuery(query);
         this.getData();
@@ -180,10 +182,10 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
-                try{
+                try {
                     authCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
-                }catch (Exception ex){
-                    System.out.println("Parse error on picture appCid "+ authCredential.id);
+                } catch (Exception ex) {
+                    System.out.println("Parse error on picture appCid " + authCredential.id);
                     authCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
                     ex.printStackTrace();
                 }
@@ -230,13 +232,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     public AuthCredential getAppCredentialById() {
         AuthCredential authCredential = new AuthCredential();
         String query = "select user_inf.id as user_inf_id," +
-                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
-                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
-                " join user_inf on user_inf.id = app_login_credential.u_id  " +
-                " left join location on location.id = user_inf.address_id " +
-                " where app_login_credential.id=" + this.id + " limit 1";
+                       " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                       " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                       " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                       " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
+                       " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                       " left join location on location.id = user_inf.address_id " +
+                       " where app_login_credential.id=" + this.id + " limit 1";
 
         this.setQuery(query);
         this.getData();
@@ -249,11 +251,11 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
-                try{
+                try {
                     authCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     authCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
-                    System.out.println("Parse error on picture appCid "+ authCredential.id);
+                    System.out.println("Parse error on picture appCid " + authCredential.id);
                     ex.printStackTrace();
                 }
 
@@ -280,20 +282,20 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     public ArrayList<AppCredential> getAppCredentialByKeyword(String keyword) {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
         String query = "select user_inf.id as user_inf_id," +
-                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
-                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
-                " join user_inf on user_inf.id = app_login_credential.u_id  " +
-                " left join location on location.id = user_inf.address_id " +
-                " where app_login_credential.id !=" + this.id;
+                       " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                       " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                       " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                       " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
+                       " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                       " left join location on location.id = user_inf.address_id " +
+                       " where app_login_credential.id !=" + this.id;
 
         if (keyword != null && keyword != "") {
             query += " and user_inf.f_name like '%" + keyword + "%'";
         }
-        if(this.limit >0){
+        if (this.limit > 0) {
             this.offset = this.offset * this.limit;
-            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+            query += " LIMIT " + this.offset + " ," + this.limit + " ";
         }
         System.out.println(query);
         this.setQuery(query);
@@ -307,11 +309,11 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 appCredential.user.id = this.resultSet.getInt("user_inf_id");
                 appCredential.user.firstName = this.resultSet.getString("f_name");
                 appCredential.user.lastName = this.resultSet.getString("l_name");
-                try{
+                try {
                     appCredential.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     appCredential.user.picPath.original.path = this.resultSet.getString("pic_path");
-                    System.out.println("Parse error on picture appCid "+ appCredential.id);
+                    System.out.println("Parse error on picture appCid " + appCredential.id);
                     ex.printStackTrace();
                 }
                 appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
@@ -346,8 +348,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
 
         String query = "INSERT INTO `app_login_credential` " +
-                "(`u_id`, `phone_number`, `access_token`, `active`, `banned`)" +
-                " VALUES (" + this.u_id + ",'" + this.phone_number + "',md5('" + this.access_token + "')," + this.active + "," + this.banned + ")";
+                       "(`u_id`, `phone_number`, `access_token`, `active`, `banned`)" +
+                       " VALUES (" + this.u_id + ",'" + this.phone_number + "',md5('" + this.access_token + "')," + this.active + "," + this.banned + ")";
 
         this.id = this.insertData(query);
         return this.id;
@@ -388,11 +390,11 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 appUser.phoneNumber = resultSet.getString("ul.phone_number");
                 appUser.user.firstName = resultSet.getString("ui.f_name");
                 appUser.user.lastName = resultSet.getString("ui.l_name");
-                try{
+                try {
                     appUser.user.picPath = this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     appUser.user.picPath.original.path = this.resultSet.getString("pic_path");
-                    System.out.println("Parse error on picture appCid "+ appUser.id);
+                    System.out.println("Parse error on picture appCid " + appUser.id);
                     ex.printStackTrace();
                 }
 
@@ -410,5 +412,26 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
 
         return this.appUserList;
+    }
+
+    public int getUserStatusById(int id) {
+        String sql = "SELECT * FROM " + this.tableName + " WHERE u_id = " + id;
+        this.setQuery(sql);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return resultSet.getInt("banned");
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return 0;
+    }
+
+    public boolean changeUserStatus(int userId, int status) {
+        String sql = "UPDATE " + this.tableName + " SET banned = '" + status + "' WHERE  id =" + userId;
+        return this.updateData(sql);
     }
 }
