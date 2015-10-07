@@ -136,7 +136,23 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
         return false;
     }
+    public boolean isIdExist() {
+        String query = "select active from " + this.tableName + " where id = " + this.id + " limit 1";
 
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+        return false;
+    }
     public AuthCredential getAuthincatedByAccessToken() {
         AuthCredential authCredential = new AuthCredential();
 

@@ -81,7 +81,34 @@ public class ImageHelper {
         }
         return fileName;
     }
+    public static String saveWallPostPicture(Object imgObj,int uId){
+        String path = GLOBAL_PATH;
+        String fileName ="";
+        try{
+            fileName = +System.nanoTime()+".jpg";
+            path +=uId;
+            createDirIfNotExist(path);
+            path +="/wallpost";
+            createDirIfNotExist(path);
+            path +="/"+fileName;
+            System.out.println(path);
+            File file = new File(path);
 
+            long startTime = System.nanoTime();
+            if(imgObj.getClass().equals(BufferedImage.class) ){
+                ImageIO.write((BufferedImage)imgObj,"jpg",file);
+            }else if(imgObj.getClass().equals(String.class)){
+                ImageIO.write(decodeToImage((String)imgObj),"jpg",file);
+            }
+
+            fileName = uId+"/profile/"+fileName;
+
+        }catch (Exception ex){
+            System.out.println(ex);
+            return fileName;
+        }
+        return fileName;
+    }
     public static BufferedImage decodeToImage(String imageString)
     {
         BufferedImage image = null;
