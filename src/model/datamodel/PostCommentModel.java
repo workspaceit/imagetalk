@@ -91,7 +91,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
         String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
-                " location.id as locationId, location.lat, location.lon, location.formatted_address, location.country, location.created_date as locationCDate" +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
                 " FROM " +this.tableName+
                 " join app_login_credential on app_login_credential.id =  " +this.tableName+".commenter_id "+
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
@@ -123,7 +123,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
 
                 postComment.commenter.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 postComment.commenter.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
-                postComment.commenter.user.address.lng = (this.resultSet.getObject("lon")==null)?0:this.resultSet.getDouble("lon");
+                postComment.commenter.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
                 postComment.commenter.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 postComment.commenter.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 postComment.commenter.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");

@@ -97,10 +97,11 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
-                " location.id as locationId, location.lat, location.lon, location.formatted_address, location.country, location.created_date as locationCDate" +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
                 " FROM wall_post " +
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
+                " left join location on location.id = user_inf.address_id " +
                 " left join location on location.id = user_inf.address_id " +
                 " where wall_post.id = "+this.id+" limit 1";
 
@@ -130,7 +131,7 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 wallPost.owner.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 wallPost.owner.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
-                wallPost.owner.user.address.lng = (this.resultSet.getObject("lon")==null)?0:this.resultSet.getDouble("lon");
+                wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
                 wallPost.owner.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
@@ -162,7 +163,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " (select count(id) from post_like where post_like.post_id = wall_post_id ) as likeCount," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
-                " location.id as locationId, location.lat, location.lon, location.formatted_address, location.country, location.created_date as locationCDate" +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
                 " FROM wall_post " +
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
@@ -198,7 +199,7 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 wallPost.owner.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
                 wallPost.owner.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
-                wallPost.owner.user.address.lng = (this.resultSet.getObject("lon")==null)?0:this.resultSet.getDouble("lon");
+                wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
                 wallPost.owner.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");

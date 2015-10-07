@@ -3,6 +3,7 @@ package controller.service;
 import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
+import model.LocationModel;
 import model.TagListModel;
 import model.WallPostModel;
 import model.datamodel.app.Location;
@@ -82,7 +83,6 @@ public class WallPostController extends HttpServlet {
 
         String imgBase64 = "";
         String fileRelativePath = "";
-        int locationId = 0;
         ArrayList<Integer> taggedList = new ArrayList<Integer>();
 
 
@@ -129,7 +129,36 @@ public class WallPostController extends HttpServlet {
         }
 
         /*===============  Insert location here ==============*/
+        LocationModel locationModel = new LocationModel();
+        if(this.baseController.checkParam("location", this.req, true)){
 
+            String loocationStr = this.req.getParameter("location");
+
+            Gson gson = new Gson();
+            try{
+                Location location = gson.fromJson(loocationStr,Location.class);
+
+
+
+                locationModel.setLat(location.lat);
+                locationModel.setLng(location.lng);
+                locationModel.setFormatted_address(location.formattedAddress);
+                locationModel.setCountry(location.countryName);
+                if(locationModel.insert()==0){
+                    this.baseController.serviceResponse.responseStat.msg = "Internal server error";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+
+                }
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "location is not in format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
         /*======================================================*/
 
 
@@ -140,7 +169,7 @@ public class WallPostController extends HttpServlet {
         wallPostModel.setOwner_id(this.baseController.appCredential.id);
         wallPostModel.setDescrption(this.req.getParameter("description"));
         wallPostModel.setPicture_path(fileRelativePath);
-        wallPostModel.setLocation_id(locationId);
+        wallPostModel.setLocation_id(locationModel.getId());
 
 
         if(wallPostModel.insert()==0){

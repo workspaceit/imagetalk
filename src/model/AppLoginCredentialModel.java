@@ -142,7 +142,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lon,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                 " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -165,7 +165,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
                 authCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
                 authCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
-                authCredential.user.address.lng = (this.resultSet.getObject("lon") == null) ? 0 : this.resultSet.getDouble("lon");
+                authCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
                 authCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
                 authCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
                 authCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
@@ -204,7 +204,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         AuthCredential authCredential = new AuthCredential();
         String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lon,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                 " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -227,7 +227,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
                 authCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
                 authCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
-                authCredential.user.address.lng = (this.resultSet.getObject("lon") == null) ? 0 : this.resultSet.getDouble("lon");
+                authCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
                 authCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
                 authCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
                 authCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
@@ -247,7 +247,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
         String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
-                " location.id as location_id,location.lat,location.lon,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                 " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -278,7 +278,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
                 appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
                 appCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
-                appCredential.user.address.lng = (this.resultSet.getObject("lon") == null) ? 0 : this.resultSet.getDouble("lon");
+                appCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
                 appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
                 appCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
                 appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
@@ -351,7 +351,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 appUser.user.createdDate = resultSet.getString("ui.created_date");
                 appUser.user.address.id = resultSet.getInt("l.id");
                 appUser.user.address.lat = resultSet.getDouble("l.lat");
-                appUser.user.address.lng = resultSet.getDouble("l.lon");
+                appUser.user.address.lng = resultSet.getDouble("l.lng");
                 appUser.user.address.formattedAddress = resultSet.getString("l.formatted_address");
                 appUser.user.address.countryName = resultSet.getString("l.country");
 
