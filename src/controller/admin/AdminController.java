@@ -373,9 +373,6 @@ public class AdminController extends HttpServlet {
         int status        = Integer.parseInt(req.getParameter("user_status"));
         int currentStatus = appModel.getUserStatusById(userId);
 
-        System.out.println(status);
-        System.out.println(currentStatus);
-
         if (status == currentStatus) {
             String statusName = "Banned";
 
