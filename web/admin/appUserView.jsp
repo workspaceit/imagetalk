@@ -84,12 +84,16 @@
                                     </td>
                                     <td>
                                         <% if (appUserData.banned) { %>
-                                        <button class="btn btn-block btn-danger" data-user-id="<%=appUserData.id%>"
-                                                data-user-status="<%=appUserData.banned%>" id="status">Banned
+                                        <button class="btn btn-block btn-danger status"
+                                                data-user-id="<%=appUserData.id%>"
+                                                data-user-status="<%=appUserData.banned%>"
+                                                id="status<%=appUserData.id%>">Banned
                                         </button>
                                         <% } else { %>
-                                        <button class="btn btn-block btn-success" data-user-id="<%=appUserData.id%>"
-                                                data-user-status="<%=appUserData.banned%>" id="status">Not Banned
+                                        <button class="btn btn-block btn-success status"
+                                                data-user-id="<%=appUserData.id%>"
+                                                data-user-status="<%=appUserData.banned%>"
+                                                id="status<%=appUserData.id%>">Not Banned
                                         </button>
                                         <% } %>
                                     </td>
@@ -264,9 +268,14 @@
     }
 
     jQuery(document).ready(function () {
-        $("#status").click(function () {
-            var userId = $("#status").data('user-id');
-            var userStatus = ($("#status").data('user-status')) ? 0 : 1;
+        $(".status").click(function () {
+            var selectedDom = $(this);
+            var userId = selectedDom.data('user-id');
+            var userStatus = (selectedDom.data('user-status')) ? 0 : 1;
+
+            console.log(userId);
+            console.log(userStatus);
+
             var r = confirm("Are you sure ?");
 
             if (r) {
@@ -279,21 +288,18 @@
                     },
                     success: function (data) {
                         if (data.responseStat.status) {
-                            $selector = $("#status");
-
                             if (userStatus == 1) {
-                                $selector.removeClass("btn-success");
-                                $selector.html("Banned");
-                                $selector.addClass("btn-danger");
-                                $selector.data("user-status", true);
+                                selectedDom.removeClass("btn-success");
+                                selectedDom.html("Banned");
+                                selectedDom.addClass("btn-danger");
+                                selectedDom.data("user-status", true);
                             } else {
-                                $selector.removeClass("btn-danger");
-                                $selector.html("Not Banned");
-                                $selector.addClass("btn-success");
-                                $selector.data("user-status", false);
+                                selectedDom.removeClass("btn-danger");
+                                selectedDom.html("Not Banned");
+                                selectedDom.addClass("btn-success");
+                                selectedDom.data("user-status", false);
                             }
                         }
-                        console.log(data);
                     }
                 });
             }

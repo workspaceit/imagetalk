@@ -422,7 +422,6 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         try {
             while (this.resultSet.next()) {
-                System.out.println(resultSet.getInt("banned"));
                 return resultSet.getInt("banned");
             }
         } catch (Exception ex) {
