@@ -154,6 +154,16 @@
         <url-pattern>/admin/app/user</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Upload Image</servlet-name>
+        <jsp-file>/admin/uploadImage.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Upload Image</servlet-name>
+        <url-pattern>/admin/upload/image</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/assets/*</url-pattern>
