@@ -1,6 +1,10 @@
-package model;
+package model.test;
 
 import com.google.gson.Gson;
+import model.ImageTalkBaseModel;
+import model.PostCommentModel;
+import model.PostLikeModel;
+import model.TagListModel;
 import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;

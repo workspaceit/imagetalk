@@ -183,8 +183,8 @@ public class AppUserRegistration extends HttpServlet {
             return;
         }
 
-
-
+        System.out.println("'" + this.req.getParameter("token")+"'");
+        System.out.println("'"+this.req.getParameter("phone_number")+"'");
         activationModel.setActivationCode(this.req.getParameter("token"));
 
         if(!activationModel.isTokenValid()){

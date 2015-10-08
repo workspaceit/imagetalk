@@ -21,7 +21,12 @@ import java.util.ArrayList;
 /**
  * Created by mi on 10/2/15.
  */
-public class WallPostController extends HttpServlet {
+
+/**
+ * Created by mi on 10/8/15.
+ */
+public class TestController extends  HttpServlet{
+
     ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
@@ -55,30 +60,10 @@ public class WallPostController extends HttpServlet {
         }
 
         switch (url) {
-            case "/app/wallpost/create":
-                this.create();
-                break;
-            case "/app/wallpost/get/own":
-                this.getOwnPost();
-                break;
-            case "/app/wallpost/get/recent":
-                this.getRecentPost();
-                break;
-            case "/app/wallpost/get/others":
-                this.getOthersPost();
-                break;
-            case "/app/wallpost/test":
+            case "/app/test/dbmodel":
                 this.test();
                 break;
-            case "/app/wallpost/create/comment":
-                this.creatComment();
-                break;
-            case "/app/wallpost/like":
-                this.likePost();
-                break;
-            case "/app/wallpost/get/likes":
-                this.getLikes();
-                break;
+
             default:
                 break;
         }

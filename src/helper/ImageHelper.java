@@ -76,17 +76,17 @@ public class ImageHelper {
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail((BufferedImage)imgObj, 200, 200,uId+"/profile");
-                thumb1.size.width = 200;
-                thumb1.size.height = 200;
+                thumb1.path = createThumbnail((BufferedImage)imgObj, 50, 50,uId+"/profile");
+                thumb1.size.width = 50;
+                thumb1.size.height = 50;
                 pictures.thumb.add(thumb1);
 
                 PictureDetails thumb2 = new  PictureDetails();
                 thumb2.type = "thumbnail";
-                thumb2.path = createThumbnail((BufferedImage)imgObj, 300, 300,uId+"/profile");
+                thumb2.path = createThumbnail((BufferedImage)imgObj, 100, 100,uId+"/profile");
 
-                thumb2.size.width = 300;
-                thumb2.size.height = 300;
+                thumb2.size.width = 100;
+                thumb2.size.height = 100;
 
                 pictures.thumb.add(thumb2);
 
@@ -95,18 +95,18 @@ public class ImageHelper {
 
                 PictureDetails thumb1 = new  PictureDetails();
                 thumb1.type = "thumbnail";
-                thumb1.path = createThumbnail(decodeToImage((String)imgObj), 200, 200,uId+"/profile");
+                thumb1.path = createThumbnail(decodeToImage((String)imgObj), 50, 50,uId+"/profile");
 
-                thumb1.size.width = 200;
-                thumb1.size.height = 200;
+                thumb1.size.width = 50;
+                thumb1.size.height = 50;
 
                 pictures.thumb.add(thumb1);
 
                 PictureDetails thumb2 = new  PictureDetails();
                 thumb2.type = "thumbnail";
-                thumb2.path = createThumbnail(decodeToImage((String)imgObj), 300, 300,uId+"/profile");
-                thumb2.size.width = 300;
-                thumb2.size.height = 300;
+                thumb2.path = createThumbnail(decodeToImage((String)imgObj), 100, 100,uId+"/profile");
+                thumb2.size.width = 100;
+                thumb2.size.height = 100;
                 pictures.thumb.add(thumb2);
             }
 

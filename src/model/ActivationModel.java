@@ -34,7 +34,7 @@ public class ActivationModel extends ImageTalkBaseModel{
     }
     public boolean isTokenValid(){
         String query ="select * from " + super.tableName+" where phone_number='"+this.phone_number+"' and activation_code='" +this.activation_code+"' limit 1";
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
@@ -85,7 +85,7 @@ public class ActivationModel extends ImageTalkBaseModel{
         return true;
     }
     public boolean setPhoneNumber(String phone_number){
-        this.phone_number =phone_number;
+        this.phone_number =phone_number.trim();
         return true;
     }
     public boolean setActivationCode(String activation_code){
