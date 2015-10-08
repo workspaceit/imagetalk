@@ -70,64 +70,18 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/test":
                 this.test();
                 break;
-            case "/app/wallpost/post/comment":
+            case "/app/wallpost/create/comment":
                 this.creatComment();
+                break;
+            case "/app/wallpost/like":
+                this.likePost();
                 break;
             default:
                 break;
         }
         this.pw.close();
     }
-    public void creatComment(){
-        if(!this.baseController.checkParam("post_id", this.req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-        if(!this.baseController.checkParam("comment", this.req, true)){
-
-            this.baseController.serviceResponse.responseStat.msg = "comment required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-
-        PostCommentModel postCommentModel = new PostCommentModel();
-        postCommentModel.setComment(this.req.getParameter("comment"));
-        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
-
-        try{
-            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
-        }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-
-        WallPostModel wallPostModel = new WallPostModel();
-        wallPostModel.setId(postCommentModel.getPost_id());
-
-        if(!wallPostModel.isIdExist()){
-            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-        if(postCommentModel.insert()==0){
-            this.baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-        this.baseController.serviceResponse.responseStat.msg = "Comment posted";
-        this.baseController.serviceResponse.responseData = postCommentModel.getById();
-        this.pw.print(this.baseController.getResponse());
-        return;
-
-    }
     public void create(){
         if(!this.baseController.checkParam("description", this.req, true)){
 
@@ -430,5 +384,107 @@ public class WallPostController extends HttpServlet {
         this.baseController.serviceResponse.responseData =  addressList;
         this.pw.print(this.baseController.getResponse());
         return;
+    }
+
+
+    public void creatComment(){
+        if(!this.baseController.checkParam("post_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        if(!this.baseController.checkParam("comment", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "comment required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+        postCommentModel.setComment(this.req.getParameter("comment"));
+        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
+
+        try{
+            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(postCommentModel.getPost_id());
+
+        if(!wallPostModel.isIdExist()){
+            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        if(postCommentModel.insert()==0){
+            this.baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "Comment posted";
+        this.baseController.serviceResponse.responseData = postCommentModel.getById();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    public void likePost(){
+        if(!this.baseController.checkParam("post_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        PostLikeModel postLikeModel = new PostLikeModel();
+        postLikeModel.setLiker_id(this.baseController.appCredential.id);
+        try{
+
+            postLikeModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String msg = "";
+
+        if(postLikeModel.isAlreadyLiked()){
+            if(postLikeModel.delete()==0){
+                this.baseController.serviceResponse.responseStat.msg = "Database error on delete";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+            msg = "You have undo your like";
+        }else{
+            if(postLikeModel.insert()==0){
+                this.baseController.serviceResponse.responseStat.msg = "Unable to like the post,database error";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }else{
+                msg = "Successfully liked";
+            }
+        }
+
+        JsonObject respObj = new JsonObject();
+        respObj.addProperty("likeCount",postLikeModel.getLikeCountByPostId());
+
+        this.baseController.serviceResponse.responseStat.msg = msg;
+        this.baseController.serviceResponse.responseData = respObj;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
 }
