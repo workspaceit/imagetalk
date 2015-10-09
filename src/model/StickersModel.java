@@ -5,13 +5,13 @@ import org.apache.commons.lang3.StringEscapeUtils;
 /**
  * Created by mi on 10/9/15.
  */
-public class StickersModel extends ImageTalkBaseModel{
+public class StickersModel extends ImageTalkBaseModel {
 
-    private int id;
-    private int sticker_category_id;
+    private int    id;
+    private int    sticker_category_id;
     private String path;
-    private int is_paid;
-    private int created_by;
+    private int    is_paid;
+    private int    created_by;
     private String created_date;
 
     public StickersModel() {
@@ -55,7 +55,7 @@ public class StickersModel extends ImageTalkBaseModel{
     }
 
     public boolean setIs_paid(int is_paid) {
-        this.is_paid = (is_paid<0||is_paid>1)?0:is_paid;
+        this.is_paid = (is_paid < 0 || is_paid > 1) ? 0 : is_paid;
         return true;
     }
 
@@ -76,9 +76,10 @@ public class StickersModel extends ImageTalkBaseModel{
         this.created_date = created_date;
         return true;
     }
-    public int insert(){
-        String query = "INSERT INTO `stickers`( `sticker_category_id`, `path`,`is_paid`, `created_by`) "+
-                       " VALUES ("+this.sticker_category_id+",'"+this.path+"',"+this.is_paid+","+this.created_by+")";
+
+    public int insert() {
+        String query = "INSERT INTO `stickers`( `sticker_category_id`, `path`,`is_paid`, `created_by`) " +
+                       " VALUES (" + this.sticker_category_id + ",'" + this.path + "'," + this.is_paid + "," + this.created_by + ")";
         this.insertData(query);
         return this.id;
     }
