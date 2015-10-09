@@ -46,7 +46,9 @@
             <div class="row">
                 <div class="row shuffle clearfix">
                     <div class="col-lg-12">
-                        <input class="file_input" type="file" multiple="multiple" name="files[]" id="input_file">
+                        <div style="margin: 0 auto;width: 98%;">
+                            <input type="file" multiple="multiple" name="files[]" id="files">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -82,67 +84,65 @@
 <!-- AdminLTE for demo purposes -->
 <script src="/assets/dist/js/demo.js"></script>
 
-
-<script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="/assets/filer/js/jquery.filer.min.js"></script>
-
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script type="text/javascript" src="/assets/filer/js/jquery.filer.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#input_file').filer({
+        $('#files').filer({
             limit: null,
             maxSize: null,
             extensions: null,
-            changeInput: true,
+            changeInput: '<div class="jFiler-input-dragDrop"><div class="jFiler-input-inner"><div class="jFiler-input-icon"><i class="icon-jfi-cloud-up-o"></i></div><div class="jFiler-input-text"><h3>Drag&Drop files here</h3> <span style="display:inline-block; margin: 15px 0">or</span></div><a class="jFiler-input-choose-btn blue">Browse Files</a></div></div>',
             showThumbs: true,
             appendTo: null,
-            theme: "default",
+            theme: "dragdropbox",
             templates: {
                 box: '<ul class="jFiler-item-list"></ul>',
                 item: '<li class="jFiler-item">\
-                        <div class="jFiler-item-container">\
-                            <div class="jFiler-item-inner">\
-                                <div class="jFiler-item-thumb">\
-                                    <div class="jFiler-item-status"></div>\
-                                    <div class="jFiler-item-info">\
-                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                            <div class="jFiler-item-container">\
+                                <div class="jFiler-item-inner">\
+                                    <div class="jFiler-item-thumb">\
+                                        <div class="jFiler-item-status"></div>\
+                                        <div class="jFiler-item-info">\
+                                            <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                        </div>\
+                                        {{fi-image}}\
                                     </div>\
-                                    {{fi-image}}\
-                                </div>\
-                                <div class="jFiler-item-assets jFiler-row">\
-                                    <ul class="list-inline pull-left">\
-                                        <li>{{fi-progressBar}}</li>\
-                                    </ul>\
-                                    <ul class="list-inline pull-right">\
-                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
-                                    </ul>\
+                                    <div class="jFiler-item-assets jFiler-row">\
+                                        <ul class="list-inline pull-left">\
+                                            <li>{{fi-progressBar}}</li>\
+                                        </ul>\
+                                        <ul class="list-inline pull-right">\
+                                            <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                        </ul>\
+                                    </div>\
                                 </div>\
                             </div>\
-                        </div>\
-                    </li>',
+                        </li>',
                 itemAppend: '<li class="jFiler-item">\
-                        <div class="jFiler-item-container">\
-                            <div class="jFiler-item-inner">\
-                                <div class="jFiler-item-thumb">\
-                                    <div class="jFiler-item-status"></div>\
-                                    <div class="jFiler-item-info">\
-                                        <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                            <div class="jFiler-item-container">\
+                                <div class="jFiler-item-inner">\
+                                    <div class="jFiler-item-thumb">\
+                                        <div class="jFiler-item-status"></div>\
+                                        <div class="jFiler-item-info">\
+                                            <span class="jFiler-item-title"><b title="{{fi-name}}">{{fi-name | limitTo: 25}}</b></span>\
+                                        </div>\
+                                        {{fi-image}}\
                                     </div>\
-                                    {{fi-image}}\
-                                </div>\
-                                <div class="jFiler-item-assets jFiler-row">\
-                                    <ul class="list-inline pull-left">\
-                                        <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
-                                    </ul>\
-                                    <ul class="list-inline pull-right">\
-                                        <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
-                                    </ul>\
+                                    <div class="jFiler-item-assets jFiler-row">\
+                                        <ul class="list-inline pull-left">\
+                                            <span class="jFiler-item-others">{{fi-icon}} {{fi-size2}}</span>\
+                                        </ul>\
+                                        <ul class="list-inline pull-right">\
+                                            <li><a class="icon-jfi-trash jFiler-item-trash-action"></a></li>\
+                                        </ul>\
+                                    </div>\
                                 </div>\
                             </div>\
-                        </div>\
-                    </li>',
+                        </li>',
                 progressBar: '<div class="bar"></div>',
                 itemAppendToEnd: false,
-                removeConfirmation: true,
+                removeConfirmation: false,
                 _selectors: {
                     list: '.jFiler-item-list',
                     item: '.jFiler-item',
@@ -151,7 +151,7 @@
                 }
             },
             uploadFile: {
-                url: "./php/upload.php",
+                url: $("#base_url").val() + "admin/operation/upload/image/ajax",
                 data: {},
                 type: 'POST',
                 enctype: 'multipart/form-data',
@@ -172,18 +172,18 @@
                 statusCode: {},
                 onProgress: function () {
                 },
-                onComplete: function () {
-                }
             },
             dragDrop: {
-                dragEnter: null,
-                dragLeave: null,
-                drop: null,
+                dragEnter: function () {
+                },
+                dragLeave: function () {
+                },
+                drop: function () {
+                },
             },
             addMore: true,
             clipBoardPaste: true,
             excludeName: null,
-            files: null,
             beforeShow: function () {
                 return true
             },
@@ -212,36 +212,9 @@
     });
 </script>
 
-<style type="text/css">
-    .file_input {
-        display: inline-block;
-        padding: 10px 16px;
-        outline: none;
-        cursor: pointer;
-        text-decoration: none;
-        text-align: center;
-        white-space: nowrap;
-        font-family: sans-serif;
-        font-size: 11px;
-        font-weight: bold;
-        border-radius: 3px;
-        color: #008BFF;
-        border: 1px solid #008BFF;
-        vertical-align: middle;
-        background-color: #fff;
-        margin-bottom: 10px;
-        box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.05);
-        -webkit-transition: all 0.2s;
-        -moz-transition: all 0.2s;
-        transition: all 0.2s;
-    }
-
-    .file_input:hover,
-    .file_input:active {
-        background: #008BFF;
-        color: #fff;
-    }
-</style>
+<!--[if IE]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
 
 </body>
 </html>

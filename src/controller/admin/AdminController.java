@@ -67,6 +67,10 @@ public class AdminController extends HttpServlet {
                 this.changeUserStatus(req);
                 break;
 
+            case "/admin/operation/upload/image/ajax":
+                this.uploadImageByAjax(req);
+                break;
+
             default:
                 break;
         }
@@ -398,5 +402,9 @@ public class AdminController extends HttpServlet {
 
         this.pw.print(this.baseController.getResponse());
         return;
+    }
+
+    private void uploadImageByAjax(HttpServletRequest req){
+        this.pw.print("{\"isComplete\":true}");
     }
 }
