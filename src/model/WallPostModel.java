@@ -137,7 +137,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.id = this.resultSet.getInt("wall_post_id");
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
-                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
