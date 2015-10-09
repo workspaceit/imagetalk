@@ -1,6 +1,6 @@
 package model.test;
 
-import model.ImageTalkBaseModel;
+import model.test.ImageTalkBaseModel;
 import model.datamodel.app.Login;
 import model.datamodel.app.User;
 

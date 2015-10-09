@@ -1,5 +1,5 @@
-package model;
-
+package model.stable;
+/* Stable without Rollbacka and commit*/
 import java.sql.*;
 
 class ImageTalkBaseModel {
@@ -8,8 +8,7 @@ class ImageTalkBaseModel {
     static final private String DBPort     = "3306";
     static final private String DBName     = "imagetalk";
     static final private String Url_Prefix = "jdbc:mysql:";
-    static final private String timeZoneParam = "?useLegacyDatetimeCode=false";
-    static final private String DBUrl      = Url_Prefix + "//" + DBHost  + "/" + DBName+timeZoneParam; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
+    static final private String DBUrl      = Url_Prefix + "//" + DBHost  + "/" + DBName; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
     static final private String DBUser     = "root";
     static final private String DBPassword = "";
 
@@ -50,9 +49,8 @@ class ImageTalkBaseModel {
 
     public void startTransaction(){
         try {
+            this.con.setAutoCommit(false);
             autoCommit = false;
-            this.con.setAutoCommit(autoCommit);
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -91,7 +89,7 @@ class ImageTalkBaseModel {
         }finally {
         }
     }
-    //    protected ResultSet getData(String sql) {
+//    protected ResultSet getData(String sql) {
 //        this.dbConnectionRecheck();
 //        try {
 //            this.query = sql;
@@ -105,23 +103,19 @@ class ImageTalkBaseModel {
 //        return this.resultSet;
 //    }
     public void dbConnectionRecheck(){
-
-        try {
-            if(this.con==null) {
-                System.out.println("con Recheck "+con);
+        if(this.con==null){
+            try {
                 Class.forName(DBDriver);
                 this.con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+                if(this.stmt==null){
+                    this.stmt = this.con.createStatement();
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            if (this.stmt == null) {
-                System.out.println("stmt Recheck "+stmt);
-                this.stmt = this.con.createStatement();
-            }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
     }
     protected int insertData(String query) {
         this.dbConnectionRecheck();
@@ -175,16 +169,13 @@ class ImageTalkBaseModel {
         try {
 
             if(this.resultSet!=null) {
-                System.out.println("resultSet Closed "+resultSet);
                 this.resultSet.close();
             }
             if(this.stmt!=null) {
-                System.out.println("stmt Closed "+stmt);
                 this.stmt.close();
                 this.stmt = null;
             }
-            if(this.con!=null && this.autoCommit) {
-                System.out.println("con Closed "+con);
+            if(this.con!=null) {
                 this.con.close();
                 this.con =null;
             }
@@ -194,11 +185,5 @@ class ImageTalkBaseModel {
         }
 
 
-    }
-    public String getPrcessedTimeStamp(Timestamp timeStamp){
-        String processedTime ="";
-        Long longTime = timeStamp.getTime()/1000;
-        processedTime = Long.toString(longTime);
-        return processedTime;
     }
 }

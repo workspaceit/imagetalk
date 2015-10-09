@@ -1,7 +1,7 @@
 package model.test;
 
 import com.google.gson.Gson;
-import model.ImageTalkBaseModel;
+import model.test.ImageTalkBaseModel;
 import model.PostCommentModel;
 import model.PostLikeModel;
 import model.TagListModel;
