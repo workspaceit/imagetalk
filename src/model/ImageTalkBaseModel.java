@@ -195,7 +195,7 @@ class ImageTalkBaseModel {
 
 
     }
-    public String getTimeStampInformat(Timestamp timeStamp){
+    public String getPrcessedTimeStamp(Timestamp timeStamp){
         String processedTime ="";
         Long longTime = timeStamp.getTime()/1000;
         processedTime = Long.toString(longTime);

@@ -3,6 +3,8 @@ package controller.service;
 import com.google.gson.*;
 import helper.ImageHelper;
 import model.CountryModel;
+import model.StickerCategoryModel;
+import model.StickersModel;
 import model.test.UserInfModel;
 import model.test.AppLoginCredentialModel;
 
@@ -55,13 +57,29 @@ public class TestController extends  HttpServlet{
             case "/app/test/dbmodel":
                 this.test();
                 break;
-
+            case "/app/test/sticker":
+                this.testSticker();
+                break;
             default:
                 break;
         }
         this.pw.close();
     }
+    private void testSticker(){
+        StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+        StickersModel stickersModel = new StickersModel();
 
+        stickerCategoryModel.setName("Dog");
+        stickerCategoryModel.setCreated_by(1);
+        stickerCategoryModel.setIs_paid(10);
+        stickersModel.setSticker_category_id(stickerCategoryModel.insert());
+        stickersModel.setPath("/sdf/sdf/df/p.oho");
+        stickersModel.setCreated_by(4);
+        stickersModel.setIs_paid(1);
+        stickersModel.insert();
+
+
+    }
     private void test(){
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Phone number required";
