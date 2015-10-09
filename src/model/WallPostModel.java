@@ -5,6 +5,7 @@ import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.security.Timestamp;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -136,7 +137,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.id = this.resultSet.getInt("wall_post_id");
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
-                wallPost.createdDate = this.resultSet.getString("wall_postCdate");
+                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
@@ -211,7 +212,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
-                wallPost.createdDate = this.resultSet.getString("wall_postCdate");
+
+                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
@@ -292,7 +294,10 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
 
-                wallPost.createdDate = this.resultSet.getString("wall_postCdate");
+                System.out.println(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                System.out.println(this.resultSet.getTimestamp("wall_postCdate"));
+
+                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
                 wallPost.owner.textStatus = this.resultSet.getString("text_status");
@@ -315,14 +320,14 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
                 wallPost.owner.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
-                wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
+                wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
 
                 wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
                 wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
                 wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
                 wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
                 wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
-                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
+                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"0":Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
 
 
                 wallPost = this.getOtherDependency(wallPost);

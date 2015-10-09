@@ -112,8 +112,6 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 " left join location on location.id = user_inf.address_id " +
                 " where "+this.tableName+".post_id = "+this.post_id+" ";
 
-
-        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
@@ -122,7 +120,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.id = this.resultSet.getInt("postCommentId");
                 postComment.comment = this.resultSet.getString("comment");
                 postComment.picPath = this.resultSet.getString("commentPicPath");
-                postComment.createdDate = this.resultSet.getString("postCommentCDate");
+                postComment.createdDate = Long.toString(this.resultSet.getTimestamp("postCommentCDate").getTime());
 
                 postComment.commenter.id = this.resultSet.getInt("app_login_credentialId");
                 postComment.commenter.textStatus = this.resultSet.getString("text_status");
