@@ -4,13 +4,19 @@ import controller.service.ImageTalkBaseController;
 
 import model.*;
 import model.datamodel.app.Login;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -404,7 +410,69 @@ public class AdminController extends HttpServlet {
         return;
     }
 
-    private void uploadImageByAjax(HttpServletRequest req){
-        this.pw.print("{\"isComplete\":true}");
+    private void uploadImageByAjax(HttpServletRequest req) {
+        boolean isMultipart;
+        String  filePath    = "/home/touch/Projects/j2ee/ImageTalk/web/assets/pic/";
+        int     maxFileSize = 250 * 1024 * 1024;
+        int     maxMemSize  = 10 * 1024 * 1024;
+        File    file;
+
+        isMultipart = ServletFileUpload.isMultipartContent(req);
+
+        if (!isMultipart) {
+            this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
+            return;
+        }
+
+        DiskFileItemFactory factory = new DiskFileItemFactory();
+        factory.setSizeThreshold(maxMemSize);
+        factory.setRepository(new File(filePath));
+
+        ServletFileUpload upload = new ServletFileUpload(factory);
+        upload.setSizeMax(maxFileSize);
+
+        try {
+            File fileSaveDir = new File(filePath);
+            if (!fileSaveDir.exists()) {
+                fileSaveDir.mkdir();
+            }
+
+            List fileItems = upload.parseRequest(req);
+            Iterator i = fileItems.iterator();
+
+            while (i.hasNext()) {
+                FileItem fi = (FileItem) i.next();
+                if (!fi.isFormField()) {
+                    // Get the uploaded file parameters
+                    String fieldName = fi.getFieldName();
+                    String fileName = fi.getName();
+                    String contentType = fi.getContentType();
+                    boolean isInMemory = fi.isInMemory();
+                    long sizeInBytes = fi.getSize();
+
+                    System.out.println(contentType);
+
+                    if (sizeInBytes > maxFileSize || contentType == "image/gif") {
+                        this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
+                        fi.delete();
+                        return;
+                    }
+
+                    if (fileName.lastIndexOf("\\") >= 0) {
+                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\")));
+                    } else {
+                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
+                    }
+
+                    fi.write(file);
+                    this.pw.print("{\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
+                    System.out.println("done \n");
+                    return;
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+            this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
+        }
     }
 }
