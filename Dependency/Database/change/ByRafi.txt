@@ -14,3 +14,31 @@ ALTER TABLE  `tag_list` CHANGE  `tag_id`  `tag_id` INT( 11 ) NOT NULL COMMENT  '
 ALTER TABLE  `location` CHANGE  `lon`  `lng` DOUBLE NOT NULL ;
 ALTER TABLE  `wall_post` CHANGE  `picture_path`  `picture_path` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;
 ALTER TABLE  `user_inf` CHANGE  `pic_path`  `pic_path` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL ;
+
+
+# Date of change 9th Oct 2015
+
+-- tables
+-- Table sticker_category
+CREATE TABLE sticker_category (
+    id int  NOT NULL  AUTO_INCREMENT,
+    name varchar(200)  NOT NULL,
+    created_by int  NOT NULL,
+    created_date timestamp  NOT NULL,
+    CONSTRAINT sticker_category_pk PRIMARY KEY (id)
+);# MySQL returned an empty result set (i.e. zero rows).
+
+
+-- Table stickers
+CREATE TABLE stickers (
+    id int  NOT NULL  AUTO_INCREMENT,
+    sticker_category_id int  NOT NULL,
+    path text  NOT NULL,
+    created_by int  NOT NULL,
+    created_date timestamp  NOT NULL,
+    CONSTRAINT stickers_pk PRIMARY KEY (id)
+);# MySQL returned an empty result set (i.e. zero rows).
+
+
+ALTER TABLE  `stickers` ADD  `is_paid` TINYINT NOT NULL DEFAULT  '0' AFTER  `path` ;
+ALTER TABLE  `sticker_category` ADD  `is_paid` TINYINT NOT NULL DEFAULT  '0' AFTER  `name` ;
