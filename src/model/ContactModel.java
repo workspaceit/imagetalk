@@ -145,7 +145,7 @@ public class ContactModel extends ImageTalkBaseModel {
         }
         return false;
     }
-    public String getContactInStrArray(String keyword) {
+    public String getContactInStrArray() {
         String contactStr = "";
         int i = 0;
         String query = "select contact_id  from " + super.tableName + " " +
@@ -157,15 +157,19 @@ public class ContactModel extends ImageTalkBaseModel {
         try {
             while (this.resultSet.next()) {
                 i++;
-                if(i<this.resultSet.)
+                System.out.println("Row count :"+this.resultSet.getRow());
+                contactStr += String.valueOf(this.resultSet.getInt("id"));
+                if(i<this.resultSet.getRow()){
+                    contactStr +=",";
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             this.closeConnection();
         }
-
-        return appCredentialList;
+        System.out.println(contactStr);
+        return contactStr;
     }
     public ArrayList<AppCredential> getContactByKeyword(String keyword) {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();

@@ -3,6 +3,7 @@ package controller.service;
 import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
+import model.ContactModel;
 import model.CountryModel;
 import model.StickerCategoryModel;
 import model.StickersModel;
@@ -67,11 +68,8 @@ public class TestController extends  HttpServlet{
         this.pw.close();
     }
     private void testSticker(){
-        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
-        this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData =  googleGeoApi.getLocationByLatLng(10,10);
-        this.pw.print(this.baseController.getResponse());
-        return;
+        ContactModel contactModel = new ContactModel();
+        contactModel.getContactInStrArray();
     }
     private void test(){
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
