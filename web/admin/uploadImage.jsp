@@ -9,6 +9,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="controller.service.ImageTalkBaseController" %>
 <%@ page import="model.datamodel.app.Login" %>
+<%@ page import="model.StickerCategoryModel" %>
+<%@ page import="java.util.ArrayList" %>
 <%
     ImageTalkBaseController imageTalkBaseController = new ImageTalkBaseController();
     Login login = new Login();
@@ -17,6 +19,9 @@
     } else {
         response.sendRedirect("/admin/login");
     }
+
+    StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+    ArrayList<StickerCategoryModel> stickerCategoryList = stickerCategoryModel.getStickerCategoryList();
 %>
 <!DOCTYPE html>
 <html>
@@ -45,6 +50,33 @@
         <section class="content">
             <div class="row">
                 <div class="row shuffle clearfix">
+                    <div class="col-lg-12">
+                        <div class="box-body form-horizontal">
+                            <div class="form-group">
+                                <label for="sticker_category_id" class="col-sm-2 control-label">Category</label>
+
+                                <div class="col-sm-10">
+                                    <select name="sticker_category_id" class="form-control" id="sticker_category_id">
+                                        <option value="">Select One</option>
+                                        <% for (StickerCategoryModel stickerCategory : stickerCategoryList) { %>
+                                        <option value="<%=stickerCategory.getId()%>%>"><%=stickerCategory.getName()%></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="is_paid" class="col-sm-2 control-label">Type</label>
+
+                                <div class="col-sm-10">
+                                    <select name="is_paid" class="form-control" id="is_paid">
+                                        <option value="">Select One</option>
+                                        <option value="0">Free</option>
+                                        <option value="1">Paid</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-lg-12">
                         <div style="margin: 0 auto;width: 98%;">
                             <input type="file" multiple="multiple" name="files[]" id="files">

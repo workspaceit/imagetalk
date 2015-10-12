@@ -196,12 +196,12 @@
 
     <servlet>
         <servlet-name>Upload Sticker</servlet-name>
-        <jsp-file>/admin/stickerCategoryForm.jsp</jsp-file>
+        <jsp-file>/admin/uploadImage.jsp</jsp-file>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>Upload Sticker</servlet-name>
-        <url-pattern>/admin/stickerCategoryForm.jsp</url-pattern>
+        <url-pattern>/admin/sticker/upload</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

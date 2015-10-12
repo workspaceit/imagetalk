@@ -1,5 +1,8 @@
 package model;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
 /**
  * Created by mi on 10/9/15.
  */
@@ -61,6 +64,31 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
                        " VALUES ('" + this.name + "'," + this.is_paid + "," + this.created_by + ")";
         this.id = this.insertData(query);
         return this.id;
+    }
+
+    public ArrayList<StickerCategoryModel> getStickerCategoryList() {
+        ArrayList<StickerCategoryModel> categoryList = new ArrayList<>();
+        String                          sql          = "SELECT * FROM sticker_category";
+        ResultSet                       resultSet    = null;
+
+        this.setQuery(sql);
+        this.getData();
+
+        try {
+            while (resultSet.next()) {
+                this.setId(resultSet.getInt("id"));
+                this.setName(resultSet.getString("name"));
+                this.setIs_paid(resultSet.getInt("is_paid"));
+                this.setCreated_by(resultSet.getInt("created_by"));
+                this.setCreated_date(resultSet.getString("created_date"));
+
+                categoryList.add(this);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return categoryList;
     }
 
 }
