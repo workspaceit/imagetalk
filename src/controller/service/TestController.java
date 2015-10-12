@@ -1,6 +1,7 @@
 package controller.service;
 
 import com.google.gson.*;
+import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
 import model.CountryModel;
 import model.StickerCategoryModel;
@@ -57,7 +58,7 @@ public class TestController extends  HttpServlet{
             case "/app/test/dbmodel":
                 this.test();
                 break;
-            case "/app/test/sticker":
+            case "/app/test/test":
                 this.testSticker();
                 break;
             default:
@@ -66,19 +67,11 @@ public class TestController extends  HttpServlet{
         this.pw.close();
     }
     private void testSticker(){
-        StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
-        StickersModel stickersModel = new StickersModel();
-
-        stickerCategoryModel.setName("Dog");
-        stickerCategoryModel.setCreated_by(1);
-        stickerCategoryModel.setIs_paid(10);
-        stickersModel.setSticker_category_id(stickerCategoryModel.insert());
-        stickersModel.setPath("/sdf/sdf/df/p.oho");
-        stickersModel.setCreated_by(4);
-        stickersModel.setIs_paid(1);
-        stickersModel.insert();
-
-
+        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+        this.baseController.serviceResponse.responseStat.msg = "";
+        this.baseController.serviceResponse.responseData =  googleGeoApi.getLocationByLatLng(10,10);
+        this.pw.print(this.baseController.getResponse());
+        return;
     }
     private void test(){
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
@@ -145,9 +138,12 @@ public class TestController extends  HttpServlet{
         countryModel.getAll();
         userInfModel.getAllByKeyword("a");
         appLoginCredentialModel.getAppCredentialById();
+
+
           userInfModel.commitTransaction();
          appLoginCredentialModel.commitTransaction();
-
+//        userInfModel.rollBack();
+//        appLoginCredentialModel.rollBack();
 
         this.baseController.serviceResponse.responseStat.msg = "Registration success";
         this.baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();

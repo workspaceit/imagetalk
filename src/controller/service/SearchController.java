@@ -58,10 +58,59 @@ public class SearchController extends HttpServlet {
             case "/app/search/location/by/keyword":
                 this.getLocationByKeyword();
                 break;
+            case "/app/search/location/by/latlng":
+                this.getLocationByLattLng();
             default:
                 break;
         }
         this.pw.close();
+    }
+    private void getLocationByLattLng(){
+        double lat= 0;
+        double lng= 0;
+
+
+        if(!this.baseController.checkParam("lat", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "lat required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+                lat = Double.parseDouble(this.req.getParameter("lat").trim());
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        if(!this.baseController.checkParam("lng", this.req, true)) {
+            this.baseController.serviceResponse.responseStat.msg = "lng required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            try{
+                lng = Double.parseDouble(this.req.getParameter("lng").trim());
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
+        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+        this.baseController.serviceResponse.responseStat.msg = "";
+        this.baseController.serviceResponse.responseData =  googleGeoApi.getLocationByLatLng(lat,lng);
+        this.pw.print(this.baseController.getResponse());
+        return;
     }
     private void getUserForTag(){
 
