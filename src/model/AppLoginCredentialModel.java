@@ -453,10 +453,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             }
 
         }
-        System.out.println("sd"+this.contactList.size());
+        System.out.println("sd" + this.contactList.size());
         if(contactIdIn==""){
             return appCredentialList;
         }
+
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.id);
         String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
@@ -464,7 +467,12 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
-                " where app_login_credential.phone_number in  (" + contactIdIn+" )";
+                " where app_login_credential.phone_number in  (" + contactIdIn+" ) ";
+        String contactIdStr = contactModel.getContactInStrArray();
+        if(contactIdStr!=""){
+            query += " and app_login_credential.id not in ("+contactIdStr +")";
+        }
+
         System.out.println(query);
         this.setQuery(query);
         this.getData();

@@ -6,7 +6,9 @@ package controller.service;
 
 import model.AdminLoginModel;
 import model.AppLoginCredentialModel;
+import model.ContactModel;
 import model.datamodel.app.AppCredential;
+import model.datamodel.app.AuthCredential;
 import model.datamodel.app.Login;
 
 import javax.mail.Message;
@@ -22,11 +24,24 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Properties;
 
 public class AppLoginController extends HttpServlet {
     ImageTalkBaseController baseController;
     PrintWriter pw;
+    LocalResponseClass localResponseObj;
+    class LocalResponseClass{
+        AuthCredential authCredential;
+        ArrayList<AppCredential> contacts;
+        Object extra;
+
+        public LocalResponseClass() {
+            this.authCredential = new AuthCredential();
+            this.contacts = new ArrayList();
+            this.extra = new Object();
+        }
+    }
     @Override
     public void init() throws ServletException {
         super.init();
@@ -37,12 +52,14 @@ public class AppLoginController extends HttpServlet {
             this.login =new Login();
         }
     }
+
     @Override
     public void doPost(HttpServletRequest req,HttpServletResponse res)
             throws ServletException,IOException
     {
         res.setContentType("application/json");
         this.baseController = new ImageTalkBaseController();
+        this.localResponseObj = new LocalResponseClass();
         this.pw=res.getWriter();
 
         String url = req.getRequestURI().toString();
@@ -91,9 +108,9 @@ public class AppLoginController extends HttpServlet {
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         appLoginCredentialModel.setAccess_token(accessToken);
-        AppCredential appCredential = appLoginCredentialModel.getAuthincatedByAccessToken();
-        if(appCredential.id>0){
-            appLoginCredentialModel.setId(appCredential.id);
+        AuthCredential authCredential = appLoginCredentialModel.getAuthincatedByAccessToken();
+        if(authCredential.id>0){
+            appLoginCredentialModel.setId(authCredential.id);
 
             if(!appLoginCredentialModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;
@@ -101,10 +118,13 @@ public class AppLoginController extends HttpServlet {
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
+            ContactModel contactModel = new ContactModel();
+            contactModel.setOwner_id(authCredential.id);
+            this.localResponseObj.authCredential =authCredential;
+            this.localResponseObj.contacts = contactModel.getContactByOwnerId();
 
-
-            this.baseController.serviceResponse.responseData = appCredential;
-            this.baseController.setAppSession(req, appCredential);
+            this.baseController.serviceResponse.responseData =  this.localResponseObj;
+            this.baseController.setAppSession(req, authCredential);
         }else{
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Access token is wrong";

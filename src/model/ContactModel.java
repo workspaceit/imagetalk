@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import model.datamodel.app.AppCredential;
 import model.datamodel.photo.Pictures;
 
@@ -85,7 +86,7 @@ public class ContactModel extends ImageTalkBaseModel {
         this.favorites = favorites;
     }
 
-    public boolean is_block() {
+    public boolean getIs_block() {
         return is_block;
     }
 
@@ -122,12 +123,32 @@ public class ContactModel extends ImageTalkBaseModel {
     }
 
     public int insert(){
-        String query = "INSERT INTO `contact`(`nickname`, `owner_id`, `contact_id`, `favorites`, `is_block`, `rating`) " +
-                "VALUES ('"+this.nickname+"',"+this.owner_id+","+this.contact_id+","+this.favorites+","+this.is_block+","+this.rating+")";
+        String query = "INSERT INTO " + this.tableName + " (`nickname`, `owner_id`, `contact_id`, `favorites`, `is_block`, `rating`) " +
+                "VALUES ('"+this.owner_id+"',"+this.owner_id+","+this.contact_id+","+this.favorites+","+this.is_block+","+this.rating+")";
         this.id = this.insertData(query);
         return this.id;
     }
-    public boolean isExist(){
+    public int delete(){
+        String query = "DELETE FROM " + this.tableName + "  " +
+                "where owner_id = "+this.owner_id+" and contact_id="+this.contact_id+" limit 1";
+
+        return this.deleteData(query);
+    }
+    public int updateIsBlock(){
+        String query = "update  " + this.tableName + " set is_block =  " +this.is_block +
+                " where owner_id = "+this.owner_id+" and contact_id="+this.contact_id+" limit 1";
+
+        return this.deleteData(query);
+    }
+
+    public int updateFavorites(){
+        String query = "update  " + this.tableName + " set favorites = " +this.favorites+
+                " where owner_id = "+this.owner_id+" and contact_id="+this.contact_id+" limit 1";
+
+        return this.deleteData(query);
+    }
+
+    public boolean isExist() {
         String query = "select id from " + this.tableName + " where contact_id = " + this.contact_id + " and owner_id = "+this.owner_id+" limit 1";
 
         this.setQuery(query);
@@ -147,22 +168,26 @@ public class ContactModel extends ImageTalkBaseModel {
     }
     public String getContactInStrArray() {
         String contactStr = "";
+        ArrayList<String> contacts = new ArrayList();
         int i = 0;
         String query = "select contact_id  from " + super.tableName + " " +
                 " where  " + super.tableName + ".owner_id="+ this.owner_id;
-
+        System.out.println(query);
 
         this.setQuery(query);
         this.getData();
         try {
             while (this.resultSet.next()) {
+                contacts.add(String.valueOf(this.resultSet.getInt("contact_id")));
+            }
+            for(String contact : contacts){
                 i++;
-                System.out.println("Row count :"+this.resultSet.getRow());
-                contactStr += String.valueOf(this.resultSet.getInt("id"));
-                if(i<this.resultSet.getRow()){
+                contactStr +=contact;
+                if(i<contacts.size()){
                     contactStr +=",";
                 }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -170,6 +195,63 @@ public class ContactModel extends ImageTalkBaseModel {
         }
         System.out.println(contactStr);
         return contactStr;
+    }
+    public ArrayList<AppCredential> getContactByOwnerId() {
+        ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
+        String query = "select user_inf.id as user_inf_id," +
+                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                " app_login_credential.created_date as app_login_credential_c_date" +
+                "  from " + super.tableName + " " +
+                " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
+                " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                " left join location on location.id = user_inf.address_id " +
+                " where  " + super.tableName + ".owner_id="+ this.owner_id;
+
+
+        if (this.limit > 0) {
+            this.offset = this.offset * this.limit;
+            query += " LIMIT " + this.offset + " ," + this.limit + " ";
+        }
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                AppCredential appCredential = new AppCredential();
+                appCredential.id = this.resultSet.getInt("app_login_credential_id");
+                appCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                appCredential.phoneNumber = this.resultSet.getString("phone_number");
+                appCredential.user.id = this.resultSet.getInt("user_inf_id");
+                appCredential.user.firstName = this.resultSet.getString("f_name");
+                appCredential.user.lastName = this.resultSet.getString("l_name");
+                try {
+                    appCredential.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                } catch (Exception ex) {
+                    System.out.println("Parse error on picture appCid " + appCredential.id);
+                    appCredential.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
+                    ex.printStackTrace();
+                }
+                appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+
+                appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                appCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                appCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
+                appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                appCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+
+                appCredentialList.add(appCredential);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+
+        return appCredentialList;
     }
     public ArrayList<AppCredential> getContactByKeyword(String keyword) {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
@@ -257,6 +339,104 @@ public class ContactModel extends ImageTalkBaseModel {
             if(this.insert()==0){
                 this.errorObj.errStatus = false;
                 this.errorObj.msg = "Internal server error";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+    public boolean removeContact(){
+        this.startTransaction();
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        for(int contactId : this.contactIdList ){
+            this.contact_id = contactId;
+            appLoginCredentialModel.setId(this.contact_id);
+
+            if(this.delete()==0){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error: no record found to delete ";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+    public boolean blockContact(){
+        this.startTransaction();
+        this.is_block = true;
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        for(int contactId : this.contactIdList ){
+            this.contact_id = contactId;
+            appLoginCredentialModel.setId(this.contact_id);
+
+            if(this.updateIsBlock()==0){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error: no record found to delete ";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+    public boolean favoriteContact(){
+        this.startTransaction();
+        this.favorites = true;
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        for(int contactId : this.contactIdList ){
+            this.contact_id = contactId;
+            appLoginCredentialModel.setId(this.contact_id);
+
+            if(this.updateFavorites()==0){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error: no record found to delete ";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+    public boolean unBlockContact(){
+        this.startTransaction();
+        this.is_block = false;
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        for(int contactId : this.contactIdList ){
+            this.contact_id = contactId;
+            appLoginCredentialModel.setId(this.contact_id);
+
+            if(this.updateIsBlock()==0){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error: no record found to delete ";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+    public boolean unFavoriteContact(){
+        this.startTransaction();
+        this.favorites = false;
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        for(int contactId : this.contactIdList ){
+            this.contact_id = contactId;
+            appLoginCredentialModel.setId(this.contact_id);
+
+            if(this.updateFavorites()==0){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error: no record found to delete ";
                 return false;
             }
         }

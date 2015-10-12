@@ -48,6 +48,11 @@ public class TestController extends  HttpServlet{
 
 
 
+        if(!this.baseController.isAppSessionValid(this.req)){
+            this.pw.print(this.baseController.getResponse());
+            this.pw.close();
+            return;
+        }
 
         String url = req.getRequestURI().toString();
 
@@ -69,6 +74,8 @@ public class TestController extends  HttpServlet{
     }
     private void testSticker(){
         ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        System.out.println(this.baseController.appCredential.id);
         contactModel.getContactInStrArray();
     }
     private void test(){

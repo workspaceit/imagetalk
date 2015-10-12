@@ -54,8 +54,21 @@ public class ContactController extends HttpServlet {
             case "/app/contact/add":
                 this.addContacts();
                 break;
-
-
+            case "/app/contact/remove":
+                this.removeContacts();
+                break;
+            case "/app/contact/block":
+                this.blockContacts();
+                break;
+            case "/app/contact/unblock":
+                this.unBlockContacts();
+                break;
+            case "/app/contact/favorite":
+                this.favoritesContacts();
+                break;
+            case "/app/contact/unfavorites":
+                this.unFavoritesContacts();
+                break;
             default:
                 break;
         }
@@ -88,7 +101,7 @@ public class ContactController extends HttpServlet {
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-
+        appLoginCredentialModel.setId(this.baseController.appCredential.id);
         appLoginCredentialModel.setContactList(contacts);
 
 
@@ -133,7 +146,213 @@ public class ContactController extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }
-        this.baseController.serviceResponse.responseStat.msg = "Contacts are added successfully";
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"added successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void removeContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.removeContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"removed successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void blockContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.blockContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "blocked successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void unBlockContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.unBlockContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unblocked successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void favoritesContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.favoriteContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "favorite successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void unFavoritesContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.unFavoriteContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        String suffix = (contactIdList.size()>1)?"s are ":" is ";
+        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unfavorite successfully";
         this.pw.print(this.baseController.getResponse());
         return;
 
