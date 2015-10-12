@@ -42,3 +42,9 @@ CREATE TABLE stickers (
 
 ALTER TABLE  `stickers` ADD  `is_paid` TINYINT NOT NULL DEFAULT  '0' AFTER  `path` ;
 ALTER TABLE  `sticker_category` ADD  `is_paid` TINYINT NOT NULL DEFAULT  '0' AFTER  `name` ;
+
+
+# Date of change 12th Oct 2015
+
+ALTER TABLE  `contact` DROP  `rating` ;
+ALTER TABLE  `contact` ADD  `rating` INT( 1 ) NOT NULL AFTER  `is_block` ;

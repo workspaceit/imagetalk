@@ -27,6 +27,9 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
     private ArrayList<OperAppCredential> appUserList;
 
+    private ArrayList<String> contactList;
+
+
     public AppLoginCredentialModel() {
         super();
         super.tableName = "app_login_credential";
@@ -42,6 +45,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         this.token = "";
 
         this.gson = new Gson();
+        this.contactList = new ArrayList();
 
     }
 
@@ -117,6 +121,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         return true;
     }
 
+    public boolean setContactList( ArrayList<String> contactList){
+
+        for(String contact:contactList){
+            this.contactList.add(contact);
+        }
+        return true;
+    }
     public boolean isActive() {
         String query = "select active from " + this.tableName + " where id = " + this.id + " limit 1";
 
@@ -430,7 +441,66 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         return 0;
     }
+    public ArrayList<AppCredential> getMatchedPhoneNumber(){
+        ArrayList<AppCredential> appCredentialList = new ArrayList<>();
+        String contactIdIn = "";
+        int i = 0;
+        for(String contact : this.contactList){
+            i++;
+            contactIdIn += contact;
+            if(i<this.contactList.size()){
+                contactIdIn +=",";
+            }
 
+        }
+        System.out.println("sd"+this.contactList.size());
+        if(contactIdIn==""){
+            return appCredentialList;
+        }
+        String query = "select user_inf.id as user_inf_id," +
+                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
+                " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                " left join location on location.id = user_inf.address_id " +
+                " where app_login_credential.phone_number in  (" + contactIdIn+" )";
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                AppCredential appCredential = new AppCredential();
+                appCredential.id = this.resultSet.getInt("app_login_credential_id");
+                appCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                appCredential.phoneNumber = this.resultSet.getString("phone_number");
+                appCredential.user.id = this.resultSet.getInt("user_inf_id");
+                appCredential.user.firstName = this.resultSet.getString("f_name");
+                appCredential.user.lastName = this.resultSet.getString("l_name");
+                try {
+                    appCredential.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                } catch (Exception ex) {
+                    System.out.println("Parse error on picture appCid " + appCredential.id);
+                    appCredential.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
+                    ex.printStackTrace();
+                }
+                appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+
+                appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                appCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                appCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
+                appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                appCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+
+                appCredentialList.add(appCredential);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+        return appCredentialList;
+    }
     public boolean changeUserStatus(int userId, int status) {
         String sql = "UPDATE " + this.tableName + " SET banned = '" + status + "' WHERE  id =" + userId;
         return this.updateData(sql);

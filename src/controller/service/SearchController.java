@@ -2,6 +2,7 @@ package controller.service;
 
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import model.AppLoginCredentialModel;
+import model.ContactModel;
 import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
@@ -112,7 +113,7 @@ public class SearchController extends HttpServlet {
         this.pw.print(this.baseController.getResponse());
         return;
     }
-    private void getUserForTag(){
+    private void getAllUserByKeyword(){
 
         String keyword="";
         if(this.baseController.checkParam("keyword", this.req, true)) {
@@ -156,6 +157,62 @@ public class SearchController extends HttpServlet {
 
         appLoginCredentialModel.setId(this.baseController.appCredential.id);
         ArrayList<AppCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
+
+        if(appCredentialsList.size()==0){
+            this.baseController.serviceResponse.responseStat.msg = "No record found";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        this.baseController.serviceResponse.responseData = appCredentialsList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getUserForTag(){
+
+        String keyword="";
+        if(this.baseController.checkParam("keyword", this.req, true)) {
+            keyword = this.req.getParameter("keyword").trim();
+        }
+
+        ContactModel contactModel  = new ContactModel();
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        ArrayList<AppCredential> appCredentialsList =  contactModel.getContactByKeyword(keyword);
 
         if(appCredentialsList.size()==0){
             this.baseController.serviceResponse.responseStat.msg = "No record found";

@@ -33,6 +33,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Contact</servlet-name>
+        <servlet-class>controller.service.ContactController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Contact</servlet-name>
+        <url-pattern>/app/contact/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>AdminLogin</servlet-name>
         <servlet-class>controller.admin.AdminLoginController</servlet-class>
     </servlet>

@@ -1,6 +1,8 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import model.AppLoginCredentialModel;
+import model.ContactModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,6 +51,11 @@ public class ContactController extends HttpServlet {
             case "/app/contact/import":
                 this.importContact();
                 break;
+            case "/app/contact/add":
+                this.addContacts();
+                break;
+
+
             default:
                 break;
         }
@@ -68,6 +75,9 @@ public class ContactController extends HttpServlet {
             try{
 
                 String [] contactsArray = gson.fromJson(this.req.getParameter("contacts").trim(),String[].class);
+                for(String contact : contactsArray){
+                    contacts.add(contact);
+                }
             } catch (Exception ex){
                 System.out.println(ex);
                 this.baseController.serviceResponse.responseStat.msg = "contacts is not in valid format";
@@ -77,7 +87,55 @@ public class ContactController extends HttpServlet {
             }
         }
 
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
 
+        appLoginCredentialModel.setContactList(contacts);
+
+
+        this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getMatchedPhoneNumber();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void addContacts(){
+        ArrayList<Integer> contactIdList = new ArrayList();
+        Gson gson = new Gson();
+        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+
+                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                for(int contact : contactsArray){
+                    contactIdList.add(contact);
+                }
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        ContactModel contactModel = new ContactModel();
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.addContact()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "Contacts are added successfully";
+        this.pw.print(this.baseController.getResponse());
+        return;
 
     }
 }
