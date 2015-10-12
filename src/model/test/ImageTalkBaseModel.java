@@ -1,6 +1,8 @@
 package model.test;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 class ImageTalkBaseModel {
     static final private String DBDriver   = "com.mysql.jdbc.Driver";
@@ -8,7 +10,7 @@ class ImageTalkBaseModel {
     static final private String DBPort     = "3306";
     static final private String DBName     = "imagetalk";
     static final private String Url_Prefix = "jdbc:mysql:";
-    static final private String timeZoneParam = "?useLegacyDatetimeCode=false";
+    static final private String timeZoneParam = "?useLegacyDatetimeCode=false&0serverTimezone=America/New_York";
     static final private String DBUrl      = Url_Prefix + "//" + DBHost  + "/" + DBName+timeZoneParam; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
     static final private String DBUser     = "root";
     static final private String DBPassword = "";
@@ -46,6 +48,8 @@ class ImageTalkBaseModel {
 
         this.limit = -1;
         this.offset = -1;
+
+
     }
 
     public void startTransaction(){

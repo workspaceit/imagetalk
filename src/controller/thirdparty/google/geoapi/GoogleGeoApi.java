@@ -28,7 +28,7 @@ public class GoogleGeoApi {
     public GoogleGeoApi() {
 
     }
-    public String generateGeoLocationUrlByKeyWord(){
+    public String generateGeoLocationUrlForKeyWord(){
         String url = null;
         try {
             url = BASE_URL+"?key="+API_KEY+"&address="+ URLEncoder.encode(this.keyWord, "UTF-8");
@@ -37,8 +37,15 @@ public class GoogleGeoApi {
         }
         return url;
     }
-    private String FireHttpsAction(){
-        String httpsURL = this.generateGeoLocationUrlByKeyWord();
+    private String generateGeoLocationUrlForLatLng(double lat,double lng){
+        String url = null;
+        String latLng = Double.toString(lat)+","+Double.toString(lng);
+        System.out.println(latLng);
+        url = BASE_URL+"?key="+API_KEY+"&latlng="+latLng+"&sensor=false";
+
+        return url;
+    }
+    private String FireHttpsAction(String httpsURL){
         if(httpsURL==null || httpsURL== ""){
             return "";
         }
@@ -66,8 +73,18 @@ public class GoogleGeoApi {
 
         return resposeStr;
     }
+
     public ArrayList<Location>  getLocationByKeyword(){
-        String str =  this.FireHttpsAction();
+        String str =  this.FireHttpsAction(this.generateGeoLocationUrlForKeyWord());
+        return parseLocationFromJson(str);
+    }
+    public ArrayList<Location>  getLocationByLatLng(double lat,double lng){
+
+        String str =  this.FireHttpsAction(this.generateGeoLocationUrlForLatLng(lat,lng));
+        return parseLocationFromJson(str);
+    }
+    private ArrayList<Location> parseLocationFromJson(String str){
+
 
         Gson gson = new Gson();
         JsonParser jsonParser = new JsonParser();
