@@ -174,6 +174,36 @@
         <url-pattern>/admin/upload/image</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Sticker</servlet-name>
+        <servlet-class>controller.admin.StickerController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Sticker</servlet-name>
+        <url-pattern>/admin/sticker/operation/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>New Category</servlet-name>
+        <jsp-file>/admin/stickerCategoryForm.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>New Category</servlet-name>
+        <url-pattern>/admin/sticker/category/new</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Upload Sticker</servlet-name>
+        <jsp-file>/admin/stickerCategoryForm.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Upload Sticker</servlet-name>
+        <url-pattern>/admin/stickerCategoryForm.jsp</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>default</servlet-name>
         <url-pattern>/assets/*</url-pattern>

@@ -57,10 +57,10 @@ public class StickerController extends HttpServlet {
         }
 
         switch (this.url) {
-            case "admin/sticker/category/new":
+            case "/admin/sticker/operation/category/new":
                 this.insertCategory(req);
                 break;
-            case "admin/sticker/create":
+            case "/admin/sticker/operation/create":
                 this.insertSticker(req);
                 break;
             default:
@@ -77,18 +77,18 @@ public class StickerController extends HttpServlet {
         StickerCategoryModel sCategoryModel = new StickerCategoryModel();
         String               categoryName   = req.getParameter("name");
 
+        System.out.print(categoryName);
+
         sCategoryModel.setName(categoryName);
         sCategoryModel.setIs_paid(Integer.parseInt(req.getParameter("is_paid")));
-        sCategoryModel.setCreated_by(Integer.parseInt(req.getParameter("is_paid")));
+        sCategoryModel.setCreated_by(this.login.u_id);
 
         if (sCategoryModel.insert() > 0) {
-            this.baseController.serviceResponse.responseStat.msg = "Category \"" + req.getParameter("name") +
-                                                                   "\" Store Successfully";
+            this.baseController.serviceResponse.responseStat.msg = "Category \"" + categoryName + "\" Store Successfully";
             this.baseController.serviceResponse.responseStat.status = true;
             this.pw.print(this.baseController.getResponse());
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Category \"" + req.getParameter("name") +
-                                                                   "\" Store Successfully";
+            this.baseController.serviceResponse.responseStat.msg = "Category \"" + categoryName + "\" Store Successfully";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
         }
