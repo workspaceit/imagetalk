@@ -2,6 +2,7 @@ package controller.admin;
 
 import controller.service.ImageTalkBaseController;
 import model.StickerCategoryModel;
+import model.StickersModel;
 import model.datamodel.app.Login;
 
 import javax.servlet.ServletException;
@@ -95,8 +96,26 @@ public class StickerController extends HttpServlet {
     }
 
     private void insertSticker(HttpServletRequest req) {
-        int    userId = this.login.id;
-        String name   = "test name";
+        String        imgPath       = req.getParameter("img_path");
+        int           category_id   = Integer.parseInt(req.getParameter("category_id"));
+        int           isPaid        = Integer.parseInt(req.getParameter("is_paid"));
+        int           userId        = this.login.id;
+        StickersModel stickersModel = new StickersModel();
+
+        stickersModel.setPath(imgPath);
+        stickersModel.setSticker_category_id(category_id);
+        stickersModel.setIs_paid(isPaid);
+        stickersModel.setCreated_by(userId);
+
+        int stickerId = stickersModel.insert();
+
+        if (stickerId > 0) {
+            this.baseController.serviceResponse.responseStat.status = true;
+        } else {
+            this.baseController.serviceResponse.responseStat.status = false;
+        }
+        this.pw.print(this.baseController.serviceResponse.responseStat.status);
+        this.pw.print("test");
     }
 
     private void getSticker() {

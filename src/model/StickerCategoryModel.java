@@ -69,20 +69,20 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
     public ArrayList<StickerCategoryModel> getStickerCategoryList() {
         ArrayList<StickerCategoryModel> categoryList = new ArrayList<>();
         String                          sql          = "SELECT * FROM sticker_category";
-        ResultSet                       resultSet    = null;
 
         this.setQuery(sql);
         this.getData();
 
         try {
-            while (resultSet.next()) {
-                this.setId(resultSet.getInt("id"));
-                this.setName(resultSet.getString("name"));
-                this.setIs_paid(resultSet.getInt("is_paid"));
-                this.setCreated_by(resultSet.getInt("created_by"));
-                this.setCreated_date(resultSet.getString("created_date"));
+            while (this.resultSet.next()) {
+                StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+                stickerCategoryModel.setId(resultSet.getInt("id"));
+                stickerCategoryModel.setName(resultSet.getString("name"));
+                stickerCategoryModel.setIs_paid(resultSet.getInt("is_paid"));
+                stickerCategoryModel.setCreated_by(resultSet.getInt("created_by"));
+                stickerCategoryModel.setCreated_date(resultSet.getString("created_date"));
 
-                categoryList.add(this);
+                categoryList.add(stickerCategoryModel);
             }
         } catch (Exception ex) {
             System.out.println(ex);
