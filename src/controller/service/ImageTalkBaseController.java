@@ -57,9 +57,13 @@ public class ImageTalkBaseController {
         HttpSession session = req.getSession();
         this.appCredential = (AppCredential)session.getAttribute("userSession");
 
+        String url = req.getRequestURI().toString();
+        System.out.println("Requested Url : "+url);
+        System.out.println("Client IP : " +req.getRemoteAddr());
         if(appCredential==null ||  this.appCredential.id==0){
             this.serviceResponse.responseStat.msg ="Your session expired";
             this.serviceResponse.responseStat.status =false;
+            this.serviceResponse.responseStat.isLogin = false;
             return false;
         }
         return true;

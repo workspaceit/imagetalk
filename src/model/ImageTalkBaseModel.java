@@ -49,6 +49,7 @@ class ImageTalkBaseModel {
     }
 
     public void startTransaction(){
+        this.dbConnectionRecheck();
         try {
             autoCommit = false;
             this.con.setAutoCommit(autoCommit);
@@ -108,12 +109,12 @@ class ImageTalkBaseModel {
 
         try {
             if(this.con==null) {
-                System.out.println("con Recheck "+con);
+            //    System.out.println("con Recheck "+con);
                 Class.forName(DBDriver);
                 this.con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
             }
             if (this.stmt == null) {
-                System.out.println("stmt Recheck "+stmt);
+            //    System.out.println("stmt Recheck "+stmt);
                 this.stmt = this.con.createStatement();
             }
         } catch (ClassNotFoundException e) {
@@ -175,16 +176,16 @@ class ImageTalkBaseModel {
         try {
 
             if(this.resultSet!=null) {
-                System.out.println("resultSet Closed "+resultSet);
+             //   System.out.println("resultSet Closed "+resultSet);
                 this.resultSet.close();
             }
             if(this.stmt!=null) {
-                System.out.println("stmt Closed "+stmt);
+             //   System.out.println("stmt Closed "+stmt);
                 this.stmt.close();
                 this.stmt = null;
             }
             if(this.con!=null && this.autoCommit) {
-                System.out.println("con Closed "+con);
+             //   System.out.println("con Closed "+con);
                 this.con.close();
                 this.con =null;
             }

@@ -6,6 +6,7 @@ import helper.ImageHelper;
 import model.*;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Location;
+import model.datamodel.app.PostComment;
 import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 
@@ -72,6 +73,15 @@ public class WallPostController extends HttpServlet {
                 break;
             case "/app/wallpost/create/comment":
                 this.creatComment();
+                break;
+            case "/app/wallpost/get/comment":
+                this.getComments(true);
+                break;
+            case "/app/wallpost/get/comment/all":
+                this.getComments(false);
+                break;
+            case "/app/wallpost/delete/comment":
+                this.deleteComment();
                 break;
             case "/app/wallpost/like":
                 this.likePost();
@@ -417,8 +427,11 @@ public class WallPostController extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }
+
+
+
         this.baseController.serviceResponse.responseStat.msg = "Comment posted";
-        this.baseController.serviceResponse.responseData = postCommentModel.getById();
+        this.baseController.serviceResponse.responseData = postCommentModel.getByPostId();
         this.pw.print(this.baseController.getResponse());
         return;
 
@@ -498,6 +511,154 @@ public class WallPostController extends HttpServlet {
         }
 
         this.baseController.serviceResponse.responseData = postLikeModel.getLikersByPostId();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    public void getComments(boolean pagination){
+
+
+
+
+        if(!this.baseController.checkParam("post_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+
+        try{
+            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        if(pagination){
+            if(this.baseController.checkParam("limit", this.req, true)) {
+                try{
+                    postCommentModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                }catch (Exception ex){
+                    System.out.println(ex);
+                    this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+                }
+            }else{
+                postCommentModel.limit = 3;
+            }
+
+            if(!this.baseController.checkParam("offset", this.req, true)){
+
+                this.baseController.serviceResponse.responseStat.msg = "offset required";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }else {
+                try{
+                    postCommentModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                }catch (Exception ex){
+                    System.out.println(ex);
+                    this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+                }
+            }
+        }
+
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(postCommentModel.getPost_id());
+
+        if(!wallPostModel.isIdExist()){
+            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        ArrayList<PostComment> postComments = new ArrayList();
+        postComments  = postCommentModel.getByPostId();
+        this.baseController.serviceResponse.responseStat.status = (postComments.size()>0);
+        this.baseController.serviceResponse.responseStat.msg = (postComments.size()>0)?"":"No comment found";
+        this.baseController.serviceResponse.responseData = postComments;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    public void deleteComment(){
+
+
+
+
+        if(!this.baseController.checkParam("comment_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "comment_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+
+        try{
+            postCommentModel.setId(Integer.parseInt(this.req.getParameter("comment_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "comment_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(postCommentModel.getPostIdById());
+        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+
+        if(!wallPostModel.isIdExist()){
+            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        boolean commenter = false;
+        if(!postCommentModel.isCommenter()){
+            this.baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+
+            return;
+        }else{
+            commenter = true;
+        }
+
+        if(!commenter && !wallPostModel.isWallPostOwner()){
+            this.baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        postCommentModel.startTransaction();
+
+        if(postCommentModel.deleteById()==0){
+            postCommentModel.rollBack();
+            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        postCommentModel.commitTransaction();
+
+        this.baseController.serviceResponse.responseStat.msg ="Comment deleted";
         this.pw.print(this.baseController.getResponse());
         return;
 

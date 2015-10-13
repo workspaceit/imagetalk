@@ -5,6 +5,7 @@ import helper.ImageHelper;
 import model.ActivationModel;
 import model.AppLoginCredentialModel;
 import model.UserInfModel;
+import model.datamodel.app.AuthCredential;
 import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
@@ -267,10 +268,13 @@ public class AppUserRegistration extends HttpServlet {
 
       //  userInfModel.commitTransaction();
        // appLoginCredentialModel.commitTransaction();
+        AuthCredential authCredential = new AuthCredential();
+        authCredential = appLoginCredentialModel.getAppCredentialById();
 
+        this.baseController.setAppSession(req, authCredential);
 
         this.baseController.serviceResponse.responseStat.msg = "Registration success";
-        this.baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
+        this.baseController.serviceResponse.responseData =authCredential;
         this.pw.print(this.baseController.getResponse());
         return;
 

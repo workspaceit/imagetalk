@@ -111,7 +111,10 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
                 " where "+this.tableName+".post_id = "+this.post_id+" ";
-
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        }
         this.setQuery(query);
         this.getData();
         try {
@@ -211,6 +214,46 @@ public class PostCommentModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
         return postComment;
+    }
+    public  int getPostIdById(){
+        String query = "SELECT post_id FROM " +this.tableName+
+                " where "+this.tableName+".id = "+this.id+" limit 1";
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                return this.resultSet.getInt("post_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return 0;
+    }
+    public  boolean isCommenter(){
+        String query = "SELECT id FROM " +this.tableName+
+                " where "+this.tableName+".id = "+this.id+" and commenter_id = "+this.commenter_id+" limit 1";
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return false;
+    }
+    public  int deleteById(){
+        String query = "delete from " +this.tableName+
+                " where "+this.tableName+".id = "+this.id+" limit 1";
+
+        return this.deleteData(query);
     }
 
 }

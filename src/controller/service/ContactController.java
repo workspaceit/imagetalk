@@ -48,8 +48,8 @@ public class ContactController extends HttpServlet {
         }
 
         switch (url) {
-            case "/app/contact/import":
-                this.importContact();
+            case "/app/contact/findmatch":
+                this.findmatchContact();
                 break;
             case "/app/contact/add":
                 this.addContacts();
@@ -66,7 +66,7 @@ public class ContactController extends HttpServlet {
             case "/app/contact/favorite":
                 this.favoritesContacts();
                 break;
-            case "/app/contact/unfavorites":
+            case "/app/contact/unfavorite":
                 this.unFavoritesContacts();
                 break;
             default:
@@ -74,7 +74,7 @@ public class ContactController extends HttpServlet {
         }
         this.pw.close();
     }
-    private void importContact(){
+    private void findmatchContact(){
         ArrayList<String> contacts = new ArrayList();
         Gson gson = new Gson();
         if(!this.baseController.checkParam("contacts", this.req, true)) {

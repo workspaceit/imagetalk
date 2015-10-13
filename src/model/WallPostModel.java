@@ -105,7 +105,22 @@ public class WallPostModel extends ImageTalkBaseModel{
         this.currentUserId = currentUserId;
         return true;
     }
+    public boolean isWallPostOwner(){
+        String query = "SELECT id from wall_post where owner_id="+this.owner_id+" and id = "+this.id;
 
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return false;
+    }
     public ArrayList<WallPost> getAllRecent(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 

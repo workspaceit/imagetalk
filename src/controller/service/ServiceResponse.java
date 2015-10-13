@@ -15,10 +15,12 @@ public class ServiceResponse {
 
     public class ResponseStat {
         public boolean status;
+        public boolean isLogin;
         public String  msg;
 
         public ResponseStat() {
             this.status = true;
+            this.isLogin = true;
             this.msg = "";
         }
     }

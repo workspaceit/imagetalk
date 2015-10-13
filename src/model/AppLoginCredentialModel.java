@@ -5,6 +5,7 @@ import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.OperAppCredential;
 import model.datamodel.photo.Pictures;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -124,6 +125,11 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     public boolean setContactList( ArrayList<String> contactList){
 
         for(String contact:contactList){
+            contact = contact.replaceAll("\\(","");
+            contact = contact.replaceAll("\\+","");
+            contact = contact.replaceAll("\\)","");
+            contact = contact.replaceAll(" ","");
+            contact = contact.replaceAll("-","");
             this.contactList.add(contact);
         }
         return true;
@@ -193,6 +199,9 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
+                authCredential.user.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("app_login_credential_c_date"));
+
+
                 try {
                     authCredential.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
                 } catch (Exception ex) {
