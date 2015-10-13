@@ -59,7 +59,8 @@
                                     <select name="sticker_category_id" class="form-control" id="sticker_category_id">
                                         <option value="">Select One</option>
                                         <% for (StickerCategoryModel stickerCategory : stickerCategoryList) { %>
-                                        <option value="<%=stickerCategory.getId()%>%>"><%=stickerCategory.getName()%></option>
+                                        <option value="<%=stickerCategory.getId()%>"><%=stickerCategory.getName()%>
+                                        </option>
                                         <% } %>
                                     </select>
                                 </div>
@@ -190,6 +191,9 @@
                 beforeSend: function () {
                 },
                 success: function (data, el) {
+                    var category_id = $("#sticker_category_id").val();
+                    var is_paid = $("#is_paid").val();
+                    insertStickerInfo(data.path, category_id, is_paid);
                     var parent = el.find(".jFiler-jProgressBar").parent();
                     el.find(".jFiler-jProgressBar").fadeOut("slow", function () {
                         $("<div class=\"jFiler-item-others text-success\"><i class=\"icon-jfi-check-circle\"></i> Success</div>").hide().appendTo(parent).fadeIn("slow");
@@ -241,6 +245,23 @@
                 }
             }
         });
+
+        function insertStickerInfo(path, category_id, is_paid) {
+            var url = $("#base_url").val() + "admin/sticker/operation/create";
+            $.ajax({
+                url: url,
+                method: "POST",
+                dataType: JSON,
+                data: {
+                    "img_path": path,
+                    "category_id": category_id,
+                    "is_paid": is_paid
+                },
+                success: function (data) {
+                    console.log(data);
+                }
+            });
+        }
     });
 </script>
 

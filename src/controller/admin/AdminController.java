@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -412,7 +413,8 @@ public class AdminController extends HttpServlet {
 
     private void uploadImageByAjax(HttpServletRequest req) {
         boolean isMultipart;
-        String  filePath    = "/home/touch/Projects/j2ee/ImageTalk/web/assets/pic/";
+        String  saveDir     = "ImageTalk_sticker/";
+        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
         int     maxFileSize = 250 * 1024 * 1024;
         int     maxMemSize  = 10 * 1024 * 1024;
         File    file;
@@ -439,9 +441,22 @@ public class AdminController extends HttpServlet {
 
             List fileItems = upload.parseRequest(req);
             Iterator i = fileItems.iterator();
+            /*List<FileItem> fl = upload.parseRequest(req);
 
+            for (FileItem item : fl) {
+                if (item.isFormField()) {
+                    // Process regular form field (input type="text|radio|checkbox|etc", select, etc).
+                    String fieldname = item.getFieldName();
+                    String fieldvalue = item.getString();
+                } else {
+
+                }
+            }*/
             while (i.hasNext()) {
+                String tempName = saveDir;
                 FileItem fi = (FileItem) i.next();
+                String fieldName1 = fi.getFieldName();
+                String fieldValue1 = fi.getString();
                 if (!fi.isFormField()) {
                     // Get the uploaded file parameters
                     String fieldName = fi.getFieldName();
@@ -450,8 +465,6 @@ public class AdminController extends HttpServlet {
                     boolean isInMemory = fi.isInMemory();
                     long sizeInBytes = fi.getSize();
 
-                    System.out.println(contentType);
-
                     if (sizeInBytes > maxFileSize || contentType == "image/gif") {
                         this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
                         fi.delete();
@@ -459,15 +472,20 @@ public class AdminController extends HttpServlet {
                     }
 
                     if (fileName.lastIndexOf("\\") >= 0) {
-                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\")));
+                        tempName = Instant.now().getEpochSecond() + "_" + fileName.substring(fileName.lastIndexOf("\\"));
+                        file = new File(filePath + tempName);
                     } else {
-                        file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
+                        tempName = Instant.now().getEpochSecond() + "_" + fileName.substring(fileName.lastIndexOf("\\") + 1);
+                        file = new File(filePath + tempName);
                     }
 
                     fi.write(file);
-                    this.pw.print("{\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
-                    System.out.println("done \n");
+                    this.pw.print("{\"path\":\"" + saveDir + tempName + "\",\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
+                    System.out.println("{\"path\":\"" + saveDir + tempName + "\",\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
                     return;
+                } else {
+                    String fieldName = fi.getFieldName();
+                    String fieldValue = fi.getString();
                 }
             }
         } catch (Exception ex) {
