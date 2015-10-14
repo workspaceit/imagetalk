@@ -48,3 +48,10 @@ ALTER TABLE  `sticker_category` ADD  `is_paid` TINYINT NOT NULL DEFAULT  '0' AFT
 
 ALTER TABLE  `contact` DROP  `rating` ;
 ALTER TABLE  `contact` ADD  `rating` INT( 1 ) NOT NULL AFTER  `is_block` ;
+
+#Date of change 13th Oct 2015
+
+ALTER TABLE  `sticker_category` ADD UNIQUE (
+`name`
+);
+

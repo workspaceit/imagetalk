@@ -414,7 +414,10 @@ public class AdminController extends HttpServlet {
     private void uploadImageByAjax(HttpServletRequest req) {
         boolean isMultipart;
         String  saveDir     = "ImageTalk_sticker/";
-        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
+//        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
+        String  filePath    = "/home/mi/Projects/j2ee/" + saveDir;
+
+
         int     maxFileSize = 250 * 1024 * 1024;
         int     maxMemSize  = 10 * 1024 * 1024;
         File    file;

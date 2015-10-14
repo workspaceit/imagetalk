@@ -7,6 +7,7 @@ import model.ContactModel;
 import model.CountryModel;
 import model.StickerCategoryModel;
 import model.StickersModel;
+import model.datamodel.app.StickerCategory;
 import model.test.UserInfModel;
 import model.test.AppLoginCredentialModel;
 
@@ -73,10 +74,10 @@ public class TestController extends  HttpServlet{
         this.pw.close();
     }
     private void testSticker(){
-        ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
-        System.out.println(this.baseController.appCredential.id);
-        contactModel.getContactInStrArray();
+        StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll();
+        this.pw.print(this.baseController.getResponse());
+        return;
     }
     private void test(){
         if(!this.baseController.checkParam("phone_number", this.req, true)) {

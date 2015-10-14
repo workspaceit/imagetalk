@@ -157,7 +157,29 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
         return false;
     }
+    public boolean isBanned() {
+        String query = "select banned from " + this.tableName + " where id = " + this.id + " limit 1";
 
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                int banned = this.resultSet.getInt("banned");
+                if (banned == 1) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+        return false;
+    }
     public boolean isIdExist() {
         String query = "select active from " + this.tableName + " where id = " + this.id + " limit 1";
 
@@ -196,10 +218,12 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
                 authCredential.accessToken = this.resultSet.getString("access_token");
                 authCredential.phoneNumber = this.resultSet.getString("phone_number");
+                authCredential.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("app_login_credential_c_date"));
+
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
-                authCredential.user.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("app_login_credential_c_date"));
+                authCredential.user.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("user_inf_c_date"));
 
 
                 try {
@@ -217,16 +241,19 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
                 authCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
                 authCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
-                authCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
-
-
+                try {
+                    authCredential.user.address.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("location_c_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    authCredential.user.address.createdDate = "";
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             this.closeConnection();
         }
-
+        this.id = authCredential.id;
         return authCredential;
     }
 

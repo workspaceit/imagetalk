@@ -1,5 +1,7 @@
 package model;
 
+import model.datamodel.app.StickerCategory;
+
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
@@ -13,6 +15,20 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
     private int    is_paid;
     private int    created_by;
     private String created_date;
+
+
+    public int stickersLimit;
+
+    public StickerCategoryModel() {
+        this.id = 0;
+        this.name = "";
+        this.is_paid = 0;
+        this.created_by = 0;
+        this.created_date = "";
+
+        this.stickersLimit = -1;
+
+    }
 
     public int getId() {
         return id;
@@ -65,7 +81,39 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
         this.id = this.insertData(query);
         return this.id;
     }
+    public ArrayList<StickerCategory> getAll(){
+        ArrayList<StickerCategory> stickerCategoryList = new ArrayList<>();
+        String query = "SELECT * FROM sticker_category ";
+        if(is_paid!=-1){
+            query+= " where is_paid = "+this.is_paid;
+        }
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        }
+        this.setQuery(query);
+        this.getData();
+        StickersModel stickersModel = new StickersModel();
+        stickersModel.limit = this.stickersLimit;
+        stickersModel.offset = 0;
+        try {
+            while (this.resultSet.next()) {
+                StickerCategory stickerCategory = new StickerCategory();
+                stickerCategory.id =resultSet.getInt("id");
+                stickerCategory.name = resultSet.getString("name");
 
+                stickersModel.setSticker_category_id(stickerCategory.id);
+                stickerCategory.stickers = stickersModel.getAllByCategoryId();
+
+                stickerCategoryList.add(stickerCategory);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }finally {
+            this.closeConnection();
+        }
+        return stickerCategoryList;
+    }
     public ArrayList<StickerCategoryModel> getStickerCategoryList() {
         ArrayList<StickerCategoryModel> categoryList = new ArrayList<>();
         String                          sql          = "SELECT * FROM sticker_category";
@@ -86,6 +134,8 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
             }
         } catch (Exception ex) {
             System.out.println(ex);
+        }finally {
+            this.closeConnection();
         }
 
         return categoryList;

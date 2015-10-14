@@ -110,14 +110,22 @@ public class AppLoginController extends HttpServlet {
         appLoginCredentialModel.setAccess_token(accessToken);
         AuthCredential authCredential = appLoginCredentialModel.getAuthincatedByAccessToken();
         if(authCredential.id>0){
-            appLoginCredentialModel.setId(authCredential.id);
 
             if(!appLoginCredentialModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;
+                this.baseController.serviceResponse.responseStat.isLogin = false;
                 this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
                 this.pw.print(this.baseController.getResponse());
                 return;
             }
+            if(appLoginCredentialModel.isBanned()){
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.baseController.serviceResponse.responseStat.isLogin = false;
+                this.baseController.serviceResponse.responseStat.msg = "Account is Banned";
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+
             ContactModel contactModel = new ContactModel();
             contactModel.setOwner_id(authCredential.id);
             this.localResponseObj.authCredential =authCredential;

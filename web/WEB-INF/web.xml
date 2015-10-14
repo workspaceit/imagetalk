@@ -91,6 +91,14 @@
         <url-pattern>/app/media/access/pictures</url-pattern>
     </servlet-mapping>
     <servlet>
+        <servlet-name>StickerAccessRequest</servlet-name>
+        <servlet-class>controller.service.StickerTransferController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StickerAccessRequest</servlet-name>
+        <url-pattern>/app/media/access/sticker</url-pattern>
+    </servlet-mapping>
+    <servlet>
         <servlet-name>AppRegister</servlet-name>
         <servlet-class>controller.service.AppUserRegistration</servlet-class>
     </servlet>
@@ -106,6 +114,14 @@
     <servlet-mapping>
         <servlet-name>SearchUser</servlet-name>
         <url-pattern>/app/search/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>Stickers</servlet-name>
+        <servlet-class>controller.service.AppStickersController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Stickers</servlet-name>
+        <url-pattern>/app/stickers/*</url-pattern>
     </servlet-mapping>
 
     <servlet>

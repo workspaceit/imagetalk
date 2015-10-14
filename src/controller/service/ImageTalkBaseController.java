@@ -6,6 +6,7 @@ import model.datamodel.app.Login;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 /**
  * Created by mi on 8/20/15.
@@ -60,6 +61,8 @@ public class ImageTalkBaseController {
         String url = req.getRequestURI().toString();
         System.out.println("Requested Url : "+url);
         System.out.println("Client IP : " +req.getRemoteAddr());
+        Date d = new Date();
+        System.out.println("Date  : " +d );
         if(appCredential==null ||  this.appCredential.id==0){
             this.serviceResponse.responseStat.msg ="Your session expired";
             this.serviceResponse.responseStat.status =false;
