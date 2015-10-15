@@ -55,3 +55,8 @@ ALTER TABLE  `sticker_category` ADD UNIQUE (
 `name`
 );
 
+# Date of change 15th Oct 2015
+
+ALTER TABLE  `app_login_credential` ADD UNIQUE (
+`phone_number`
+);

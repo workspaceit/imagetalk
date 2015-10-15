@@ -1,7 +1,9 @@
 package model;
 
+import com.google.gson.Gson;
 import model.datamodel.app.Login;
 import model.datamodel.app.User;
+import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ public class UserInfModel extends ImageTalkBaseModel {
     private String created_date;
     private String picPath;
 
+    private Gson gson;
+
     public UserInfModel() {
         super.tableName = "user_inf";
 
@@ -26,6 +30,8 @@ public class UserInfModel extends ImageTalkBaseModel {
         this.address = "";
         this.created_date = "";
         this.picPath = "";
+
+        this.gson =  new Gson();
     }
 
     public String getPicPath() {
@@ -120,6 +126,8 @@ public class UserInfModel extends ImageTalkBaseModel {
                 user.id = this.resultSet.getInt("id");
                 user.firstName = this.resultSet.getString("f_name");
                 user.lastName = this.resultSet.getString("l_name");
+                user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+
                 user.createdDate = this.resultSet.getString("created_date");
                 userList.add(user);
             }
@@ -194,8 +202,11 @@ public class UserInfModel extends ImageTalkBaseModel {
         return loginList;
     }
 
-    public User getById(int id) {
-        String query ="select * from " + super.tableName+" where id="+id+" limit 1 ";
+    public User getById() {
+        String query ="select * from " + super.tableName+
+                        " left join location on location.id = user_inf.address_id " +
+                        " where "+super.tableName+".id="+this.id+"" +
+                        " limit 1 ";
 
         this.setQuery(query);
         this.getData();
@@ -206,8 +217,14 @@ public class UserInfModel extends ImageTalkBaseModel {
                 user.id = this.resultSet.getInt("id");
                 user.firstName = this.resultSet.getString("f_name");
                 user.lastName = this.resultSet.getString("l_name");
-
+                user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
                 user.createdDate = this.resultSet.getString("created_date");
+
+                user.address.id = (this.resultSet.getObject("location.id") == null) ? 0 : this.resultSet.getInt("location.id");
+                user.address.lat = (this.resultSet.getObject("location.lat") == null) ? 0 : this.resultSet.getDouble("location.lat");
+                user.address.lng = (this.resultSet.getObject("location.lng") == null) ? 0 : this.resultSet.getDouble("location.lng");
+                user.address.formattedAddress = (this.resultSet.getObject("location.formatted_address") == null) ? "" : this.resultSet.getString("location.formatted_address");
+                user.address.countryName = (this.resultSet.getObject("location.country") == null) ? "" : this.resultSet.getString("location.country");
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -82,7 +82,14 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
 
     public boolean setPhone_number(String phone_number) {
-        this.phone_number = phone_number.trim();
+        phone_number = phone_number.trim();
+        phone_number = phone_number.replaceAll("\\(","");
+        phone_number = phone_number.replaceAll("\\+","");
+        phone_number = phone_number.replaceAll("\\)","");
+        phone_number = phone_number.replaceAll(" ","");
+        phone_number = phone_number.replaceAll("-","");
+
+        this.phone_number = phone_number;
         return true;
     }
 
@@ -133,6 +140,40 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             this.contactList.add(contact);
         }
         return true;
+    }
+    public boolean isPhoneNumberOthers() {
+        String query = "select phone_number from " + this.tableName + " where phone_number = " + this.phone_number + " and id != "+this.id+" limit 1";
+
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+        return false;
+    }
+    public boolean isPhoneNumberActive() {
+        String query = "select phone_number from " + this.tableName + " where phone_number = " + this.phone_number + " limit 1";
+
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+        return false;
     }
     public boolean isActive() {
         String query = "select active from " + this.tableName + " where id = " + this.id + " limit 1";
@@ -298,6 +339,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
+                authCredential.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("app_login_credential_c_date"));
+
                 try {
                     authCredential.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
                 } catch (Exception ex) {
@@ -483,13 +526,12 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         int i = 0;
         for(String contact : this.contactList){
             i++;
-            contactIdIn += contact;
+            contactIdIn += "'"+contact+"'";
             if(i<this.contactList.size()){
                 contactIdIn +=",";
             }
 
         }
-        System.out.println("sd" + this.contactList.size());
         if(contactIdIn==""){
             return appCredentialList;
         }
@@ -545,8 +587,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         }
         return appCredentialList;
     }
-    public boolean changeUserStatus(int userId, int status) {
-        String sql = "UPDATE " + this.tableName + " SET banned = '" + status + "' WHERE  id =" + userId;
+    public boolean updateUserStatus() {
+        String sql = "UPDATE " + this.tableName + " SET banned = '" + this.banned + "' WHERE  id =" + this.id;
+        return this.updateData(sql);
+    }
+    public boolean updatePhoneNumber() {
+        String sql = "UPDATE " + this.tableName + " SET phone_number = '" + this.phone_number + "' WHERE  id =" + this.id;
+        System.out.println(sql);
         return this.updateData(sql);
     }
 }

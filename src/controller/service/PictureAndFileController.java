@@ -73,10 +73,16 @@ public class PictureAndFileController extends HttpServlet {
                 out.write(bytes, 0, bytesRead);
             }
 
-            in.close();
-            out.close();
+
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }

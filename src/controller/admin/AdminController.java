@@ -397,7 +397,10 @@ public class AdminController extends HttpServlet {
             return;
         }
 
-        boolean changeStatus = appModel.changeUserStatus(userId, status);
+        appModel.setId(userId);
+        appModel.setBanned(status);
+
+        boolean changeStatus = appModel.updateUserStatus();
 
         if (changeStatus) {
             this.baseController.serviceResponse.responseStat.msg = "User Status Changed Successfully";

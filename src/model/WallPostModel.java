@@ -126,7 +126,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
         String query = "SELECT wall_post.id as wall_post_id,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
-                " (select count(id) from post_like where post_like.post_id = wall_post_id ) as likeCount," +
+                " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
+                " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
                 " (select count(id) from post_like where post_like.post_id = wall_post_id and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
@@ -154,6 +155,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
+                wallPost.likeCount = this.resultSet.getInt("likeCount");
+                wallPost.commentCount = this.resultSet.getInt("commentCount");
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
                 wallPost.owner.textStatus = this.resultSet.getString("text_status");
@@ -205,6 +208,7 @@ public class WallPostModel extends ImageTalkBaseModel{
         String query = "SELECT wall_post.id as wall_post_id,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
+                " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
                 " (select count(id) from post_like where post_like.post_id = wall_post_id and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
@@ -227,6 +231,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
+                wallPost.commentCount = this.resultSet.getInt("commentCount");
 
                 wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
@@ -280,7 +285,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
         String query = "SELECT wall_post.id as wall_post_id,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
-                " (select count(id) from post_like where post_like.post_id = wall_post_id ) as likeCount," +
+                " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
+                " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
                 " (select count(id) from post_like where post_like.post_id = wall_post_id and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
@@ -308,6 +314,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
+                wallPost.likeCount = this.resultSet.getInt("likeCount");
+                wallPost.commentCount = this.resultSet.getInt("commentCount");
 
                 System.out.println(this.resultSet.getTimestamp("wall_postCdate").getTime());
                 System.out.println(this.resultSet.getTimestamp("wall_postCdate"));
@@ -398,8 +406,8 @@ public class WallPostModel extends ImageTalkBaseModel{
     }
     public int insert() {
 
-        String query = "INSERT INTO `wall_post`(`owner_id`, `description`, `picture_path`, `location_id`) " +
-                " VALUES (" + this.owner_id + ",'" + this.description + "','" + this.picture_path + "'," + this.location_id + ")";
+        String query = "INSERT INTO `wall_post`(`owner_id`, `description`, `picture_path`, `location_id`,`created_date`) " +
+                " VALUES (" + this.owner_id + ",'" + this.description + "','" + this.picture_path + "'," + this.location_id +",'"+ this.getUtcDateTime() + "')";
 
         this.id = this.insertData(query);
         return this.id;

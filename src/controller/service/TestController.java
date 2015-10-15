@@ -8,8 +8,6 @@ import model.CountryModel;
 import model.StickerCategoryModel;
 import model.StickersModel;
 import model.datamodel.app.StickerCategory;
-import model.test.UserInfModel;
-import model.test.AppLoginCredentialModel;
 
 import model.datamodel.photo.Pictures;
 
@@ -19,6 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 /**
  * Created by mi on 10/2/15.
  */
@@ -74,86 +75,21 @@ public class TestController extends  HttpServlet{
         this.pw.close();
     }
     private void testSticker(){
-        StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
-        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll();
-        this.pw.print(this.baseController.getResponse());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+//Here you say to java the initial timezone. This is the secret
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+//Will print in UTC
+        System.out.println(dateFormat.format(new Date()));
+
+//Here you set to your timezone
+        dateFormat.setTimeZone(TimeZone.getDefault());
+//Will print on your default Timezone
+        System.out.println(dateFormat.format(new Date()));
         return;
     }
     private void test(){
-        if(!this.baseController.checkParam("phone_number", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Phone number required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-        if(!this.baseController.checkParam("token",this.req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Token required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-        if(!this.baseController.checkParam("first_name", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Name required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
 
 
-
-
-
-
-        UserInfModel userInfModel = new UserInfModel();
-        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        String imgBase64 = "";
-
-        userInfModel.setF_name(this.req.getParameter("first_name"));
-        userInfModel.setL_name(this.req.getParameter("last_name"));
-
-         /*  transaction started */
-
-          userInfModel.startTransaction();
-        userInfModel.insertData();
-        if(userInfModel.getId()==0){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-          appLoginCredentialModel.startTransaction();
-        appLoginCredentialModel.setU_id(userInfModel.getId());
-        appLoginCredentialModel.setPhone_number(this.req.getParameter("phone_number"));
-        appLoginCredentialModel.isNumberExist();
-         /*  transaction started */
-
-
-        appLoginCredentialModel.insert();
-
-        if(appLoginCredentialModel.getId()==0){
-            //       userInfModel.rollBack();
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
-//        userInfModel.rollBack();
-//        appLoginCredentialModel.rollBack();
-        /* Commit database transaction */
-        CountryModel countryModel = new CountryModel();
-        countryModel.getAll();
-        userInfModel.getAllByKeyword("a");
-        appLoginCredentialModel.getAppCredentialById();
-
-
-          userInfModel.commitTransaction();
-         appLoginCredentialModel.commitTransaction();
-//        userInfModel.rollBack();
-//        appLoginCredentialModel.rollBack();
-
-        this.baseController.serviceResponse.responseStat.msg = "Registration success";
-        this.baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
-        this.pw.print(this.baseController.getResponse());
-        return;
     }
 }

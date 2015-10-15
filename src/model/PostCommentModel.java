@@ -94,8 +94,8 @@ public class PostCommentModel extends ImageTalkBaseModel {
         return true;
     }
     public int insert(){
-        String query = "INSERT INTO "+this.tableName+" (comment,pic_path, post_id, commenter_id)";
-        query +="VALUES ('"+this.comment+"','"+this.pic_path+"',"+this.post_id+","+this.commenter_id+")";
+        String query = "INSERT INTO "+this.tableName+" (comment,pic_path, post_id, commenter_id,created_date)";
+        query +="VALUES ('"+this.comment+"','"+this.pic_path+"',"+this.post_id+","+this.commenter_id+",'"+this.getUtcDateTime()+"')";
 
         this.id = this.insertData(query);
         return this.id;

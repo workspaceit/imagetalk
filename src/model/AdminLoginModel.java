@@ -134,7 +134,9 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 Byte typeByte = this.resultSet.getByte("type");
                 login.type =typeByte.intValue();
                 UserInfModel userInfModel = new UserInfModel();
-                login.user = userInfModel.getById(login.u_id);
+                userInfModel.setId(login.u_id);
+
+                login.user = userInfModel.getById();
 
                 loginsList.add(login);
             }
@@ -164,7 +166,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 Byte typeByte = this.resultSet.getByte("type");
                 login.type =typeByte.intValue();
                 UserInfModel userInfModel = new UserInfModel();
-                login.user = userInfModel.getById(login.u_id);
+                userInfModel.setId(login.u_id);
+
+                login.user = userInfModel.getById();
+
 
                 loginsList.add(login);
             }
@@ -192,8 +197,12 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 this.login.u_id = this.resultSet.getInt("u_id");
                 Byte typeByte = this.resultSet.getByte("type");
                 login.type =typeByte.intValue();
+
                 UserInfModel userInfModel = new UserInfModel();
-                this.login.user = userInfModel.getById(this.login.u_id);
+                userInfModel.setId(this.login.u_id);
+
+                this.login.user = userInfModel.getById();
+
                 return true;
             }
         } catch (SQLException e) {
@@ -221,7 +230,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 Byte typeByte = this.resultSet.getByte("type");
                 login.type =typeByte.intValue();
                 UserInfModel userInfModel = new UserInfModel();
-                this.login.user = userInfModel.getById(this.login.u_id);
+                userInfModel.setId(this.login.u_id);
+
+                this.login.user = userInfModel.getById();
+
                 return true;
             }
         } catch (SQLException e) {
@@ -248,7 +260,10 @@ public class AdminLoginModel extends ImageTalkBaseModel {
                 Byte typeByte = this.resultSet.getByte("type");
                 login.type =typeByte.intValue();
                 UserInfModel userInfModel = new UserInfModel();
-                this.login.user = userInfModel.getById(this.login.u_id );
+                userInfModel.setId(this.login.u_id);
+
+                this.login.user = userInfModel.getById();
+
 
                 return true;
             }

@@ -41,6 +41,17 @@
         <url-pattern>/app/contact/*</url-pattern>
     </servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>AppProfile</servlet-name>
+        <servlet-class>controller.service.ProfileControllery</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AppProfile</servlet-name>
+        <url-pattern>/app/profile/*</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>AdminLogin</servlet-name>
         <servlet-class>controller.admin.AdminLoginController</servlet-class>

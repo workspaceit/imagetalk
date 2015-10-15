@@ -1,6 +1,9 @@
 package model;
 
 import java.sql.*;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 class ImageTalkBaseModel {
     static final private String DBDriver   = "com.mysql.jdbc.Driver";
@@ -198,12 +201,18 @@ class ImageTalkBaseModel {
     }
     public String getPrcessedTimeStamp(Timestamp timeStamp) {
         String processedTime = "";
-        if(timeStamp==null){
+        if(timeStamp!=null){
 
             Long longTime = timeStamp.getTime() / 1000;
             processedTime = Long.toString(longTime);
         }
 
         return processedTime;
+    }
+    public String getUtcDateTime(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return dateFormat.format(new java.util.Date());
     }
 }
