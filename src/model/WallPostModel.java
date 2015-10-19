@@ -279,6 +279,23 @@ public class WallPostModel extends ImageTalkBaseModel{
         return wallPost;
 
     }
+    public int getCountByOwnerId(){
+        String query = "SELECT count(wall_post.id) as postCount  FROM wall_post " +
+                " where wall_post.owner_id = "+this.owner_id;
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+
+                return this.resultSet.getInt("postCount");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return 0;
+    }
 
     public ArrayList<WallPost> getByOwner_id(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();

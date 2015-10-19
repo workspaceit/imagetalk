@@ -232,6 +232,23 @@ public class PostCommentModel extends ImageTalkBaseModel {
         }
         return 0;
     }
+    public  int getCountByPostId(){
+        String query = "SELECT count(id) as commentCount FROM " +this.tableName+
+                " where "+this.tableName+".post_id = "+this.post_id+" ";
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                return this.resultSet.getInt("commentCount");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return 0;
+    }
     public  boolean isCommenter(){
         String query = "SELECT id FROM " +this.tableName+
                 " where "+this.tableName+".id = "+this.id+" and commenter_id = "+this.commenter_id+" limit 1";

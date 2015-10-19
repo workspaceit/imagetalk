@@ -1,6 +1,7 @@
 package controller.service;
 
 import model.StickerCategoryModel;
+import model.StickersModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -48,6 +49,9 @@ public class AppStickersController extends HttpServlet {
                 break;
             case "/app/stickers/get/all/free":
                 this.getAllFree(false);
+                break;
+            case "/app/stickers/get/for/post":
+                this.getForPost(false);
                 break;
             default:
                 break;
@@ -112,7 +116,48 @@ public class AppStickersController extends HttpServlet {
         this.pw.print(this.baseController.getResponse());
         return;
     }
+    private void getForPost(boolean pagination){
+        StickersModel stickersModel = new StickersModel();
 
+
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                stickersModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            stickersModel.limit = 30;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                stickersModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
+        this.baseController.serviceResponse.responseData = stickersModel.getAll();
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
 
 
 

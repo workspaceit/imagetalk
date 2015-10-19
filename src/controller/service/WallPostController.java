@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by mi on 10/2/15.
@@ -88,6 +89,9 @@ public class WallPostController extends HttpServlet {
                 break;
             case "/app/wallpost/get/likes":
                 this.getLikes();
+                break;
+            case "/app/wallpost/get/comment/count":
+                this.getCommentCount();
                 break;
             default:
                 break;
@@ -511,6 +515,39 @@ public class WallPostController extends HttpServlet {
         }
 
         this.baseController.serviceResponse.responseData = postLikeModel.getLikersByPostId();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    public void getCommentCount(){
+
+
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+
+        if(!this.baseController.checkParam("post_id", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+
+
+        try{
+            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        HashMap<String,Integer> commnetCountResponse = new HashMap();
+        commnetCountResponse.put("likeCount",postCommentModel.getCountByPostId());
+
+        this.baseController.serviceResponse.responseData = commnetCountResponse;
         this.pw.print(this.baseController.getResponse());
         return;
 

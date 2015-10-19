@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import helper.ImageHelper;
 import model.AppLoginCredentialModel;
 import model.UserInfModel;
+import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.photo.Pictures;
 
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by mi on 10/15/15.
@@ -54,6 +57,8 @@ public class ProfileControllery extends HttpServlet {
                 this.changePicture();
             case "/app/profile/change/phone/number":
                 this.changePhoneNumber();
+            case "/app/profile/get/entities/count":
+                this.getCounts();
             default:
                 break;
         }
@@ -137,6 +142,63 @@ public class ProfileControllery extends HttpServlet {
 
         this.baseController.serviceResponse.responseStat.msg = "Phone number successfully update";
         this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialById();
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void getCounts(){
+        if(!this.baseController.checkParam("count_params",this.req,true)) {
+            this.baseController.serviceResponse.responseStat.msg = "count_params is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        int ownerId = 0;
+
+        if(this.baseController.checkParam("user_credential_id",this.req,true)) {
+            try{
+                ownerId = Integer.parseInt(this.req.getParameter("user_credential_id"));
+            }catch (Exception ex){
+                ex.printStackTrace();
+                this.baseController.serviceResponse.responseStat.msg = "user_credential_id is not integer";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+
+        }else{
+            ownerId = this.baseController.appCredential.id;
+        }
+
+        Gson gson = new Gson();
+        ArrayList<String> countList = new ArrayList();
+        try{
+            String[] countParams = gson.fromJson(this.req.getParameter("count_params"), String[].class);
+
+            for(String countParam : countParams){
+                countList.add(countParam);
+            }
+
+        }catch(Exception ex){
+            this.baseController.serviceResponse.responseStat.msg = "count_params is not in format";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        HashMap<String,Integer> countResponse =  new HashMap();
+
+        if(countList.contains("present")){
+            countResponse.put("present",0);
+        }
+        if(countList.contains("wallPost")){
+            WallPostModel  wallPostModel = new WallPostModel();
+            wallPostModel.setOwner_id(ownerId);
+
+            countResponse.put("wallPost",wallPostModel.getCountByOwnerId());
+        }
+
+        this.baseController.serviceResponse.responseData = countResponse;
         this.pw.print(this.baseController.getResponse());
         return;
 

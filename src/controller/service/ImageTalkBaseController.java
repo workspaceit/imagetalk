@@ -55,14 +55,21 @@ public class ImageTalkBaseController {
         return true;
     }
     public boolean isAppSessionValid(HttpServletRequest req){
+        String url = req.getRequestURI().toString();
+
+        System.out.println("*************************************************************");
+        System.out.println("Requested Url : "+url);
+        System.out.println("Client IP     : " +req.getRemoteAddr());
+        Date d = new Date();
+        System.out.println("Date          : " +d );
+        System.out.println("*************************************************************");
+        System.out.println();
+        System.out.println();
+
         HttpSession session = req.getSession();
         this.appCredential = (AppCredential)session.getAttribute("userSession");
 
-        String url = req.getRequestURI().toString();
-        System.out.println("Requested Url : "+url);
-        System.out.println("Client IP : " +req.getRemoteAddr());
-        Date d = new Date();
-        System.out.println("Date  : " +d );
+
         if(appCredential==null ||  this.appCredential.id==0){
             this.serviceResponse.responseStat.msg ="Your session expired";
             this.serviceResponse.responseStat.status =false;

@@ -40,7 +40,7 @@ public class GoogleGeoApi {
     private String generateGeoLocationUrlForLatLng(double lat,double lng){
         String url = null;
         String latLng = Double.toString(lat)+","+Double.toString(lng);
-        System.out.println(latLng);
+
         url = BASE_URL+"?key="+API_KEY+"&latlng="+latLng+"&sensor=false";
 
         return url;
@@ -61,7 +61,7 @@ public class GoogleGeoApi {
             String inputLine = "";
             while ((inputLine = in.readLine()) != null)
             {
-                System.out.println(inputLine);
+
                 resposeStr+=inputLine.trim();
             }
              in.close();

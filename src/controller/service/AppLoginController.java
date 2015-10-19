@@ -7,6 +7,7 @@ package controller.service;
 import model.AdminLoginModel;
 import model.AppLoginCredentialModel;
 import model.ContactModel;
+import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.Login;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class AppLoginController extends HttpServlet {
@@ -131,6 +133,15 @@ public class AppLoginController extends HttpServlet {
             this.localResponseObj.authCredential =authCredential;
             this.localResponseObj.contacts = contactModel.getContactByOwnerId();
 
+            HashMap<String,Integer> countResponse =  new HashMap();
+
+            WallPostModel wallPostModel = new WallPostModel();
+            wallPostModel.setOwner_id(authCredential.id);
+
+            countResponse.put("present",0);
+            countResponse.put("wallPost",wallPostModel.getCountByOwnerId());
+
+            this.localResponseObj.extra = countResponse;
             this.baseController.serviceResponse.responseData =  this.localResponseObj;
             this.baseController.setAppSession(req, authCredential);
         }else{

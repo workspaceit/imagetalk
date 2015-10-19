@@ -387,7 +387,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             this.offset = this.offset * this.limit;
             query += " LIMIT " + this.offset + " ," + this.limit + " ";
         }
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try {
@@ -551,7 +551,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             query += " and app_login_credential.id not in ("+contactIdStr +")";
         }
 
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
 
@@ -593,7 +593,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
     public boolean updatePhoneNumber() {
         String sql = "UPDATE " + this.tableName + " SET phone_number = '" + this.phone_number + "' WHERE  id =" + this.id;
-        System.out.println(sql);
+
         return this.updateData(sql);
     }
 }

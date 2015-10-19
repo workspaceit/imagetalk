@@ -62,8 +62,8 @@ public class StickerTransferController extends HttpServlet {
                 return;
             }
             out = this.res.getOutputStream();
-            System.out.println(this.req.getParameter("p"));
-            String picRelativePath = URLDecoder.decode(this.req.getParameter("p"), "UTF-8");
+            System.out.println("Value of p : "+this.req.getParameter("p"));
+            String picRelativePath = URLDecoder.decode(this.req.getParameter("p").trim(), "UTF-8");
             System.out.println(picRelativePath);
             in = new FileInputStream(ImageHelper.getStickerGlobalPath()+picRelativePath);
             String mimeType = "image/jpeg";
