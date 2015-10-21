@@ -51,7 +51,7 @@ public class PictureAndFileController extends HttpServlet {
         ServletOutputStream out = null;
         InputStream in = null;
 
-
+        String picRelativePath = "";
 // do the following in a finally block:
         try {
 
@@ -60,7 +60,7 @@ public class PictureAndFileController extends HttpServlet {
             }
             out = this.res.getOutputStream();
             System.out.println(this.req.getParameter("p"));
-            String picRelativePath = URLDecoder.decode(this.req.getParameter("p"), "UTF-8");
+            picRelativePath = URLDecoder.decode(this.req.getParameter("p"), "UTF-8");
             System.out.println(picRelativePath);
             in = new FileInputStream(ImageHelper.getGlobalPath()+picRelativePath);
             String mimeType = "image/jpeg";
@@ -81,6 +81,7 @@ public class PictureAndFileController extends HttpServlet {
                 in.close();
                 out.close();
             } catch (IOException e) {
+                System.out.println("Exception picRelativePath "+picRelativePath);
                 e.printStackTrace();
             }
         }

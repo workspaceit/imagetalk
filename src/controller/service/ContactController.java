@@ -3,6 +3,8 @@ package controller.service;
 import com.google.gson.Gson;
 import model.AppLoginCredentialModel;
 import model.ContactModel;
+import model.datamodel.app.AppCredential;
+import model.datamodel.app.Contact;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -68,6 +70,18 @@ public class ContactController extends HttpServlet {
                 break;
             case "/app/contact/unfavorite":
                 this.unFavoritesContacts();
+                break;
+            case "/app/contact/who/has/mine":
+                this.getWhoHasMyNumber();
+                break;
+            case "/app/contact/doesnot/have/mine":
+                this.getWhoDoesNotHasMyNumber();
+                break;
+            case "/app/contact/who/blocked/me":
+                this.getWhoBlockedMe();
+                break;
+            case "/app/contact/whom/i/blocked":
+                this.getWhomIBlockedMe();
                 break;
             default:
                 break;
@@ -357,4 +371,69 @@ public class ContactController extends HttpServlet {
         return;
 
     }
+    private void getWhoHasMyNumber() {
+        ContactModel contactModel = new ContactModel();
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+
+
+        ArrayList<Contact> contactList = contactModel.getWhoHasMyContactByOwnerId();
+        String respStr = (contactList.size()==0)?"No record found":"";
+
+        this.baseController.serviceResponse.responseStat.msg = respStr;
+        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        this.baseController.serviceResponse.responseData = contactList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void getWhoDoesNotHasMyNumber(){
+        ContactModel contactModel = new ContactModel();
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+
+        ArrayList<Contact> contactList = contactModel.getWhoDoesNotHasMyContactByOwnerId();
+        String respStr = (contactList.size()==0)?"No record found":"";
+
+        this.baseController.serviceResponse.responseStat.msg = respStr;
+        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        this.baseController.serviceResponse.responseData = contactList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void getWhoBlockedMe(){
+        ContactModel contactModel = new ContactModel();
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+
+
+        ArrayList<Contact> contactList = contactModel.getWhoBlockedMeByOwnerId();
+        String respStr = (contactList.size()==0)?"No record found":"";
+
+        this.baseController.serviceResponse.responseStat.msg = respStr;
+        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        this.baseController.serviceResponse.responseData = contactList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+    private void getWhomIBlockedMe(){
+        ContactModel contactModel = new ContactModel();
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+
+
+        ArrayList<Contact> contactList = contactModel.getWhomIBlockedByOwnerId();
+        String respStr = (contactList.size()==0)?"No record found":"";
+
+        this.baseController.serviceResponse.responseStat.msg = respStr;
+        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        this.baseController.serviceResponse.responseData = contactList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
+    }
+
+
 }

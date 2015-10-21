@@ -53,16 +53,56 @@ public class ProfileControllery extends HttpServlet {
         }
 
         switch (url) {
+            case "/app/profile/change/status":
+                this.changeTextStatus();
+                break;
             case "/app/profile/change/picture":
                 this.changePicture();
+                break;
             case "/app/profile/change/phone/number":
                 this.changePhoneNumber();
+                break;
             case "/app/profile/get/entities/count":
                 this.getCounts();
+                break;
             default:
                 break;
         }
         this.pw.close();
+    }
+    private void changeTextStatus(){
+        System.out.println("Inside status change " + this.baseController.appCredential.id);
+
+        if(!this.baseController.checkParam("text_status", this.req, true)) {
+            this.baseController.serviceResponse.responseStat.msg = "text_status is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setText_status(this.req.getParameter("text_status"));
+        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+
+        HashMap<String,String> textStatusResponse = new HashMap<String,String>();
+
+        if(!appLoginCredentialModel.updateUserTextStatus()){
+            this.baseController.serviceResponse.responseStat.msg = "Internal server error on text status update";
+            this.baseController.serviceResponse.responseStat.status = false;
+            textStatusResponse.put("textStatus",appLoginCredentialModel.getUserTextStatusById());
+            this.baseController.serviceResponse.responseData = textStatusResponse;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        textStatusResponse.put("textStatus",appLoginCredentialModel.getUserTextStatusById());
+
+
+        this.baseController.serviceResponse.responseStat.msg = "Text status Successfully updated";
+        this.baseController.serviceResponse.responseData = textStatusResponse;
+        this.pw.print(this.baseController.getResponse());
+        return;
     }
     private void changePicture(){
         if(!this.baseController.checkParam("photo",this.req,true)) {

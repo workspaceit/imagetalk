@@ -71,6 +71,12 @@ public class ImageTalkBaseController {
 
 
         if(appCredential==null ||  this.appCredential.id==0){
+            System.out.println("Your session expired          : "  );
+            System.out.println("*************************************************************");
+            System.out.println();
+            System.out.println();
+
+
             this.serviceResponse.responseStat.msg ="Your session expired";
             this.serviceResponse.responseStat.status =false;
             this.serviceResponse.responseStat.isLogin = false;

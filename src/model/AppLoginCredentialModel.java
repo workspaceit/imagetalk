@@ -73,6 +73,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
 
     public boolean setText_status(String text_status) {
+        text_status = StringEscapeUtils.escapeEcmaScript(text_status);
         this.text_status = text_status.trim();
         return true;
     }
@@ -504,7 +505,21 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         return this.appUserList;
     }
+    public String getUserTextStatusById() {
+        String sql = "SELECT text_status FROM " + this.tableName + " WHERE id = " + id;
+        this.setQuery(sql);
+        this.getData();
 
+        try {
+            while (this.resultSet.next()) {
+                return resultSet.getString("text_status");
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return "";
+    }
     public int getUserStatusById(int id) {
         String sql = "SELECT * FROM " + this.tableName + " WHERE u_id = " + id;
         this.setQuery(sql);
@@ -589,6 +604,10 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     }
     public boolean updateUserStatus() {
         String sql = "UPDATE " + this.tableName + " SET banned = '" + this.banned + "' WHERE  id =" + this.id;
+        return this.updateData(sql);
+    }
+    public boolean updateUserTextStatus() {
+        String sql = "UPDATE " + this.tableName + " SET text_status = '" + this.text_status + "' WHERE  id =" + this.id;
         return this.updateData(sql);
     }
     public boolean updatePhoneNumber() {

@@ -100,30 +100,35 @@ public class WallPostController extends HttpServlet {
     }
 
     public void create(){
-        if(!this.baseController.checkParam("description", this.req, true)){
 
+        System.out.println("description :'"+this.req.getParameter("description")+"'");
+        System.out.println("appCredential.id  :'"+this.baseController.appCredential.id+"'");
+        if(!this.baseController.checkParam("description", this.req, true)){
+            System.out.println("At description error");
             this.baseController.serviceResponse.responseStat.msg = "description required";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
-
+        System.out.println("01");
         String imgBase64 = "";
         String fileRelativePath = "";
         ArrayList<Integer> taggedList = new ArrayList<Integer>();
 
 
-        if(this.baseController.checkParam("photo", this.req, true)){
+
+
             if(this.baseController.checkParam("photo",this.req,true)) {
                 imgBase64 = this.req.getParameter("photo");
                 fileRelativePath = "";
-
+                System.out.println("photo received");
                 Pictures pictures = ImageHelper.saveWallPostPicture(imgBase64, this.baseController.appCredential.id);
+                System.out.println("photo Saved");
                 fileRelativePath= pictures.original.path;
                 Gson gson = new Gson();
-                System.out.println(gson.toJson(pictures));
+                System.out.println("fileRelativePath : "+fileRelativePath);
                 if (fileRelativePath == "") {
-
+                    System.out.println("Unable to save the Image : "+fileRelativePath);
                     // Need roll back
                     this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
                     this.baseController.serviceResponse.responseStat.status = false;
@@ -131,13 +136,13 @@ public class WallPostController extends HttpServlet {
                     return;
                 }
             }
-        }
+
 
 
         if(this.baseController.checkParam("tagged_list", this.req, true)){
 
             String tagged_listStr = this.req.getParameter("tagged_list");
-
+            System.out.println("At tagged_list  ");
             Gson gson = new Gson();
             try{
                 int[] tempTaggedList = gson.fromJson(tagged_listStr,int[].class);
@@ -169,12 +174,12 @@ public class WallPostController extends HttpServlet {
         /*===============  Insert location here ==============*/
         LocationModel locationModel = new LocationModel();
         if(this.baseController.checkParam("location", this.req, true)){
-
-            String loocationStr = this.req.getParameter("location");
+            System.out.println("At location  ");
+            String locationStr = this.req.getParameter("location");
 
             Gson gson = new Gson();
             try{
-                Location location = gson.fromJson(loocationStr,Location.class);
+                Location location = gson.fromJson(locationStr,Location.class);
 
 
 
@@ -230,6 +235,7 @@ public class WallPostController extends HttpServlet {
         this.baseController.serviceResponse.responseStat.msg = "Wall post created";
         this.baseController.serviceResponse.responseData = wallPostModel.getById();
         this.pw.print(this.baseController.getResponse());
+        System.out.println("Response Sent");
         return;
     }
     private void getRecentPost(){

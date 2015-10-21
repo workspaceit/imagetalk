@@ -2,6 +2,7 @@ package controller.thirdparty.google.geoapi;
 
 import com.google.gson.*;
 import model.datamodel.app.Location;
+import model.datamodel.app.Places;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -17,6 +18,7 @@ public class GoogleGeoApi {
 
     private static String API_KEY = "AIzaSyAq4og4K5Wb6D38azyml00Ewc7J0rSKgEc";
     private static String BASE_URL ="https://maps.googleapis.com/maps/api/geocode/json";
+    private static String BASE_PACE_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
     private String params;
 
     public void setKeyWord(String keyWord) {
@@ -35,6 +37,14 @@ public class GoogleGeoApi {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        return url;
+    }
+    private String generatePlacesUrlForLatLng(double lat,double lng){
+        String url = null;
+        String latLng = Double.toString(lat)+","+Double.toString(lng);
+
+        url = BASE_PACE_URL+"?key="+API_KEY+"&location="+latLng+"&radius=500";
+
         return url;
     }
     private String generateGeoLocationUrlForLatLng(double lat,double lng){
@@ -80,8 +90,14 @@ public class GoogleGeoApi {
     }
     public ArrayList<Location>  getLocationByLatLng(double lat,double lng){
 
-        String str =  this.FireHttpsAction(this.generateGeoLocationUrlForLatLng(lat,lng));
+        String str =  this.FireHttpsAction(this.generateGeoLocationUrlForLatLng(lat, lng));
         return parseLocationFromJson(str);
+    }
+    public ArrayList<Places>  getPlacesByLatLng(double lat,double lng){
+
+        String str =  this.FireHttpsAction(this.generatePlacesUrlForLatLng(lat, lng));
+        System.out.println(str);
+        return parsePlaceFromJson(str);
     }
     private ArrayList<Location> parseLocationFromJson(String str){
 
@@ -116,5 +132,40 @@ public class GoogleGeoApi {
 
         }
         return addressList;
+    }
+    private ArrayList<Places> parsePlaceFromJson(String str){
+
+
+        Gson gson = new Gson();
+        JsonParser jsonParser = new JsonParser();
+        JsonObject response =  jsonParser.parse(str).getAsJsonObject();
+        String status = jsonParser.parse(response.get("status").toString()).getAsString() ;
+        ArrayList<Places> placesList = new ArrayList();
+
+        if(status.equals("OK")){
+            JsonArray result = jsonParser.parse(response.get("results").toString()).getAsJsonArray();
+            if(result==null || result.size()==0){
+
+                return placesList;
+            }
+            for(int i=0;i<result.size();i++){
+                JsonObject location = gson.toJsonTree(result.get(i)).getAsJsonObject();
+                Places places = new Places();
+
+                places.placeId = location.get("id").getAsString();
+                places.icon = location.get("icon").getAsString();
+                places.name = location.get("name").getAsString();
+                places.googlePlaceId = location.get("place_id").getAsString();
+
+
+                places.formattedAddress = location.get("vicinity").getAsString();
+
+                places.lat = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lat").getAsDouble();
+                places.lng = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lng").getAsDouble();
+                placesList.add(places);
+            }
+
+        }
+        return placesList;
     }
 }
