@@ -7,6 +7,7 @@ import model.ContactModel;
 import model.CountryModel;
 import model.StickerCategoryModel;
 import model.StickersModel;
+import model.datamodel.app.Places;
 import model.datamodel.app.StickerCategory;
 
 import model.datamodel.photo.Pictures;
@@ -18,7 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.TimeZone;
 /**
  * Created by mi on 10/2/15.
@@ -129,10 +132,18 @@ public class TestController extends  HttpServlet{
             }
         }
 
-
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+        HashMap<String,Object> respObj =  new HashMap<>();
+        HashMap<String,Object> extraObj =  new HashMap<>();
+        ArrayList<Places> places = googleGeoApi.getPlacesByLatLng(lat, lng);
+
+        extraObj.put("next_page_token",googleGeoApi.pagetoken);
+
+        respObj.put("places",places);
+        respObj.put("extra",extraObj);
+
         this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData =  googleGeoApi.getPlacesByLatLng(lat,lng);
+        this.baseController.serviceResponse.responseData = respObj ;
         this.pw.print(this.baseController.getResponse());
         return;
     }

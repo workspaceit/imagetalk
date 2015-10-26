@@ -1,13 +1,11 @@
 package controller.service;
 
+import com.google.gson.Gson;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import model.AppLoginCredentialModel;
 import model.ContactModel;
 import model.WallPostModel;
-import model.datamodel.app.AppCredential;
-import model.datamodel.app.AuthCredential;
-import model.datamodel.app.Location;
-import model.datamodel.app.Login;
+import model.datamodel.app.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by mi on 10/2/15.
@@ -61,6 +60,10 @@ public class SearchController extends HttpServlet {
                 break;
             case "/app/search/location/by/latlng":
                 this.getLocationByLattLng();
+                break;
+            case "/app/search/places/by/latlng":
+                this.getPalcesByLatLng();
+                break;
             default:
                 break;
         }
@@ -249,4 +252,70 @@ public class SearchController extends HttpServlet {
         return;
 
     }
+    private void getPalcesByLatLng(){
+        double lat= 0;
+        double lng= 0;
+
+
+        if(!this.baseController.checkParam("lat", this.req, true)) {
+
+            this.baseController.serviceResponse.responseStat.msg = "lat required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+
+            try{
+                lat = Double.parseDouble(this.req.getParameter("lat").trim());
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        if(!this.baseController.checkParam("lng", this.req, true)) {
+            this.baseController.serviceResponse.responseStat.msg = "lng required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            try{
+                lng = Double.parseDouble(this.req.getParameter("lng").trim());
+            } catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+
+        if(this.baseController.checkParam("next_page_token", this.req, true)) {
+            googleGeoApi.pagetoken = this.req.getParameter("next_page_token").trim();
+        }
+
+        HashMap<String,Object> respObj =  new HashMap<>();
+        HashMap<String,Object> extraObj =  new HashMap<>();
+        ArrayList<Places> places = googleGeoApi.getPlacesByLatLng(lat, lng);
+
+        extraObj.put("nextPageToken",googleGeoApi.pagetoken);
+
+        respObj.put("places", places);
+
+        Gson gson = new Gson();
+        System.out.println("Length : " + gson.toJson(places).toString().length());
+        System.out.println(gson.toJson(places).toString());
+
+        //respObj.put("extra",extraObj);
+
+        this.baseController.serviceResponse.responseStat.msg = "";
+        this.baseController.serviceResponse.responseData = places;//respObj ;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+
 }

@@ -103,19 +103,18 @@ public class WallPostController extends HttpServlet {
 
         System.out.println("description :'"+this.req.getParameter("description")+"'");
         System.out.println("appCredential.id  :'"+this.baseController.appCredential.id+"'");
-        if(!this.baseController.checkParam("description", this.req, true)){
-            System.out.println("At description error");
-            this.baseController.serviceResponse.responseStat.msg = "description required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
+
         System.out.println("01");
         String imgBase64 = "";
         String fileRelativePath = "";
         ArrayList<Integer> taggedList = new ArrayList<Integer>();
 
-
+        if(!this.baseController.checkParam("type", this.req, true)){
+            this.baseController.serviceResponse.responseStat.msg = "type required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
 
 
             if(this.baseController.checkParam("photo",this.req,true)) {
@@ -210,7 +209,24 @@ public class WallPostController extends HttpServlet {
         WallPostModel wallPostModel = new WallPostModel();
 
         wallPostModel.setOwner_id(this.baseController.appCredential.id);
-        wallPostModel.setDescrption(this.req.getParameter("description"));
+
+        if(this.baseController.checkParam("description", this.req, true)){
+            wallPostModel.setDescrption(this.req.getParameter("description"));
+        }
+
+        try{
+            wallPostModel.setType(Integer.parseInt(this.req.getParameter("type")));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            this.baseController.serviceResponse.responseStat.msg = "type int required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+
+        }
+
+
+
         wallPostModel.setPicture_path(fileRelativePath);
         wallPostModel.setLocation_id(locationModel.getId());
 

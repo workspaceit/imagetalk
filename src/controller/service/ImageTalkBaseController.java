@@ -54,7 +54,7 @@ public class ImageTalkBaseController {
         }
         return true;
     }
-    public boolean isAppSessionValid(HttpServletRequest req){
+    public void printRequestDetails(HttpServletRequest req){
         String url = req.getRequestURI().toString();
 
         System.out.println("*************************************************************");
@@ -65,7 +65,10 @@ public class ImageTalkBaseController {
         System.out.println("*************************************************************");
         System.out.println();
         System.out.println();
+    }
+    public boolean isAppSessionValid(HttpServletRequest req){
 
+        this.printRequestDetails(req);
         HttpSession session = req.getSession();
         this.appCredential = (AppCredential)session.getAttribute("userSession");
 

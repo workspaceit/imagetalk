@@ -60,3 +60,8 @@ ALTER TABLE  `sticker_category` ADD UNIQUE (
 ALTER TABLE  `app_login_credential` ADD UNIQUE (
 `phone_number`
 );
+
+# Date of change 26th Oct 2015
+
+ALTER TABLE  `wall_post` ADD  `type` INT( 1 ) NULL DEFAULT  '0' AFTER  `description` ;
+ALTER TABLE  `wall_post` CHANGE  `type`  `type` INT( 1 ) NULL DEFAULT  '0' COMMENT  '0 = image post, 1 = location , 2 = mood/scticker';

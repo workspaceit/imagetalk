@@ -156,7 +156,7 @@ public class AppUserRegistration extends HttpServlet {
     }
     private void registerUser(){
 
-
+        System.out.println("At registration ");
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Phone number required";
             this.baseController.serviceResponse.responseStat.status = false;

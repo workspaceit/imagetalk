@@ -78,10 +78,12 @@ public class PictureAndFileController extends HttpServlet {
             e.printStackTrace();
         }finally {
             try {
+
                 in.close();
+                out.flush();
                 out.close();
             } catch (IOException e) {
-                System.out.println("Exception picRelativePath "+picRelativePath);
+                System.out.println("Exception picRelativePath : '"+picRelativePath+"'");
                 e.printStackTrace();
             }
         }

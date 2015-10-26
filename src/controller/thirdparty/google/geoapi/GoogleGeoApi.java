@@ -3,6 +3,7 @@ package controller.thirdparty.google.geoapi;
 import com.google.gson.*;
 import model.datamodel.app.Location;
 import model.datamodel.app.Places;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -24,11 +25,11 @@ public class GoogleGeoApi {
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
     }
-
+    public String pagetoken;
     private String keyWord;
 
     public GoogleGeoApi() {
-
+        this.pagetoken = "";
     }
     public String generateGeoLocationUrlForKeyWord(){
         String url = null;
@@ -43,7 +44,7 @@ public class GoogleGeoApi {
         String url = null;
         String latLng = Double.toString(lat)+","+Double.toString(lng);
 
-        url = BASE_PACE_URL+"?key="+API_KEY+"&location="+latLng+"&radius=500";
+        url = BASE_PACE_URL+"?key="+API_KEY+"&location="+latLng+"&radius=500&pagetoken="+this.pagetoken;
 
         return url;
     }
@@ -56,6 +57,7 @@ public class GoogleGeoApi {
         return url;
     }
     private String FireHttpsAction(String httpsURL){
+        System.out.println(httpsURL);
         if(httpsURL==null || httpsURL== ""){
             return "";
         }
@@ -96,7 +98,7 @@ public class GoogleGeoApi {
     public ArrayList<Places>  getPlacesByLatLng(double lat,double lng){
 
         String str =  this.FireHttpsAction(this.generatePlacesUrlForLatLng(lat, lng));
-        System.out.println(str);
+
         return parsePlaceFromJson(str);
     }
     private ArrayList<Location> parseLocationFromJson(String str){
@@ -135,7 +137,6 @@ public class GoogleGeoApi {
     }
     private ArrayList<Places> parsePlaceFromJson(String str){
 
-
         Gson gson = new Gson();
         JsonParser jsonParser = new JsonParser();
         JsonObject response =  jsonParser.parse(str).getAsJsonObject();
@@ -143,22 +144,40 @@ public class GoogleGeoApi {
         ArrayList<Places> placesList = new ArrayList();
 
         if(status.equals("OK")){
+
             JsonArray result = jsonParser.parse(response.get("results").toString()).getAsJsonArray();
+            this.pagetoken = response.get("next_page_token").getAsString();
+
             if(result==null || result.size()==0){
 
                 return placesList;
             }
+            //result.size()
             for(int i=0;i<result.size();i++){
                 JsonObject location = gson.toJsonTree(result.get(i)).getAsJsonObject();
                 Places places = new Places();
+                //places.name ="sdf";//"Vía Paviso";
 
                 places.placeId = location.get("id").getAsString();
                 places.icon = location.get("icon").getAsString();
-                places.name = location.get("name").getAsString();
+
+                String myString = "example";
+                try {
+
+                    places.name = location.get("name").getAsString().getBytes("ISO-8859-1").toString();
+
+                    byte ptext[] = location.get("name").getAsString().getBytes("ISO-8859-1");
+                    places.name = new String(ptext,"UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+             //   byte[] convertedBytes = StringUtils.getBytesUtf8(myString);
+
+               // places.name = location.get("name").getAsString();
                 places.googlePlaceId = location.get("place_id").getAsString();
 
 
-                places.formattedAddress = location.get("vicinity").getAsString();
+               // places.formattedAddress = location.get("vicinity").getAsString();
 
                 places.lat = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lat").getAsDouble();
                 places.lng = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lng").getAsDouble();
