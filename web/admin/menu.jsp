@@ -8,7 +8,6 @@
                 </a>
             </li>
 
-
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-user-secret"></i>
@@ -30,12 +29,38 @@
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Add new user</a></li>
+                    <%--<li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Add new user</a></li>--%>
                     <li><a href="<%=baseUrl%>admin/app/user"><i class="fa fa-circle-o"></i> All member</a></li>
 
-                    <li><a href="<%=baseUrl%>admin/app/user?type=active"><i class="fa fa-circle-o"></i> Active user</a></li>
-                    <li><a href="<%=baseUrl%>admin/app/user?type=inactive"><i class="fa fa-circle-o"></i> Inactive user</a></li>
-                    <li><a href="<%=baseUrl%>admin/app/user?type=banned"><i class="fa fa-circle-o"></i> Banned user</a></li>
+                    <li><a href="<%=baseUrl%>admin/app/user?type=active"><i class="fa fa-circle-o"></i> Active user</a>
+                    </li>
+                    <li><a href="<%=baseUrl%>admin/app/user?type=inactive"><i class="fa fa-circle-o"></i> Inactive user</a>
+                    </li>
+                    <li><a href="<%=baseUrl%>admin/app/user?type=banned"><i class="fa fa-circle-o"></i> Banned user</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-user"></i>
+                    <span>Sticker</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    <li>
+                        <a href="<%=baseUrl%>admin/sticker/upload"><i class="fa fa-circle-o"></i> Upload Sticker</a>
+                    </li>
+                    <li>
+                        <a href="<%=baseUrl%>admin/sticker/list"><i class="fa fa-circle-o"></i> Upload List</a>
+                    </li>
+                    <li>
+                        <a href="<%=baseUrl%>admin/sticker/category/new"><i class="fa fa-circle-o"></i> New Category</a>
+                    </li>
+                    <li>
+                        <a href="<%=baseUrl%>admin/sticker/category/list"><i class="fa fa-circle-o"></i> Category
+                            List</a>
+                    </li>
                 </ul>
             </li>
 
@@ -71,6 +96,7 @@
                     <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> Total service list</a></li>
                 </ul>
             </li>
+
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-envelope-o"></i>
