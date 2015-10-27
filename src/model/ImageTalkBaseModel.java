@@ -24,6 +24,7 @@ class ImageTalkBaseModel {
     private String    query       = null;
     public  ResultSet resultSet = null;
     public  BaseErrorManager errorObj;
+    public BaseOperationManager operationStatus;
 
     public  int    limit;
     public  int    offset;
@@ -37,6 +38,15 @@ class ImageTalkBaseModel {
             this.errStatus = false;
         }
     }
+    public class BaseOperationManager{
+        public String msg;
+        public boolean status;
+
+        public BaseOperationManager() {
+            this.msg = "";
+            this.status = true;
+        }
+    }
     public ImageTalkBaseModel() {
         try {
             Class.forName(DBDriver);
@@ -46,7 +56,7 @@ class ImageTalkBaseModel {
             ex.printStackTrace();
         }
         this.errorObj = new BaseErrorManager();
-
+        this.operationStatus =  new BaseOperationManager();
         this.limit = -1;
         this.offset = -1;
     }
@@ -159,7 +169,6 @@ class ImageTalkBaseModel {
         this.dbConnectionRecheck();
         try {
             status = stmt.executeUpdate(query);
-            System.out.println("Return Update "+status);
         } catch (Exception ex) {
             ex.printStackTrace();
         }finally {

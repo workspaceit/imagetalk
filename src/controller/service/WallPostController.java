@@ -93,6 +93,10 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/get/comment/count":
                 this.getCommentCount();
                 break;
+            case "/app/wallpost/add/remove/favourite":
+                this.favourWallPost();
+                break;
+
             default:
                 break;
         }
@@ -840,5 +844,45 @@ public class WallPostController extends HttpServlet {
         this.baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
         this.pw.print(this.baseController.getResponse());
         return;
+    }
+    private void favourWallPost(){
+        if(!this.baseController.checkParam("wall_post_id", this.req, true)) {
+            this.baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+
+
+        WallPostFavoriteModel wallPostFavoriteModel = new WallPostFavoriteModel();
+
+        wallPostFavoriteModel.setOwner_id(this.baseController.appCredential.id);
+
+        try{
+            wallPostFavoriteModel.setWall_post_id(Integer.parseInt(this.req.getParameter("wall_post_id")));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            this.baseController.serviceResponse.responseStat.msg = "wall_post_id int required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        wallPostFavoriteModel.changeFavoriteState();
+        if(wallPostFavoriteModel.errorObj.errStatus){
+            this.baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.errorObj.msg;
+            this.baseController.serviceResponse.responseStat.status =  !wallPostFavoriteModel.errorObj.errStatus;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        HashMap<String,Object> respObj = new HashMap<>();
+
+        respObj.put("isFavorite",wallPostFavoriteModel.isFavorite);
+        this.baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.operationStatus.msg;
+        this.baseController.serviceResponse.responseData = respObj;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
 }

@@ -18,25 +18,27 @@ public class WallPost {
     public int likeCount;
     public int commentCount;
     public boolean isLiked;
+    public boolean isFavorite;
     public int type;
     public ArrayList<PostComment> comments;
     public Location location;
     public String createdDate;
 
    public WallPost() {
-     this.id = 0;
-     this.description = "";
-     this.owner = new AppCredential();
-     this.picPath = "";
-     this.tagList = new ArrayList<AppCredential>();
-     this.likerList = new ArrayList<Liker>();
-     this.tagCount = 0;
-     this.likeCount = 0;
-     this.commentCount = 0;
-     this.isLiked = false;
-     this.type = 0;
-     this.comments = new ArrayList<PostComment>();
-     this.location = new Location();
-     this.createdDate = "";
+        this.id = 0;
+        this.description = "";
+        this.owner = new AppCredential();
+        this.picPath = "";
+        this.tagList = new ArrayList<AppCredential>();
+        this.likerList = new ArrayList<Liker>();
+        this.tagCount = 0;
+        this.likeCount = 0;
+        this.commentCount = 0;
+        this.isLiked = false;
+        this.isFavorite = false;
+        this.type = 0;
+        this.comments = new ArrayList<PostComment>();
+        this.location = new Location();
+        this.createdDate = "";
    }
 }

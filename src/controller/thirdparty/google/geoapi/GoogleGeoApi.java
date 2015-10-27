@@ -161,26 +161,20 @@ public class GoogleGeoApi {
                 places.placeId = location.get("id").getAsString();
                 places.icon = location.get("icon").getAsString();
 
-                String myString = "example";
                 try {
-
-                    places.name = location.get("name").getAsString().getBytes("ISO-8859-1").toString();
-
                     byte ptext[] = location.get("name").getAsString().getBytes("ISO-8859-1");
                     places.name = new String(ptext,"UTF-8");
+
+                    byte pAddresstext[] = location.get("vicinity").getAsString().getBytes("ISO-8859-1");
+                    places.formattedAddress = new String(pAddresstext,"UTF-8");
+
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
-             //   byte[] convertedBytes = StringUtils.getBytesUtf8(myString);
-
-               // places.name = location.get("name").getAsString();
                 places.googlePlaceId = location.get("place_id").getAsString();
-
-
-               // places.formattedAddress = location.get("vicinity").getAsString();
-
                 places.lat = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lat").getAsDouble();
                 places.lng = location.get("geometry").getAsJsonObject().get("location").getAsJsonObject().get("lng").getAsDouble();
+
                 placesList.add(places);
             }
 
