@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Application Name : ImageTalk
@@ -61,6 +62,9 @@ public class StickerController extends HttpServlet {
             case "/admin/sticker/operation/category/new":
                 this.insertCategory(req);
                 break;
+            case "/admin/sticker/operation/category/delete":
+                this.getCategoryDelete(req);
+                break;
             case "/admin/sticker/operation/create":
                 this.insertSticker(req);
                 break;
@@ -93,6 +97,24 @@ public class StickerController extends HttpServlet {
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
         }
+    }
+
+    private void getCategoryDelete(HttpServletRequest req) {
+        int categoryId = Integer.parseInt(req.getParameter("id"));
+
+        if (categoryId > 0) {
+            StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+            if (stickerCategoryModel.deleteCategory(categoryId)) {
+                this.baseController.serviceResponse.responseStat.msg = "Category delete successfully";
+                this.baseController.serviceResponse.responseStat.status = true;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        this.baseController.serviceResponse.responseStat.msg = "Category delete failed";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
     }
 
     private void insertSticker(HttpServletRequest req) {

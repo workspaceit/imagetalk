@@ -231,6 +231,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Category List</servlet-name>
+        <jsp-file>/admin/stickerCategoryList.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Category List</servlet-name>
+        <url-pattern>/admin/sticker/category/list</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>Upload Sticker</servlet-name>
         <jsp-file>/admin/uploadImage.jsp</jsp-file>
     </servlet>
