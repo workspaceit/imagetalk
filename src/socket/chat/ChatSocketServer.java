@@ -12,39 +12,44 @@ public class ChatSocketServer {
         System.out.println("OK");
 
         int postNumber = 9091;
-
+        boolean runServer =true;
         try {
             ServerSocket chatServerSocket = new ServerSocket(postNumber);
-            System.out.println("Waiting for request");
-            Socket serviceSocket = chatServerSocket.accept();
-            System.out.println("Request arrived");
-            class StartThread extends Thread{
-                @Override
-                public void run(){
-                    try {
-                        BufferedReader input  = new BufferedReader(new InputStreamReader(serviceSocket.getInputStream()));
-                        PrintStream output = new PrintStream(serviceSocket.getOutputStream());
-                        while(true){
-                            String recvStr = input.readLine();
-                            if(recvStr!=null){
-                                System.out.println(input.readLine());
-                                output.println("Hi");
-                            }else{
-                                input.close();
+            while(runServer) {
+                System.out.println("Waiting for request");
+                Socket serviceSocket = chatServerSocket.accept();
+                System.out.println("Request arrived");
+                class StartThread extends Thread {
+                    @Override
+                    public void run() {
+                        try {
+                            BufferedReader input = new BufferedReader(new InputStreamReader(serviceSocket.getInputStream()));
+                            PrintStream output = new PrintStream(serviceSocket.getOutputStream());
+                            while (true) {
+                                String recvStr = input.readLine();
+                                if (recvStr != null) {
+                                    System.out.println(recvStr);
+                                    output.println("Hi");
+                                } else {
+                                    input.close();
+                                }
+
                             }
 
+                            //
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
 
-                       //
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-
                 }
+                new StartThread().run();
             }
-            new StartThread().run();
+            chatServerSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+
         }
     }
     public static void main(String args[]){

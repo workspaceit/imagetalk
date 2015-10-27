@@ -64,6 +64,9 @@ public class SearchController extends HttpServlet {
             case "/app/search/places/by/latlng":
                 this.getPalcesByLatLng();
                 break;
+            case "/app/search/contact/by/keyword":
+                this.getContactByKeyword();
+                break;
             default:
                 break;
         }
@@ -215,7 +218,7 @@ public class SearchController extends HttpServlet {
 
 
         contactModel.setOwner_id(this.baseController.appCredential.id);
-        ArrayList<AppCredential> appCredentialsList =  contactModel.getContactByKeyword(keyword);
+        ArrayList<Contact> appCredentialsList =  contactModel.getContactByKeyword(keyword);
 
         if(appCredentialsList.size()==0){
             this.baseController.serviceResponse.responseStat.msg = "No record found";
@@ -225,6 +228,62 @@ public class SearchController extends HttpServlet {
         }
 
         this.baseController.serviceResponse.responseData = appCredentialsList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getContactByKeyword(){
+
+        String keyword="";
+        if(this.baseController.checkParam("keyword", this.req, true)) {
+            keyword = this.req.getParameter("keyword").trim();
+        }
+        System.out.println("keyword :"+keyword);
+        ContactModel contactModel  = new ContactModel();
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
+        contactModel.setOwner_id(this.baseController.appCredential.id);
+        ArrayList<Contact> contactList =  contactModel.getContactByKeyword(keyword);
+
+        if(contactList.size()==0){
+            this.baseController.serviceResponse.responseStat.msg = "No record found";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        this.baseController.serviceResponse.responseData = contactList;
         this.pw.print(this.baseController.getResponse());
         return;
     }
@@ -310,10 +369,10 @@ public class SearchController extends HttpServlet {
         System.out.println("Length : " + gson.toJson(places).toString().length());
         System.out.println(gson.toJson(places).toString());
 
-        //respObj.put("extra",extraObj);
+        respObj.put("extra",extraObj);
 
         this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData = places;//respObj ;
+        this.baseController.serviceResponse.responseData = respObj ;
         this.pw.print(this.baseController.getResponse());
         return;
     }

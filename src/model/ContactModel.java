@@ -254,9 +254,10 @@ public class ContactModel extends ImageTalkBaseModel {
 
         return appCredentialList;
     }
-    public ArrayList<AppCredential> getContactByKeyword(String keyword) {
-        ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
-        String query = "select user_inf.id as user_inf_id," +
+    public ArrayList<Contact> getContactByKeyword(String keyword) {
+        ArrayList<Contact> contactList = new ArrayList<Contact>();
+        String query = "select " +super.tableName+".*,"+
+                " user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
@@ -268,7 +269,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 " where  " + super.tableName + ".owner_id="+ this.owner_id;
 
         if (keyword != null && keyword != "") {
-            query += " and user_inf.f_name like '%" + keyword + "%'";
+            query += " and ( user_inf.f_name like '%" + keyword + "%' or user_inf.l_name like '%" + keyword + "%' )";
         }
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;
@@ -279,30 +280,42 @@ public class ContactModel extends ImageTalkBaseModel {
         this.getData();
         try {
             while (this.resultSet.next()) {
-                AppCredential appCredential = new AppCredential();
-                appCredential.id = this.resultSet.getInt("app_login_credential_id");
-                appCredential.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
-                appCredential.phoneNumber = this.resultSet.getString("phone_number");
-                appCredential.user.id = this.resultSet.getInt("user_inf_id");
-                appCredential.user.firstName = this.resultSet.getString("f_name");
-                appCredential.user.lastName = this.resultSet.getString("l_name");
+
+                Byte tempFavorites = this.resultSet.getByte(super.tableName + ".favorites");
+                Byte tempIsBlock =this.resultSet.getByte(super.tableName + ".is_block");
+
+                Contact contact = new Contact();
+
+                contact.contactId = this.resultSet.getInt(super.tableName + ".id");
+                contact.nickName = this.resultSet.getString(super.tableName + ".nickname");
+                contact.favorites = (tempFavorites.intValue()>0);
+                contact.isBlock = (tempIsBlock.intValue()>0);
+                contact.rating = this.resultSet.getInt(super.tableName + ".rating");
+
+                contact.id = this.resultSet.getInt("app_login_credential_id");
+                contact.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                contact.phoneNumber = this.resultSet.getString("phone_number");
+                contact.user.id = this.resultSet.getInt("user_inf_id");
+                contact.user.firstName = this.resultSet.getString("f_name");
+                contact.user.lastName = this.resultSet.getString("l_name");
+
                 try {
-                    appCredential.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                    contact.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
                 } catch (Exception ex) {
-                    System.out.println("Parse error on picture appCid " + appCredential.id);
-                    appCredential.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
+                    System.out.println("Parse error on picture appCid " + contact.id);
+                    contact.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
                     ex.printStackTrace();
                 }
-                appCredential.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+                contact.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
 
-                appCredential.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
-                appCredential.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
-                appCredential.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
-                appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
-                appCredential.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
-                appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+                contact.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                contact.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                contact.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
+                contact.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                contact.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
-                appCredentialList.add(appCredential);
+                contactList.add(contact);
 
             }
         } catch (SQLException e) {
@@ -311,7 +324,7 @@ public class ContactModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
 
-        return appCredentialList;
+        return contactList;
     }
 
     public ArrayList<Contact> getWhoHasMyContactByOwnerId() {

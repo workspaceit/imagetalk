@@ -63,6 +63,9 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/get/own":
                 this.getOwnPost();
                 break;
+            case "/app/wallpost/get/favorite":
+                this.getFavoritePost();
+                break;
             case "/app/wallpost/get/recent":
                 this.getRecentPost();
                 break;
@@ -342,6 +345,52 @@ public class WallPostController extends HttpServlet {
 
         wallPostModel.setOwner_id(this.baseController.appCredential.id);
         ArrayList<WallPost> wallPostList =  wallPostModel.getByOwner_id();
+
+        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        this.baseController.serviceResponse.responseData =  wallPostList;
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getFavoritePost(){
+
+        WallPostModel wallPostModel = new WallPostModel();
+
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            wallPostModel.limit = 3;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        ArrayList<WallPost> wallPostList =  wallPostModel.getAllFavoriteByOwnerId();
 
         this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
         this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
