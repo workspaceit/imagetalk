@@ -20,13 +20,23 @@ public class ClientSocket {
             clientSocket = new Socket(hostName, portNumber);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out.println("HELLO");
-            out.println("HELLO");
-            out.println("HELLO");
-            out.println("HELLO");
-            out.close();
+            int count = 0;
+
+            while(!clientSocket.isClosed()){
+                Thread.sleep(3000);
+                out.println("HELLO "+count);
+                String recvStr = in.readLine();
+                if(recvStr!=null)
+                    System.out.println(recvStr);
+                else
+                    in.close();
+                count++;
+            }
+
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
