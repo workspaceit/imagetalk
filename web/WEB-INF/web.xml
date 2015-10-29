@@ -93,6 +93,16 @@
         <servlet-name>Utility</servlet-name>
         <url-pattern>/utility/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Job</servlet-name>
+        <servlet-class>controller.service.JobController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Job</servlet-name>
+        <url-pattern>/job/*</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>PictureAccessRequest</servlet-name>
         <servlet-class>controller.service.PictureAndFileController</servlet-class>
