@@ -2,7 +2,7 @@ package model.stable;
 /* Stable without Rollbacka and commit*/
 import java.sql.*;
 
-class ImageTalkBaseModel {
+final class ImageTalkBaseModel {
     static final private String DBDriver   = "com.mysql.jdbc.Driver";
     static final private String DBHost     = "127.0.0.1";
     static final private String DBPort     = "3306";

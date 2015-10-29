@@ -1,4 +1,4 @@
-package socket.chat;
+package socket;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -7,25 +7,32 @@ import java.net.Socket;
 /**
  * Created by mi on 10/26/15.
  */
-public class ChatSocketServer {
+public class ImgTalkServerSocket {
+
+    BaseSocketController baseSocketController;
     public void startServer(){
         System.out.println("OK");
 
         int postNumber = 9091;
         boolean runServer =true;
-
+        int count = 1;
+        this.baseSocketController = new BaseSocketController();
         try {
-            ServerSocket chatServerSocket = new ServerSocket(postNumber);
+            ServerSocket chatImgTalkServerSocket = new ServerSocket(postNumber);
 
             while(runServer) {
                 System.out.println("Waiting for request");
-                Socket serviceSocket = chatServerSocket.accept();
+                Socket serviceSocket = chatImgTalkServerSocket.accept();
                 System.out.println("Request arrived");
 
                 ServiceThread serviceThread = new ServiceThread(serviceSocket);
+
+                 this.baseSocketController.serviceThreads.put(count,serviceThread);
+                System.out.println("count :"+count);
+                count++;
                 serviceThread.start();
             }
-            chatServerSocket.close();
+            chatImgTalkServerSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
@@ -34,7 +41,7 @@ public class ChatSocketServer {
     }
     public static void main(String args[]){
 
-        ChatSocketServer chatSocketServer = new ChatSocketServer();
-        chatSocketServer.startServer();
+        ImgTalkServerSocket imgTalkServerSocket = new ImgTalkServerSocket();
+        imgTalkServerSocket.startServer();
     }
 }

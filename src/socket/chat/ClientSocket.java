@@ -1,5 +1,8 @@
 package socket.chat;
 
+import com.google.gson.Gson;
+import socket.SocketReponse;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,12 +13,14 @@ import java.net.Socket;
  * Created by mi on 10/26/15.
  */
 public class ClientSocket {
+    Gson gson;
     public void getConnected(){
 
         String hostName = "192.168.1.27";
         int portNumber = 9091;
 
         Socket clientSocket = null;
+        this.gson = new Gson();
         try {
             clientSocket = new Socket(hostName, portNumber);
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -24,11 +29,14 @@ public class ClientSocket {
 
             while(!clientSocket.isClosed()){
                 Thread.sleep(3000);
-                out.println("HELLO "+count);
+                //out.println("1");
                 String recvStr = in.readLine();
-                if(recvStr!=null)
-                    System.out.println(recvStr);
-                else
+                if(recvStr!=null){
+
+                    System.out.println("recvStr : "+recvStr);
+                    System.out.println(this.gson.fromJson(recvStr, SocketReponse.class));
+
+                }else
                     in.close();
                 count++;
             }
