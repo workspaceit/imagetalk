@@ -3,10 +3,7 @@ package controller.service;
 import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
-import model.ContactModel;
-import model.CountryModel;
-import model.StickerCategoryModel;
-import model.StickersModel;
+import model.*;
 import model.datamodel.app.Places;
 import model.datamodel.app.StickerCategory;
 
@@ -93,57 +90,10 @@ public class TestController extends  HttpServlet{
     }
     private void test(){
 
-        double lat= 0;
-        double lng= 0;
-
-
-        if(!this.baseController.checkParam("lat", this.req, true)) {
-
-            this.baseController.serviceResponse.responseStat.msg = "lat required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }else{
-
-            try{
-                lat = Double.parseDouble(this.req.getParameter("lat").trim());
-            } catch (Exception ex){
-                System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
-            }
-        }
-        if(!this.baseController.checkParam("lng", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "lng required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }else{
-            try{
-                lng = Double.parseDouble(this.req.getParameter("lng").trim());
-            } catch (Exception ex){
-                System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
-            }
-        }
-
-        GoogleGeoApi googleGeoApi = new GoogleGeoApi();
-        HashMap<String,Object> respObj =  new HashMap<>();
-        HashMap<String,Object> extraObj =  new HashMap<>();
-        ArrayList<Places> places = googleGeoApi.getPlacesByLatLng(lat, lng);
-
-        extraObj.put("next_page_token",googleGeoApi.pagetoken);
-
-        respObj.put("places",places);
-        respObj.put("extra",extraObj);
-
-        this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData = respObj ;
+        JobModel jobModel = new JobModel();
+        jobModel.setId(1);
+        this.baseController.serviceResponse.responseStat.msg = "Job added successfully";
+        this.baseController.serviceResponse.responseData = jobModel.getAllById();
         this.pw.print(this.baseController.getResponse());
         return;
     }

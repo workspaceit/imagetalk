@@ -100,7 +100,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Job</servlet-name>
-        <url-pattern>/job/*</url-pattern>
+        <url-pattern>/app/user/job/*</url-pattern>
     </servlet-mapping>
 
     <servlet>

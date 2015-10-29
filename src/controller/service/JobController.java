@@ -1,8 +1,10 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import helper.ImageHelper;
 import model.ContactModel;
 import model.JobModel;
+import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +24,7 @@ public class JobController extends HttpServlet {
     PrintWriter pw;
     HttpServletRequest req;
     HttpServletResponse res;
-
+    Gson gson;
 
     @Override
     public void init() throws ServletException {
@@ -40,6 +42,8 @@ public class JobController extends HttpServlet {
         this.baseController = new ImageTalkBaseController();
         this.pw = res.getWriter();
 
+        this.gson = new Gson();
+
         String url = req.getRequestURI().toString();
 
         if (url.endsWith("/")) {
@@ -56,7 +60,7 @@ public class JobController extends HttpServlet {
             case "/job/findAllJobs":
                 this.findAllJobs();
                 break;
-            case "/job/add":
+            case "/app/user/job/add":
                 this.addJobs();
                 break;
             case "/job/remove":
@@ -75,32 +79,94 @@ public class JobController extends HttpServlet {
 
     private void addJobs() {
 
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        String imgBase64 = "";
+        String fileRelativePath = "";
+        String title= "";
+        String description = "";
+        float price = 0;
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+        if(!this.baseController.checkParam("title",this.req,true)) {
+            this.baseController.serviceResponse.responseStat.msg = "title is required";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
+        }else{
+            title = req.getParameter("title");
+        }
+
+        if(this.baseController.checkParam("description",this.req,true)) {
+            description = req.getParameter("description");
+        }
+
+
+
+        if(!this.baseController.checkParam("price",this.req,true)) {
+            this.baseController.serviceResponse.responseStat.msg = "price is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            try{
+                price =  parseInt(req.getParameter("price"));
+            }catch (Exception ex){
+
+                this.baseController.serviceResponse.responseStat.msg = "price is float required";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                ex.printStackTrace();
+                return;
+
+            }
+
+        }
+
+
+        Pictures pictures = new Pictures();
+
+        if(this.baseController.checkParam("icon",this.req,true)) {
+            imgBase64 = this.req.getParameter("icon");
+            fileRelativePath = "";
+            System.out.println("photo received");
+            pictures = ImageHelper.saveJobIcon(imgBase64, this.baseController.appCredential.id);
+            System.out.println("photo Saved");
+
+
+
+            if (pictures.original.path == "") {
+                System.out.println("Unable to save the Image : "+fileRelativePath);
+
+                this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
         }
 
         JobModel jobModel = new JobModel();
-        jobModel.setApp_login_credential_id(this.baseController.appCredential.id);
-        jobModel.setDescription(req.getParameter("description"));
-        jobModel.setPrice(parseInt(req.getParameter("price")));
-        jobModel.setIcon("Picture.jpg");
 
+        jobModel.setApp_login_credential_id(this.baseController.appCredential.id);
+        jobModel.setTitle(title);
+        jobModel.setDescription(description);
+        jobModel.setPrice(price);
+        jobModel.setIcon(this.gson.toJson(pictures));
+
+        if(jobModel.isExist()){
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = "Job already added";
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
         if(jobModel.insert()==0){
             this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = jobModel.errorObj.msg;
+            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
             this.pw.print(this.baseController.getResponse());
             return;
         }
 
         this.baseController.serviceResponse.responseStat.msg = "Job added successfully";
+        this.baseController.serviceResponse.responseData = jobModel.getAllById();
         this.pw.print(this.baseController.getResponse());
         return;
-
-
     }
 
     private void findAllJobs() {

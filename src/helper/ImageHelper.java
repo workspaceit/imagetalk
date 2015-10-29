@@ -129,7 +129,60 @@ public class ImageHelper {
         }
         return pictures;
     }
+    public static Pictures saveJobIcon(Object imgObj, int uId) {
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+        try {
+            fileName = +System.nanoTime() + ".jpg";
+            path += uId;
+            createDirIfNotExist(path);
+            path += "/job";
+            createDirIfNotExist(path);
+            path += "/" + fileName;
+            System.out.println(path);
+            File file = new File(path);
+            BufferedImage img;
 
+            if (imgObj.getClass().equals(BufferedImage.class)) {
+                img = (BufferedImage) imgObj;
+            } else if (imgObj.getClass().equals(String.class)) {
+                img = decodeToImage((String) imgObj);
+            }else{
+                img = decodeToImage((String) imgObj);
+            }
+
+            ImageIO.write(img, "jpg", file);
+
+            fileName = uId + "/job/" + fileName;
+            pictures.original.size.height = 0;
+            pictures.original.size.width = 0;
+            pictures.original.path = fileName;
+
+
+            PictureDetails thumb1 = new PictureDetails();
+            thumb1.type = "thumbnail";
+            thumb1.path = createThumbnail(decodeToImage((String) imgObj), 32, 32, uId + "/job");
+
+            thumb1.size.width = 32;
+            thumb1.size.height = 32;
+
+            pictures.thumb.add(thumb1);
+
+            PictureDetails thumb2 = new PictureDetails();
+            thumb2.type = "thumbnail";
+            thumb2.path = createThumbnail(decodeToImage((String) imgObj), 48, 48, uId + "/job");
+            thumb2.size.width = 48;
+            thumb2.size.height = 48;
+
+            pictures.thumb.add(thumb2);
+
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return pictures;
+        }
+        return pictures;
+    }
     public static Pictures saveWallPostPicture(Object imgObj, int uId) {
         Pictures pictures = new Pictures();
         String   path     = GLOBAL_PATH;

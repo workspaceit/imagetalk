@@ -2,6 +2,7 @@ package controller.service;
 
 import model.StickerCategoryModel;
 import model.StickersModel;
+import model.datamodel.app.Stickers;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Created by mi on 10/13/15.
@@ -152,9 +154,11 @@ public class AppStickersController extends HttpServlet {
                 return;
             }
         }
+        ArrayList<Stickers> stickers = stickersModel.getAll();
 
-
-        this.baseController.serviceResponse.responseData = stickersModel.getAll();
+        this.baseController.serviceResponse.responseData = stickers;
+        this.baseController.serviceResponse.responseStat.status =  (stickers.size()>0);
+        this.baseController.serviceResponse.responseStat.msg = (stickers.size()==0)?"No record found":"";
         this.pw.print(this.baseController.getResponse());
         return;
     }

@@ -65,3 +65,17 @@ ALTER TABLE  `app_login_credential` ADD UNIQUE (
 
 ALTER TABLE  `wall_post` ADD  `type` INT( 1 ) NULL DEFAULT  '0' AFTER  `description` ;
 ALTER TABLE  `wall_post` CHANGE  `type`  `type` INT( 1 ) NULL DEFAULT  '0' COMMENT  '0 = image post, 1 = location , 2 = mood/scticker';
+
+# Date of change 29th Oct 2015
+
+ALTER TABLE  `job` CHANGE  `description`  `description` TEXT NOT NULL ;
+ALTER TABLE  `job` ADD  `icon` VARCHAR( 200 ) NOT NULL AFTER  `description` ;
+ALTER TABLE  `job` CHANGE  `icon`  `icon` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL ;
+ALTER TABLE  `job` CHANGE  `price`  `price` FLOAT NOT NULL ;
+ALTER TABLE  `job` DROP  `app_login_credential_id` ;
+ALTER TABLE  `job` ADD  `app_login_credential_id` INT NOT NULL AFTER  `id` ;
+
+ALTER TABLE  `job` ADD UNIQUE (`app_login_credential_id`);
+ALTER TABLE  `job` ADD  `title` TEXT NOT NULL AFTER  `app_login_credential_id` ;
+
+

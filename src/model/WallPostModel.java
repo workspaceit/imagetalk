@@ -241,7 +241,7 @@ public class WallPostModel extends ImageTalkBaseModel{
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         }
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try {
@@ -402,7 +402,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     public ArrayList<WallPost> getByOwner_id(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 
-        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.description,,wall_post.type as postType,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.description,wall_post.type as postType,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -418,7 +418,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
                 " where wall_post.owner_id = "+this.owner_id;
-
+        query += " order by  wall_post.id  DESC ";
 
         if(this.limit >0){
             this.offset = this.offset * this.limit;
@@ -438,11 +438,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.isLiked = (this.resultSet.getInt("isFavorite")==1)?true:false;
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
                 wallPost.commentCount = this.resultSet.getInt("commentCount");
-
-                System.out.println(this.resultSet.getTimestamp("wall_postCdate").getTime());
-                System.out.println(this.resultSet.getTimestamp("wall_postCdate"));
-
-                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate"));
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
                 wallPost.owner.textStatus = this.resultSet.getString("text_status");
