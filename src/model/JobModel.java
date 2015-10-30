@@ -6,6 +6,8 @@ import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by rajib on 10/29/15.
@@ -164,6 +166,27 @@ public class JobModel extends ImageTalkBaseModel {
         this.id = this.insertData(query);
         return this.id;
     }
+
+    public boolean update(HashMap<String,String> paramWithValues)
+    {
+        boolean isSuccess = true;
+        String query = "UPDATE "+this.tableName+" SET ";
+        String comma = "";
+        for(Map.Entry m:paramWithValues.entrySet())
+       {
+           query += comma;
+           comma = ",";
+           if(m.getKey()=="price")
+               query += m.getKey()+"="+String.valueOf(m.getValue());
+           else
+               query += m.getKey()+"="+m.getValue();
+       }
+        query += "WHERE app_login_credential_id="+this.app_login_credential_id;
+
+        isSuccess = this.updateData(query);
+        return isSuccess;
+    }
+
 
 
 }

@@ -243,8 +243,8 @@ public class ImageHelper {
     }
 
     public static String encodeToString(BufferedImage image, String type) {
-        String                imageString = null;
-        ByteArrayOutputStream bos         = new ByteArrayOutputStream();
+        String imageString = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             ImageIO.write(image, type, bos);
             byte[] imageBytes = bos.toByteArray();
