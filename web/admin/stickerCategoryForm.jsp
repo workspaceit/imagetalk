@@ -44,13 +44,14 @@
             <div class="row">
                 <div class="row shuffle clearfix">
                     <div class="col-lg-12">
-                        <form class="form-horizontal" method="post" action="<%=baseUrl%>admin/sticker/operation/category/new">
+                        <form class="form-horizontal" method="post" action="" onsubmit="return false;">
                             <div class="box-body">
                                 <div class="form-group">
                                     <label for="name" class="col-sm-2 control-label">Name</label>
 
                                     <div class="col-sm-10">
-                                        <input name="name" type="text" class="form-control" id="name" placeholder="Category Name">
+                                        <input name="name" type="text" class="form-control" id="name"
+                                               placeholder="Category Name">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -65,10 +66,17 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="feedback">
+                                <div id="error">
+
+                                </div>
+                                <div id="success"></div>
+
+                            </div>
                             <!-- /.box-body -->
                             <div class="box-footer">
                                 <button type="submit" class="btn btn-default">Cancel</button>
-                                <button type="submit" class="btn btn-info pull-right">Submit</button>
+                                <button id="submit" class="btn btn-info pull-right">Submit</button>
                             </div>
                             <!-- /.box-footer -->
                         </form>
@@ -106,7 +114,27 @@
 <script src="/assets/dist/js/pages/dashboard2.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="/assets/dist/js/demo.js"></script>
+<script>
+    $("#submit").click(function () {
+        $.ajax({
+            method: "POST",
+            url: "<%=baseUrl%>admin/sticker/operation/category/new",
+            data: {
+                name: $("#name").val(),
+                is_paid: $("#is_paid").val()
+            },
+            error: function (data) {
 
+            },
+            success: function (data) {
+
+                var parseData = jQuery.parseJSON(data);
+
+                $("#success").html(parseData.responseStat.msg);
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

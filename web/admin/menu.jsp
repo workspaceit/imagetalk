@@ -41,6 +41,7 @@
                 </ul>
             </li>
 
+            <% if( login.email.equals("developer@admin.com")){ %>
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-user"></i>
@@ -51,6 +52,7 @@
                     <li>
                         <a href="<%=baseUrl%>admin/sticker/upload"><i class="fa fa-circle-o"></i> Upload Sticker</a>
                     </li>
+
                     <li>
                         <a href="<%=baseUrl%>admin/sticker/list"><i class="fa fa-circle-o"></i> Upload List</a>
                     </li>
@@ -63,6 +65,7 @@
                     </li>
                 </ul>
             </li>
+            <%}%>
 
             <li class="treeview">
                 <a href="#">

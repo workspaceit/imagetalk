@@ -80,7 +80,17 @@ public class StickerController extends HttpServlet {
 
     private void insertCategory(HttpServletRequest req) {
         StickerCategoryModel sCategoryModel = new StickerCategoryModel();
-        String               categoryName   = req.getParameter("name");
+        String categoryName;
+
+        if(!this.baseController.checkParam("name",req,true)) {
+            this.baseController.serviceResponse.responseStat.msg = "Category Name is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            categoryName = req.getParameter("name");
+        }
+
 
         System.out.print(categoryName);
 
@@ -93,7 +103,7 @@ public class StickerController extends HttpServlet {
             this.baseController.serviceResponse.responseStat.status = true;
             this.pw.print(this.baseController.getResponse());
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Category \"" + categoryName + "\" Store Successfully";
+            this.baseController.serviceResponse.responseStat.msg = "Category \"" + categoryName + "\" Couldn't upload!";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
         }
