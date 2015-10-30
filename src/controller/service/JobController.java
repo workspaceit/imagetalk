@@ -98,7 +98,10 @@ public class JobController extends HttpServlet {
             }
             else if(paramName.equals("description"))
             {
-                paramWithValues.put(paramName,req.getParameter("description"));
+                if(req.getParameter("description")==null)
+                    paramWithValues.put(paramName,"");
+                else
+                    paramWithValues.put(paramName,req.getParameter("description"));
             }
             else if(paramName.equals("price"))
             {
@@ -121,6 +124,13 @@ public class JobController extends HttpServlet {
 
                     }
 
+                }
+                if(price<1)
+                {
+                    this.baseController.serviceResponse.responseStat.msg = "price can't be Zero or negative ";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
                 }
                 paramWithValues.put(paramName,Integer.toString(price));
 

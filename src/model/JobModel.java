@@ -176,13 +176,15 @@ public class JobModel extends ImageTalkBaseModel {
        {
            query += comma;
            comma = ",";
-           if(m.getKey()=="price")
+           if(m.getKey().equals("price"))
                query += m.getKey()+"="+String.valueOf(m.getValue());
+           else if(m.getKey().equals("description")&& m.getValue()=="")
+               query += m.getKey()+"=' '";
            else
                query += m.getKey()+"="+m.getValue();
        }
-        query += "WHERE app_login_credential_id="+this.app_login_credential_id;
-
+        query += " WHERE app_login_credential_id="+this.app_login_credential_id;
+        System.out.print(query);
         isSuccess = this.updateData(query);
         return isSuccess;
     }

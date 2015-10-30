@@ -59,7 +59,7 @@
                                     <div class="col-sm-10">
                                         <select name="is_paid" class="form-control" id="is_paid">
                                             <option value="">Select One</option>
-                                            <option value="0">Free</option>
+                                            <option value="0" selected>Free</option>
                                             <option value="1">Paid</option>
                                         </select>
                                     </div>
@@ -106,5 +106,7 @@
 <script src="/assets/dist/js/pages/dashboard2.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="/assets/dist/js/demo.js"></script>
+
+
 </body>
 </html>
