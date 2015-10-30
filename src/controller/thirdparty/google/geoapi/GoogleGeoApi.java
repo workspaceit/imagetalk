@@ -23,7 +23,12 @@ public class GoogleGeoApi {
     private String params;
 
     public void setKeyWord(String keyWord) {
-        this.keyWord = keyWord;
+        try {
+            this.keyWord = URLEncoder.encode(keyWord, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            this.keyWord ="";
+            e.printStackTrace();
+        }
     }
     public String pagetoken;
     private String keyWord;
@@ -44,7 +49,8 @@ public class GoogleGeoApi {
         String url = null;
         String latLng = Double.toString(lat)+","+Double.toString(lng);
 
-        url = BASE_PACE_URL+"?key="+API_KEY+"&location="+latLng+"&radius=500&pagetoken="+this.pagetoken;
+        url = BASE_PACE_URL+"?key="+API_KEY+"&location="+latLng+"&radius=500&pagetoken="+this.pagetoken+"&name="+this.keyWord;;
+
 
         return url;
     }
@@ -103,12 +109,16 @@ public class GoogleGeoApi {
     }
     private ArrayList<Location> parseLocationFromJson(String str){
 
+        ArrayList<Location> addressList = new ArrayList<Location>();
+        if(str==null||str==""){
+            return addressList;
+        }
 
         Gson gson = new Gson();
         JsonParser jsonParser = new JsonParser();
         JsonObject response =  jsonParser.parse(str).getAsJsonObject();
         String status = jsonParser.parse(response.get("status").toString()).getAsString() ;
-        ArrayList<Location> addressList = new ArrayList<Location>();
+
 
         if(status.equals("OK")){
             JsonArray result = jsonParser.parse(response.get("results").toString()).getAsJsonArray();
@@ -146,7 +156,10 @@ public class GoogleGeoApi {
         if(status.equals("OK")){
 
             JsonArray result = jsonParser.parse(response.get("results").toString()).getAsJsonArray();
-            this.pagetoken = response.get("next_page_token").getAsString();
+            if(response.has("next_page_token")){
+                this.pagetoken = response.get("next_page_token").getAsString();
+            }
+
 
             if(result==null || result.size()==0){
 

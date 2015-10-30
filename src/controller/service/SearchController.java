@@ -52,7 +52,7 @@ public class SearchController extends HttpServlet {
         }
 
         switch (url) {
-            case "/app/search/user/fortag":
+            case "/app/search/alluser/by/keyword":
                 this.getUserForTag();
                 break;
             case "/app/search/location/by/keyword":
@@ -62,7 +62,7 @@ public class SearchController extends HttpServlet {
                 this.getLocationByLattLng();
                 break;
             case "/app/search/places/by/latlng":
-                this.getPalcesByLatLng();
+                this.getPlacesByLatLng();
                 break;
             case "/app/search/contact/by/keyword":
                 this.getContactByKeyword();
@@ -302,19 +302,39 @@ public class SearchController extends HttpServlet {
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
         googleGeoApi.setKeyWord(keyword);
 
+
+        HashMap<String,Object> respObj =  new HashMap<>();
+        HashMap<String,Object> extraObj =  new HashMap<>();
+        if(this.baseController.checkParam("next_page_token", this.req, true)) {
+            googleGeoApi.pagetoken = this.req.getParameter("next_page_token").trim();
+        }
         ArrayList<Location> addressList = googleGeoApi.getLocationByKeyword();
+
+        extraObj.put("nextPageToken", googleGeoApi.pagetoken);
+
+        respObj.put("location", addressList);
+
+
+
+        respObj.put("extra",extraObj);
+
 
         this.baseController.serviceResponse.responseStat.msg =(addressList.size()<=0)?"No record found":"";
         this.baseController.serviceResponse.responseStat.status = (addressList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  addressList;
+        this.baseController.serviceResponse.responseData =  respObj;
         this.pw.print(this.baseController.getResponse());
         return;
 
     }
-    private void getPalcesByLatLng(){
+    private void getPlacesByLatLng(){
         double lat= 0;
         double lng= 0;
 
+        String keyword="";
+
+        if(this.baseController.checkParam("keyword", this.req, true)) {
+            keyword = this.req.getParameter("keyword").trim();
+        }
 
         if(!this.baseController.checkParam("lat", this.req, true)) {
 
@@ -352,6 +372,7 @@ public class SearchController extends HttpServlet {
         }
 
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
+        googleGeoApi.setKeyWord(keyword);
 
         if(this.baseController.checkParam("next_page_token", this.req, true)) {
             googleGeoApi.pagetoken = this.req.getParameter("next_page_token").trim();

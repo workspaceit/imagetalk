@@ -4,10 +4,7 @@ import com.google.gson.*;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
 import model.*;
-import model.datamodel.app.AppCredential;
-import model.datamodel.app.Location;
-import model.datamodel.app.PostComment;
-import model.datamodel.app.WallPost;
+import model.datamodel.app.*;
 import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
@@ -179,20 +176,23 @@ public class WallPostController extends HttpServlet {
 
         /*===============  Insert location here ==============*/
         LocationModel locationModel = new LocationModel();
-        if(this.baseController.checkParam("location", this.req, true)){
+        if(this.baseController.checkParam("places", this.req, true)){
             System.out.println("At location  ");
-            String locationStr = this.req.getParameter("location");
+            String locationStr = this.req.getParameter("places");
 
             Gson gson = new Gson();
             try{
-                Location location = gson.fromJson(locationStr,Location.class);
+                Places places = gson.fromJson(locationStr,Places.class);
 
 
-
-                locationModel.setLat(location.lat);
-                locationModel.setLng(location.lng);
-                locationModel.setFormatted_address(location.formattedAddress);
-                locationModel.setCountry(location.countryName);
+                locationModel.setPlace_id(places.placeId);
+                locationModel.setIcon(places.icon);
+                locationModel.setName(places.name);
+                locationModel.setGoogle_place_id(places.googlePlaceId);
+                locationModel.setLat(places.lat);
+                locationModel.setLng(places.lng);
+                locationModel.setFormatted_address(places.formattedAddress);
+                locationModel.setCountry(places.countryName);
                 if(locationModel.insert()==0){
                     this.baseController.serviceResponse.responseStat.msg = "Internal server error";
                     this.baseController.serviceResponse.responseStat.status = false;

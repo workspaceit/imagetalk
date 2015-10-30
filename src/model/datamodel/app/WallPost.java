@@ -21,7 +21,7 @@ public class WallPost {
     public boolean isFavorite;
     public int type;
     public ArrayList<PostComment> comments;
-    public Location location;
+    public Places places;
     public String createdDate;
 
    public WallPost() {
@@ -38,7 +38,7 @@ public class WallPost {
         this.isFavorite = false;
         this.type = 0;
         this.comments = new ArrayList<PostComment>();
-        this.location = new Location();
+        this.places = new Places();
         this.createdDate = "";
    }
 }

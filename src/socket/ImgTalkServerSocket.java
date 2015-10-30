@@ -16,7 +16,7 @@ public class ImgTalkServerSocket {
         int postNumber = 9091;
         boolean runServer =true;
         int count = 1;
-        this.baseSocketController = new BaseSocketController();
+
         try {
             ServerSocket chatImgTalkServerSocket = new ServerSocket(postNumber);
 
@@ -27,7 +27,6 @@ public class ImgTalkServerSocket {
 
                 ServiceThread serviceThread = new ServiceThread(serviceSocket);
 
-                 this.baseSocketController.serviceThreads.put(count,serviceThread);
                 System.out.println("count :"+count);
                 count++;
                 serviceThread.start();

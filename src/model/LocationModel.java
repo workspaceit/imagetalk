@@ -1,10 +1,16 @@
 package model;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+
 /**
  * Created by mi on 10/7/15.
  */
 public class LocationModel extends ImageTalkBaseModel {
     private int id;
+    private String place_id;
+    private String icon;
+    private String name;
+    private String google_place_id;
     private double lat;
     private double lng;
     private String  formatted_address;
@@ -21,6 +27,38 @@ public class LocationModel extends ImageTalkBaseModel {
         this.formatted_address = "";
         this.country ="";
         this.created_date = "";
+    }
+
+    public String getPlace_id() {
+        return place_id;
+    }
+
+    public void setPlace_id(String place_id) {
+        this.place_id = place_id;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = StringEscapeUtils.escapeEcmaScript(name);
+    }
+
+    public String getGoogle_place_id() {
+        return google_place_id;
+    }
+
+    public void setGoogle_place_id(String google_place_id) {
+        this.google_place_id = StringEscapeUtils.escapeEcmaScript(google_place_id);
     }
 
     public double getLat() {
@@ -78,8 +116,20 @@ public class LocationModel extends ImageTalkBaseModel {
     }
 
     public int insert(){
-        String query = "INSERT INTO "+this.tableName+" (lat, lng, formatted_address, country)";
-        query += "VALUES ("+this.lat+","+this.lng+",'"+this.formatted_address+"','"+this.country+"')";
+        String query = "INSERT INTO "+this.tableName+" (place_id,icon,name,google_place_id,lat, lng, formatted_address, country)";
+        query += "VALUES ('"+this.place_id+"','"+this.icon+"','"+this.name+"','"+this.place_id+"',"+this.lat+","+this.lng+",'"+this.formatted_address+"','"+this.country+"')";
+        System.out.println(query);
+        this.id = this.insertData(query);
+        return  this.id;
+
+//        String query = "INSERT INTO "+this.tableName+" (lat, lng, formatted_address, country)";
+//        query += "VALUES ("+this.lat+","+this.lng+",'"+this.formatted_address+"','"+this.country+"')";
+//        this.id = this.insertData(query);
+//        return  this.id;
+    }
+    public int insertPlaces(){
+        String query = "INSERT INTO "+this.tableName+" (place_id,icon,name,google_place_id,lat, lng, formatted_address, country)";
+        query += "VALUES ('"+this.place_id+"','"+this.icon+"','"+this.name+"','"+this.place_id+"',,"+this.lat+","+this.lng+",'"+this.formatted_address+"','"+this.country+"')";
         this.id = this.insertData(query);
         return  this.id;
     }

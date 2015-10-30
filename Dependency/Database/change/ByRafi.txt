@@ -78,4 +78,10 @@ ALTER TABLE  `job` ADD  `app_login_credential_id` INT NOT NULL AFTER  `id` ;
 ALTER TABLE  `job` ADD UNIQUE (`app_login_credential_id`);
 ALTER TABLE  `job` ADD  `title` TEXT NOT NULL AFTER  `app_login_credential_id` ;
 
+# Date of change 30th Oct 2015
+
+ALTER TABLE  `location` ADD  `place_id` VARCHAR( 500 ) NULL AFTER  `id` ;
+ALTER TABLE  `location` ADD  `icon` VARCHAR( 500 )  NULL AFTER  `place_id` ;
+ALTER TABLE  `location` ADD  `name` TEXT NULL AFTER  `icon` ;
+ALTER TABLE  `location` ADD  `google_place_id` VARCHAR( 200 ) NULL AFTER  `name` ;
 

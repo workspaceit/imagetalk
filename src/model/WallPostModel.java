@@ -195,12 +195,17 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
-                wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
-                wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
-                wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
-                wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
-                wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
-                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
+                wallPost.places.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
+                wallPost.places.placeId = (this.resultSet.getObject("postLoc.place_id")==null)?"":this.resultSet.getString("postLoc.place_id");
+                wallPost.places.icon = (this.resultSet.getObject("postLoc.icon")==null)?"":this.resultSet.getString("postLoc.icon");
+                wallPost.places.name = (this.resultSet.getObject("postLoc.name")==null)?"":this.resultSet.getString("postLoc.name");
+                wallPost.places.googlePlaceId = (this.resultSet.getObject("postLoc.google_place_id")==null)?"":this.resultSet.getString("postLoc.google_place_id");
+
+                wallPost.places.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
+                wallPost.places.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
+                wallPost.places.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
+                wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
+                wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
 
                 wallPost = this.getOtherDependency(wallPost);
@@ -280,12 +285,17 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
-                wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
-                wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
-                wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
-                wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
-                wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
-                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
+                wallPost.places.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
+                wallPost.places.placeId = (this.resultSet.getObject("postLoc.place_id")==null)?"":this.resultSet.getString("postLoc.place_id");
+                wallPost.places.icon = (this.resultSet.getObject("postLoc.icon")==null)?"":this.resultSet.getString("postLoc.icon");
+                wallPost.places.name = (this.resultSet.getObject("postLoc.name")==null)?"":this.resultSet.getString("postLoc.name");
+                wallPost.places.googlePlaceId = (this.resultSet.getObject("postLoc.google_place_id")==null)?"":this.resultSet.getString("postLoc.google_place_id");
+
+                wallPost.places.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
+                wallPost.places.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
+                wallPost.places.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
+                wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
+                wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
 
                 wallPost = this.getOtherDependency(wallPost);
@@ -362,12 +372,17 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
-                wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
-                wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
-                wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
-                wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
-                wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
-                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
+                wallPost.places.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
+                wallPost.places.placeId = (this.resultSet.getObject("postLoc.place_id")==null)?"":this.resultSet.getString("postLoc.place_id");
+                wallPost.places.icon = (this.resultSet.getObject("postLoc.icon")==null)?"":this.resultSet.getString("postLoc.icon");
+                wallPost.places.name = (this.resultSet.getObject("postLoc.name")==null)?"":this.resultSet.getString("postLoc.name");
+                wallPost.places.googlePlaceId = (this.resultSet.getObject("postLoc.google_place_id")==null)?"":this.resultSet.getString("postLoc.google_place_id");
+
+                wallPost.places.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
+                wallPost.places.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
+                wallPost.places.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
+                wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
+                wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
                 wallPost = getOtherDependency(wallPost);
 
@@ -463,12 +478,17 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
 
-                wallPost.location.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
-                wallPost.location.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
-                wallPost.location.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
-                wallPost.location.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
-                wallPost.location.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
-                wallPost.location.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"0":Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.places.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
+                wallPost.places.placeId = (this.resultSet.getObject("postLoc.place_id")==null)?"":this.resultSet.getString("postLoc.place_id");
+                wallPost.places.icon = (this.resultSet.getObject("postLoc.icon")==null)?"":this.resultSet.getString("postLoc.icon");
+                wallPost.places.name = (this.resultSet.getObject("postLoc.name")==null)?"":this.resultSet.getString("postLoc.name");
+                wallPost.places.googlePlaceId = (this.resultSet.getObject("postLoc.google_place_id")==null)?"":this.resultSet.getString("postLoc.google_place_id");
+
+                wallPost.places.lat = (this.resultSet.getObject("postLoc.lat")==null)?0:this.resultSet.getDouble("postLoc.lat");
+                wallPost.places.lng = (this.resultSet.getObject("postLoc.lng")==null)?0:this.resultSet.getDouble("postLoc.lng");
+                wallPost.places.formattedAddress = (this.resultSet.getObject("postLoc.formatted_address")==null)?"":this.resultSet.getString("postLoc.formatted_address");
+                wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
+                wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
 
                 wallPost = this.getOtherDependency(wallPost);

@@ -1,7 +1,9 @@
 package socket.chat;
 
 import com.google.gson.Gson;
-import socket.SocketReponse;
+import model.AppLoginCredentialModel;
+import model.datamodel.app.Contact;
+import model.datamodel.app.socket.SocketResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,18 +29,38 @@ public class ClientSocket {
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             int count = 0;
 
+            SocketResponse socketResponse = new SocketResponse();
+            AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+
+
+            socketResponse.responseStat.tag = "authentication";
+            appLoginCredentialModel.setId(32);
+            socketResponse.responseData =  appLoginCredentialModel.getAppCredentialById();
+
+            out.println(this.gson.toJson(socketResponse));
+            Thread.sleep(3000);
+            Contact contact =  new Contact();
+            contact.id = 1;
+            socketResponse.responseStat.tag="textchat";
+            socketResponse.responseData = contact;
+            out.println(this.gson.toJson(socketResponse));
             while(!clientSocket.isClosed()){
                 Thread.sleep(3000);
+
+
+
                 //out.println("1");
                 String recvStr = in.readLine();
                 if(recvStr!=null){
 
                     System.out.println("recvStr : "+recvStr);
-                    System.out.println(this.gson.fromJson(recvStr, SocketReponse.class));
+                    System.out.println(this.gson.fromJson(recvStr, SocketResponse.class));
 
                 }else
                     in.close();
                 count++;
+                out.println(this.gson.toJson(socketResponse));
             }
 
 
