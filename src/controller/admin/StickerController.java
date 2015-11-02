@@ -92,7 +92,7 @@ public class StickerController extends HttpServlet {
         }
 
 
-        System.out.print(categoryName);
+       // System.out.print(categoryName);
 
         sCategoryModel.setName(categoryName);
         sCategoryModel.setIs_paid(Integer.parseInt(req.getParameter("is_paid")));
@@ -128,10 +128,20 @@ public class StickerController extends HttpServlet {
     }
 
     private void insertSticker(HttpServletRequest req) {
+        int           category_id;
         String        imgPath       = req.getParameter("img_path");
-        int           category_id   = Integer.parseInt(req.getParameter("category_id"));
         int           isPaid        = Integer.parseInt(req.getParameter("is_paid"));
         int           userId        = this.login.id;
+
+        if(!this.baseController.checkParam("category_id",req,true)) {
+            this.baseController.serviceResponse.responseStat.msg = "select a cateogory name first!";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else{
+            category_id = Integer.parseInt(req.getParameter("category_id"));
+        }
+
         StickersModel stickersModel = new StickersModel();
 
         stickersModel.setPath(imgPath);
@@ -142,12 +152,17 @@ public class StickerController extends HttpServlet {
         int stickerId = stickersModel.insert();
 
         if (stickerId > 0) {
+            this.baseController.serviceResponse.responseStat.msg = "Sticker uploaded Successfully";
             this.baseController.serviceResponse.responseStat.status = true;
-        } else {
-            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
         }
-        this.pw.print(this.baseController.serviceResponse.responseStat.status);
-        this.pw.print("test");
+
+        this.baseController.serviceResponse.responseStat.msg = "Sticker Not Updated!";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
+        //this.pw.print("test");
+        return;
     }
 
     private void getSticker() {

@@ -71,10 +71,13 @@
                                 <div class="col-sm-10">
                                     <select name="is_paid" class="form-control" id="is_paid">
                                         <option value="">Select One</option>
-                                        <option value="0">Free</option>
+                                        <option value="0" selected>Free</option>
                                         <option value="1">Paid</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <h1 class="col-sm-12" id="errorMsg" ></h1>
                             </div>
                         </div>
                     </div>
@@ -188,7 +191,21 @@
                 data: {},
                 type: 'POST',
                 enctype: 'multipart/form-data',
-                beforeSend: function () {
+                beforeSend: function (el) {
+                    var category_id = $("#sticker_category_id").val();
+                    if(category_id<=0)
+                    {
+                        $("#errorMsg").html("Select a category Name First");
+                        var parent = el.find(".jFiler-jProgressBar").parent();
+                        el.find(".jFiler-jProgressBar").fadeOut("slow", function () {
+                            $("<div class=\"jFiler-item-others text-error\"><i class=\"icon-jfi-minus-circle\"></i> Error</div>").hide().appendTo(parent).fadeIn("slow");
+                        });
+                        return false;
+                    }
+                    else
+                    {
+                        $("#errorMsg").html("");
+                    }
                 },
                 success: function (data, el) {
                     var category_id = $("#sticker_category_id").val();
@@ -198,6 +215,8 @@
                     el.find(".jFiler-jProgressBar").fadeOut("slow", function () {
                         $("<div class=\"jFiler-item-others text-success\"><i class=\"icon-jfi-check-circle\"></i> Success</div>").hide().appendTo(parent).fadeIn("slow");
                     });
+
+
                 },
                 error: function (el) {
                     var parent = el.find(".jFiler-jProgressBar").parent();
@@ -211,10 +230,12 @@
             },
             dragDrop: {
                 dragEnter: function () {
+
                 },
                 dragLeave: function () {
                 },
                 drop: function () {
+
                 },
             },
             addMore: true,
@@ -248,6 +269,7 @@
 
         function insertStickerInfo(path, category_id, is_paid) {
             var url = $("#base_url").val() + "admin/sticker/operation/create";
+            var result = "";
             $.ajax({
                 url: url,
                 method: "POST",
@@ -258,9 +280,15 @@
                     "is_paid": is_paid
                 },
                 success: function (data) {
-                    console.log(data);
+                    console.log("fvmxcnv,mfhjk");
+                    /*var parseData = jQuery.parseJSON(data);
+                    console.log(parseData.responseStat.msg);
+                    alert("After successful insert operation");
+                    alert(parseData.responseStat.msg);*/
+                    alert("I am in final success");
                 }
             });
+
         }
     });
 </script>

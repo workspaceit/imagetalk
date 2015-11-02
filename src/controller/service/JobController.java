@@ -17,7 +17,11 @@ import java.util.HashMap;
 import static java.lang.Integer.parseInt;
 
 /**
- * Created by rajib on 10/29/15.
+ * Created by IntelliJ IDEA.
+ * User: rajib
+ * Email: rajibcse2k10@gmail.com
+ * Date: 10/29/15
+ * Project Name:ImageTalk
  */
 public class JobController extends HttpServlet {
     ImageTalkBaseController baseController;
