@@ -305,6 +305,7 @@ public class ContactModel extends ImageTalkBaseModel {
         if (keyword != null && keyword != "") {
             query += " and ( user_inf.f_name like '%" + keyword + "%' or user_inf.l_name like '%" + keyword + "%' )";
         }
+
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;
             query += " LIMIT " + this.offset + " ," + this.limit + " ";
@@ -398,6 +399,9 @@ public class ContactModel extends ImageTalkBaseModel {
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " where  " + super.tableName + ".owner_id="+ this.owner_id;
 
+        if (this.keyword != null && this.keyword != "") {
+            query += " and ( user_inf.f_name like '%" + this.keyword + "%' or user_inf.l_name like '%" + this.keyword + "%' )";
+        }
 
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;
@@ -508,6 +512,9 @@ public class ContactModel extends ImageTalkBaseModel {
             query +=" and " + super.tableName + ".contact_id not in ("+contactIdStr+")";
         }
 
+        if (this.keyword != null && this.keyword != "") {
+            query += " and ( user_inf.f_name like '%" + this.keyword + "%' or user_inf.l_name like '%" + this.keyword + "%' )";
+        }
 
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;
@@ -625,6 +632,10 @@ public class ContactModel extends ImageTalkBaseModel {
                 " where  " + super.tableName + ".owner_id="+ this.owner_id+" and " + super.tableName + ".is_block = 1";
 
 
+        if (this.keyword != null && this.keyword != "") {
+            query += " and ( user_inf.f_name like '%" + this.keyword + "%' or user_inf.l_name like '%" + this.keyword + "%' )";
+        }
+
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;
             query += " LIMIT " + this.offset + " ," + this.limit + " ";
@@ -717,6 +728,9 @@ public class ContactModel extends ImageTalkBaseModel {
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " where  " + super.tableName + ".contact_id="+ this.owner_id+" and " + super.tableName + ".is_block = 1";
 
+        if (this.keyword != null && this.keyword != "") {
+            query += " and ( user_inf.f_name like '%" + this.keyword + "%' or user_inf.l_name like '%" + this.keyword + "%' )";
+        }
 
         if (this.limit > 0) {
             this.offset = this.offset * this.limit;

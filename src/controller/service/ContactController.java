@@ -460,6 +460,12 @@ public class ContactController extends HttpServlet {
                 return;
             }
         }
+        String keyword="";
+        if(this.baseController.checkParam("keyword", this.req, true)) {
+            keyword = this.req.getParameter("keyword").trim();
+        }
+
+        contactModel.setKeyword(keyword);
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
         ArrayList<Contact> contactList = contactModel.getWhoDoesNotHasMyContactByOwnerId();
@@ -506,6 +512,12 @@ public class ContactController extends HttpServlet {
                 return;
             }
         }
+        String keyword="";
+        if(this.baseController.checkParam("keyword", this.req, true)) {
+            keyword = this.req.getParameter("keyword").trim();
+        }
+
+        contactModel.setKeyword(keyword);
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
 
@@ -554,6 +566,13 @@ public class ContactController extends HttpServlet {
             }
         }
 
+        String keyword="";
+        if(this.baseController.checkParam("keyword",this.req,true))
+        {
+            keyword = req.getParameter("keyword").trim();
+        }
+
+        contactModel.setKeyword(keyword);
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
 
