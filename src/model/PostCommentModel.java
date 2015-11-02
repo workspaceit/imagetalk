@@ -103,9 +103,9 @@ public class PostCommentModel extends ImageTalkBaseModel {
     public  ArrayList<PostComment> getByPostId(){
         ArrayList<PostComment> postCommentList = new ArrayList<PostComment>();
         String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
-                " job.*, app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
+                " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
-                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate,job.*" +
                 " FROM " +this.tableName+
                 " join app_login_credential on app_login_credential.id =  " +this.tableName+".commenter_id "+
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
@@ -150,24 +150,25 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
                 //job details
-                postComment.commenter.job.id = this.resultSet.getInt("job.id");
-                postComment.commenter.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                postComment.commenter.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                postComment.commenter.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                postComment.commenter.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                postComment.commenter.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                postComment.commenter.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                postComment.commenter.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    postComment.commenter.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    postComment.commenter.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                postComment.commenter.job.price = this.resultSet.getFloat("job.price");
-                postComment.commenter.job.paymentType = this.resultSet.getInt("job.payment_type");
+                postComment.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                postComment.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    postComment.commenter.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     postComment.commenter.job.createdDate = "";
                 }
+                //end job details
 
                 postCommentList.add(postComment);
 
@@ -182,9 +183,9 @@ public class PostCommentModel extends ImageTalkBaseModel {
     public  PostComment getById(){
         PostComment postComment = new PostComment();
         String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
-                " job.*, app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
+                " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
-                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
+                " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate,job.*" +
                 " FROM " +this.tableName+
                 " join app_login_credential on app_login_credential.id =  " +this.tableName+".commenter_id "+
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
@@ -229,24 +230,25 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
                 //job details
-                postComment.commenter.job.id = this.resultSet.getInt("job.id");
-                postComment.commenter.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                postComment.commenter.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                postComment.commenter.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                postComment.commenter.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                postComment.commenter.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                postComment.commenter.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                postComment.commenter.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    postComment.commenter.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    postComment.commenter.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                postComment.commenter.job.price = this.resultSet.getFloat("job.price");
-                postComment.commenter.job.paymentType = this.resultSet.getInt("job.payment_type");
+                postComment.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                postComment.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    postComment.commenter.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     postComment.commenter.job.createdDate = "";
                 }
+                //end job details
 
             }
         } catch (SQLException e) {

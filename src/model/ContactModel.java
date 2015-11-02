@@ -210,11 +210,11 @@ public class ContactModel extends ImageTalkBaseModel {
     }
     public ArrayList<AppCredential> getContactByOwnerId() {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
-        String query = "select job.*,user_inf.id as user_inf_id," +
+        String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -256,25 +256,25 @@ public class ContactModel extends ImageTalkBaseModel {
                 appCredential.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
                 //job details
-
-                appCredential.job.id = this.resultSet.getInt("job.id");
-                appCredential.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                appCredential.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                appCredential.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                appCredential.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                appCredential.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                appCredential.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                appCredential.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    appCredential.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    appCredential.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                appCredential.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                appCredential.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    appCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    appCredential.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     appCredential.job.createdDate = "";
                 }
+                //end job details
 
                 appCredentialList.add(appCredential);
 
@@ -290,11 +290,11 @@ public class ContactModel extends ImageTalkBaseModel {
     public ArrayList<Contact> getContactByKeyword(String keyword) {
         ArrayList<Contact> contactList = new ArrayList<Contact>();
         String query = "select " +super.tableName+".*,"+
-                " job.*,user_inf.id as user_inf_id," +
+                " user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -350,24 +350,25 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
                 //job details
-                contact.job.id = this.resultSet.getInt("job.id");
-                contact.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                contact.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                contact.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    contact.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                contact.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                contact.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
                 }
+                //end job details
 
                 contactList.add(contact);
 
@@ -384,11 +385,11 @@ public class ContactModel extends ImageTalkBaseModel {
     public ArrayList<Contact> getWhoHasMyContactByOwnerId() {
         ArrayList<Contact> contacts = new ArrayList<Contact>();
         String query = "select " + super.tableName + ".*, " +
-                "job.*, user_inf.id as user_inf_id," +
+                "user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  " +
                 " join contact as secondContact on ( secondContact.owner_id = contact.contact_id and secondContact.contact_id = "+this.owner_id+" )"+
@@ -441,24 +442,25 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
                 //job details
-                contact.job.id = this.resultSet.getInt("job.id");
-                contact.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                contact.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                contact.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    contact.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                contact.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                contact.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
                 }
+                //end job details
 
 
                 contacts.add(contact);
@@ -490,11 +492,11 @@ public class ContactModel extends ImageTalkBaseModel {
         }
 
         String query ="select " + super.tableName + ".*, " +
-                " job.*, user_inf.id as user_inf_id," +
+                " user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -549,24 +551,25 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
 
                 //job details
-                contact.job.id = this.resultSet.getInt("job.id");
-                contact.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                contact.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                contact.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    contact.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                contact.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                contact.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
                 }
+                //end job details
 
 
                 contacts.add(contact);
@@ -609,11 +612,11 @@ public class ContactModel extends ImageTalkBaseModel {
         ArrayList<Contact> contacts = new ArrayList<Contact>();
 
         String query ="select " + super.tableName + ".*, " +
-                " job.*, user_inf.id as user_inf_id," +
+                " user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -666,24 +669,25 @@ public class ContactModel extends ImageTalkBaseModel {
 
 
                 //job details
-                contact.job.id = this.resultSet.getInt("job.id");
-                contact.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                contact.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                contact.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    contact.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                contact.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                contact.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
                 }
+                //end job details
 
                 contacts.add(contact);
 
@@ -701,11 +705,11 @@ public class ContactModel extends ImageTalkBaseModel {
 
 
         String query ="select " + super.tableName + ".*, " +
-                " job.*, user_inf.id as user_inf_id," +
+                " user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                 " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                " app_login_credential.created_date as app_login_credential_c_date" +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
                 " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".owner_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
@@ -757,24 +761,25 @@ public class ContactModel extends ImageTalkBaseModel {
 
 
                 //job details
-                contact.job.id = this.resultSet.getInt("job.id");
-                contact.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                contact.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                contact.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    contact.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                contact.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                contact.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
                 }
+                //end job details
 
                 contacts.add(contact);
 
