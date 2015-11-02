@@ -155,10 +155,38 @@ public class StickersModel extends ImageTalkBaseModel {
         }
         return stickerList;
     }
+    public ArrayList<Stickers> getAllByCategoryId(int category_id){
+
+        ArrayList<Stickers> stickerList = new ArrayList<Stickers>();
+        String query =  " select *" +
+                " from " + super.tableName+
+                " join sticker_category on sticker_category.id ="+ super.tableName+".sticker_category_id "+
+                " where sticker_category_id = "+category_id;
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                Stickers stickers = new Stickers();
+                stickers.id = this.resultSet.getInt("id");
+                stickers.stickerCategoryId = this.resultSet.getInt("sticker_category_id");
+                stickers.categoryName = this.resultSet.getString("sticker_category.name");
+                stickers.path = this.resultSet.getString("path");
+
+                stickerList.add(stickers);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return stickerList;
+    }
     public int insert() {
         String query = "INSERT INTO `stickers`( `sticker_category_id`, `path`,`is_paid`, `created_by`) " +
                        " VALUES (" + this.sticker_category_id + ",'" + this.path + "'," + this.is_paid + "," + this.created_by + ")";
         this.insertData(query);
         return this.id;
     }
+
 }

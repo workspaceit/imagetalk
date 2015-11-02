@@ -168,4 +168,9 @@ public class StickerController extends HttpServlet {
     private void getSticker() {
 
     }
+
+    public void deleteAllByCategoryID()
+    {
+
+    }
 }

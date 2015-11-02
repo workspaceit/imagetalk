@@ -23,6 +23,8 @@ public class ContactModel extends ImageTalkBaseModel {
     private String created_date;
     private int  rating;
 
+    private String keyword;
+
     private Gson gson;
     private ArrayList<Integer> contactIdList;
 
@@ -38,6 +40,7 @@ public class ContactModel extends ImageTalkBaseModel {
         this.is_block = false;
         this.created_date = "";
         this.rating = 0;
+        this.keyword = "";
 
         this.gson = new Gson();
         this.contactIdList= new ArrayList();
@@ -112,6 +115,14 @@ public class ContactModel extends ImageTalkBaseModel {
     public boolean setRating(int rating) {
         this.rating = rating;
         return true;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
     }
 
     public ArrayList<Integer> getContactIdList() {
