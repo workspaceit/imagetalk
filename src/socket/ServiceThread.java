@@ -5,6 +5,7 @@ import helper.DateHelper;
 import model.AppLoginCredentialModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
+import model.datamodel.app.Contact;
 import model.datamodel.app.socket.SocketResponse;
 import model.datamodel.app.socket.chat.TextChat;
 
@@ -101,6 +102,9 @@ public class ServiceThread extends Thread {
 
                 if(contactServiceThread.isOnline()) {
                     // Send text msg
+                   // Remove when user will send actual contact;
+                    textChat.contact.user.firstName = contactServiceThread.appCredential.user.firstName;
+                    textChat.contact.user.lastName = contactServiceThread.appCredential.user.lastName;
 
                     this.socketResponse.responseData = textChat;
 
@@ -113,6 +117,9 @@ public class ServiceThread extends Thread {
                     System.out.println(" Offline text msg");
                 }
             }else{
+                // Offline text msg
+
+
                 System.out.println("Obj is null");
             }
         }catch (ClassCastException ex){
