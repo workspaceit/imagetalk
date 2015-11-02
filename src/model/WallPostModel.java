@@ -133,7 +133,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     public ArrayList<WallPost> getAllFavoriteByOwnerId(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 
-        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT job.*,wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -148,6 +148,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
                 " where wall_post_favorite.owner_id = "+this.owner_id;
 
@@ -207,6 +208,26 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
                 wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
+                //job details
+                wallPost.owner.job.id = this.resultSet.getInt("job.id");
+                wallPost.owner.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                wallPost.owner.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                wallPost.owner.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    wallPost.owner.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                wallPost.owner.job.price = this.resultSet.getFloat("job.price");
+                wallPost.owner.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    wallPost.owner.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    wallPost.owner.job.createdDate = "";
+                }
+                //job details end
 
                 wallPost = this.getOtherDependency(wallPost);
 
@@ -225,7 +246,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     public ArrayList<WallPost> getAllRecent(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 
-        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT job.*,wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -239,6 +260,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id ";
 
         query += " order by  wall_post.id  DESC ";
@@ -297,6 +319,26 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
                 wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
+                //job details
+                wallPost.owner.job.id = this.resultSet.getInt("job.id");
+                wallPost.owner.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                wallPost.owner.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                wallPost.owner.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    wallPost.owner.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                wallPost.owner.job.price = this.resultSet.getFloat("job.price");
+                wallPost.owner.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    wallPost.owner.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    wallPost.owner.job.createdDate = "";
+                }
+                //job details end
 
                 wallPost = this.getOtherDependency(wallPost);
 
@@ -314,7 +356,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     }
     public WallPost getById(){
         WallPost wallPost = new WallPost();
-        String query = "SELECT wall_post.id,wall_post.type as postType,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT job.*,wall_post.id,wall_post.type as postType,wall_post.owner_id,wall_post.description,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -328,6 +370,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
                 " where wall_post.id = "+this.id+" limit 1";
 
@@ -384,6 +427,27 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
                 wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
+                //job details
+                wallPost.owner.job.id = this.resultSet.getInt("job.id");
+                wallPost.owner.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                wallPost.owner.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                wallPost.owner.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    wallPost.owner.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                wallPost.owner.job.price = this.resultSet.getFloat("job.price");
+                wallPost.owner.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    wallPost.owner.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    wallPost.owner.job.createdDate = "";
+                }
+                //job details end
+
                 wallPost = getOtherDependency(wallPost);
 
 
@@ -417,7 +481,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     public ArrayList<WallPost> getByOwner_id(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 
-        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.description,wall_post.type as postType,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT job.*,wall_post.id,wall_post.owner_id,wall_post.description,wall_post.type as postType,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -431,6 +495,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " join app_login_credential on app_login_credential.id = wall_post.owner_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
                 " where wall_post.owner_id = "+this.owner_id;
         query += " order by  wall_post.id  DESC ";
@@ -490,6 +555,27 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.places.countryName = (this.resultSet.getObject("postLoc.country")==null)?"":this.resultSet.getString("postLoc.country");
                 wallPost.places.createdDate = (this.resultSet.getObject("postLoc.created_date")==null)?"":this.resultSet.getString("postLoc.created_date");
 
+
+                //job details
+                wallPost.owner.job.id = this.resultSet.getInt("job.id");
+                wallPost.owner.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                wallPost.owner.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                wallPost.owner.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    wallPost.owner.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                wallPost.owner.job.price = this.resultSet.getFloat("job.price");
+                wallPost.owner.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    wallPost.owner.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    wallPost.owner.job.createdDate = "";
+                }
+                //job details end
 
                 wallPost = this.getOtherDependency(wallPost);
 

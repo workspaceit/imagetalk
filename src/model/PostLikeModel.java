@@ -109,13 +109,14 @@ public class PostLikeModel extends  ImageTalkBaseModel {
     public ArrayList<Liker> getLikersByPostId(){
         ArrayList<Liker> likerList = new ArrayList<Liker>();
         String query =  " select post_like.id,post_like.created_date," +
-                " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
+                " job.*, app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
                 " FROM post_like " +
                 " join app_login_credential on app_login_credential.id = post_like.liker_id " +
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " where post_like.post_id = "+this.post_id;
 
         query += " order by post_like.id DESC ";
@@ -156,6 +157,25 @@ public class PostLikeModel extends  ImageTalkBaseModel {
                 liker.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 liker.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
 
+                //job details
+                liker.job.id = this.resultSet.getInt("job.id");
+                liker.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                liker.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                liker.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    liker.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                liker.job.price = this.resultSet.getFloat("job.price");
+                liker.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    liker.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    liker.job.createdDate = "";
+                }
 
                 likerList.add(liker);
 
