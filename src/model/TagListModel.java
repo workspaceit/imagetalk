@@ -68,7 +68,7 @@ public class TagListModel extends ImageTalkBaseModel{
     public ArrayList<AppCredential> getByPostId(){
         ArrayList<AppCredential> tagList  = new ArrayList<AppCredential>();
 
-        String query = "SELECT  " +
+        String query = "SELECT  job.*, " +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate" +
@@ -76,6 +76,7 @@ public class TagListModel extends ImageTalkBaseModel{
                 " join app_login_credential on app_login_credential.id = " +this.tableName+".tag_id"+
                 " join user_inf on user_inf.id = app_login_credential.u_id " +
                 " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " where "+this.tableName+".post_id= "+this.post_id;
 
         this.setQuery(query);
@@ -107,6 +108,27 @@ public class TagListModel extends ImageTalkBaseModel{
                 appCredential.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 appCredential.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
                 appCredential.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
+
+                //job details
+                appCredential.job.id = this.resultSet.getInt("job.id");
+                appCredential.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
+                appCredential.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                appCredential.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    appCredential.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                appCredential.job.price = this.resultSet.getFloat("job.price");
+                appCredential.job.paymentType = this.resultSet.getInt("job.payment_type");
+                try {
+                    appCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    appCredential.job.createdDate = "";
+                }
+
 
                 tagList.add(appCredential);
 
