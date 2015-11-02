@@ -243,16 +243,18 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
     public AuthCredential getAuthincatedByAccessToken() {
         AuthCredential authCredential = new AuthCredential();
 
-        String query = "select job.*,user_inf.id as user_inf_id," +
+        String query = "select user_inf.id as user_inf_id," +
                        " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                        " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                        " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
-                       " app_login_credential.created_date as app_login_credential_c_date  from " + super.tableName + " " +
+                       " app_login_credential.created_date as app_login_credential_c_date," +
+                        " job.*" +
+                       "  from " + super.tableName + " " +
                        " join user_inf on user_inf.id = app_login_credential.u_id  " +
                        " left join location on location.id = user_inf.address_id " +
                        " left join job on job.app_login_credential_id = app_login_credential.id " +
                        " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
@@ -292,24 +294,26 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 }
 
                 //job details
-                authCredential.job.id = this.resultSet.getInt("job.id");
-                authCredential.job.appCredentialId = this.resultSet.getInt("job.app_login_credential_id");
-                authCredential.job.title = (this.resultSet.getString("job.title") == null) ? "" : this.resultSet.getString("job.title");
-                authCredential.job.description = (this.resultSet.getString("job.description") == null)? "" : this.resultSet.getString("job.description");
+                authCredential.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                authCredential.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                authCredential.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                authCredential.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    authCredential.job.icons = (this.resultSet.getObject("icon")==null || !this.resultSet.getString("icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("icon"),Pictures.class);
+                    authCredential.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
                 }
-                authCredential.job.price = this.resultSet.getFloat("job.price");
-                authCredential.job.paymentType = this.resultSet.getInt("job.payment_type");
+                authCredential.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                authCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    authCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    authCredential.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     authCredential.job.createdDate = "";
                 }
+
+
 
             }
         } catch (SQLException e) {
@@ -394,7 +398,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                     ex.printStackTrace();
                 }
                 authCredential.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                authCredential.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                authCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null) ? 0 : this.resultSet.getInt("job.payment_type");
                 try {
                     authCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
@@ -471,7 +475,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                     ex.printStackTrace();
                 }
                 appCredential.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null) ? 0 : this.resultSet.getInt("job.payment_type");
                 try {
                     appCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {
@@ -671,7 +675,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                     ex.printStackTrace();
                 }
                 appCredential.job.price = (this.resultSet.getObject("job.price") == null) ? 0 :this.resultSet.getFloat("job.price");
-                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type")== null) ? 0 : this.resultSet.getInt("job.payment_type");
+                appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null) ? 0 : this.resultSet.getInt("job.payment_type");
                 try {
                     appCredential.job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
                 }catch(Exception e) {

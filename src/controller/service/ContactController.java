@@ -81,7 +81,7 @@ public class ContactController extends HttpServlet {
                 this.getWhoBlockedMe();
                 break;
             case "/app/contact/whom/i/blocked":
-                this.getWhomIBlockedMe();
+                this.getWhomIBlocked();
                 break;
             default:
                 break;
@@ -386,6 +386,39 @@ public class ContactController extends HttpServlet {
         ArrayList<Contact> contactList = contactModel.getWhoHasMyContactByOwnerId();
         String respStr = (contactList.size()==0)?"No record found":"";
 
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
         this.baseController.serviceResponse.responseStat.msg = respStr;
         this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
         this.baseController.serviceResponse.responseData = contactList;
@@ -396,6 +429,37 @@ public class ContactController extends HttpServlet {
     private void getWhoDoesNotHasMyNumber(){
         ContactModel contactModel = new ContactModel();
 
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
         ArrayList<Contact> contactList = contactModel.getWhoDoesNotHasMyContactByOwnerId();
@@ -411,6 +475,37 @@ public class ContactController extends HttpServlet {
     private void getWhoBlockedMe(){
         ContactModel contactModel = new ContactModel();
 
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
 
@@ -424,8 +519,40 @@ public class ContactController extends HttpServlet {
         return;
 
     }
-    private void getWhomIBlockedMe(){
+    private void getWhomIBlocked(){
         ContactModel contactModel = new ContactModel();
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            contactModel.limit = 10;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
 
         contactModel.setOwner_id(this.baseController.appCredential.id);
 

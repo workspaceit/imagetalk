@@ -51,6 +51,9 @@ public class ServiceThread extends Thread {
 
                 try{
                     String recvStr = input.readLine();
+                    if(recvStr==null || recvStr==""){
+                        continue;
+                    }
 
                     System.out.println("recvStr : "+recvStr);
                     this.socketResponse = this.gson.fromJson(recvStr, SocketResponse.class);
@@ -76,7 +79,7 @@ public class ServiceThread extends Thread {
                     continue;
                 }
 
-                this.sendData(this.gson.toJson(this.socketResponse));
+               // this.sendData(this.gson.toJson(this.socketResponse));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,20 +87,33 @@ public class ServiceThread extends Thread {
 
     }
     private void processTextChat(Object dataObject){
+        System.out.println("AT processTextChat");
         this.socketResponse = new SocketResponse();
         try{
             String jObjStr = this.gson.toJson(dataObject);
 
             TextChat textChat = this.gson.fromJson(jObjStr, TextChat.class);
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(textChat.contact.id);
+
+            this.socketResponse.responseStat.tag = "textchat";
+
             if(contactServiceThread!=null){
 
                 if(contactServiceThread.isOnline()) {
                     // Send text msg
-                    contactServiceThread.sendData(this.gson.toJson(textChat));
+
+                    this.socketResponse.responseData = textChat;
+
+                    contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
+
+                    System.out.println("Send text msg : to " + textChat.contact.user.firstName);
+                    System.out.println("Send text Object "+textChat.text);
                 }else{
                     // Offline text msg
+                    System.out.println(" Offline text msg");
                 }
+            }else{
+                System.out.println("Obj is null");
             }
         }catch (ClassCastException ex){
             this.socketResponse.responseStat.tag = "error";
@@ -120,7 +136,7 @@ public class ServiceThread extends Thread {
             if(this.authintic){
                 this.socketResponse.responseStat.tag = "authentication_status";
                 this.socketResponse.responseStat.msg = "authentication success";
-
+                System.out.println("Putting obj in :"+authCredential.id);
                 BaseSocketController.putServiceThread(authCredential.id,this);
             }else{
                 this.socketResponse.responseStat.tag = "authentication_status";

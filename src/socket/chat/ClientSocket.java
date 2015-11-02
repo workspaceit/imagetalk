@@ -47,23 +47,18 @@ public class ClientSocket {
             out.println(this.gson.toJson(socketResponse));
             while(!clientSocket.isClosed()){
                 Thread.sleep(3000);
-
-
-
                 //out.println("1");
                 String recvStr = in.readLine();
                 if(recvStr!=null){
-
                     System.out.println("recvStr : "+recvStr);
                     System.out.println(this.gson.fromJson(recvStr, SocketResponse.class));
 
-                }else
+                }else {
                     in.close();
+                }
                 count++;
-                out.println(this.gson.toJson(socketResponse));
+               // out.println(this.gson.toJson(socketResponse));
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
