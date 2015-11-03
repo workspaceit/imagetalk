@@ -15,9 +15,6 @@ import java.util.Map;
 public class JobModel extends ImageTalkBaseModel {
     private int id;
     private String description;
-
-
-
     private String title;
     private String icon;
     private float price;

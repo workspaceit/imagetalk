@@ -61,13 +61,13 @@ public class JobController extends HttpServlet {
         }
         switch (url)
         {
-            case "/job/findAllJobs":
+            case "app/user/job/findAllJobs":
                 this.findAllJobs();
                 break;
             case "/app/user/job/add":
                 this.addJobs();
                 break;
-            case "/job/remove":
+            case "app/user/job/remove":
                 this.removeJobs();
                 break;
             case "/app/user/job/update":
