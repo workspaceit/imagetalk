@@ -1,7 +1,7 @@
 package controller.service;
 
 import com.google.gson.Gson;
-import model.ChatModel;
+import model.ChatHistoryModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -99,10 +99,10 @@ public class ChatController extends HttpServlet {
             }
         }
 
-        ChatModel chatModel = new ChatModel();
-        chatModel.setFrom(this.baseController.appCredential.id);
-        chatModel.setTo(to);
-        if(chatModel.getChatHistory())
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        chatHistoryModel.setFrom(this.baseController.appCredential.id);
+        chatHistoryModel.setTo(to);
+        if(chatHistoryModel.getChatHistory())
         {
             this.baseController.serviceResponse.responseStat.msg = "success";
             this.baseController.serviceResponse.responseStat.status = true;
@@ -160,10 +160,10 @@ public class ChatController extends HttpServlet {
             }
         }
 
-        ChatModel chatModel = new ChatModel();
-        chatModel.setId(c_id);
-        chatModel.setRead_status(read_status);
-        if(!chatModel.updateReadStatus())
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        chatHistoryModel.setId(c_id);
+        chatHistoryModel.setRead_status(read_status);
+        if(!chatHistoryModel.updateReadStatus())
         {
             this.baseController.serviceResponse.responseStat.msg = "read_status not update ";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -293,16 +293,16 @@ public class ChatController extends HttpServlet {
             type = 0;
 
 
-        ChatModel chatModel = new ChatModel();
-        chatModel.setChat_id(chat_id);
-        chatModel.setTo(to);
-        chatModel.setFrom(from);
-        chatModel.setChat_text(chat_text);
-        chatModel.setExtra(extra);
-        chatModel.setMedia_path(media_path);
-        chatModel.setRead_status(0);
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        chatHistoryModel.setChat_id(chat_id);
+        chatHistoryModel.setTo(to);
+        chatHistoryModel.setFrom(from);
+        chatHistoryModel.setChat_text(chat_text);
+        chatHistoryModel.setExtra(extra);
+        chatHistoryModel.setMedia_path(media_path);
+        chatHistoryModel.setRead_status(0);
 
-        if(chatModel.insert()==0)
+        if(chatHistoryModel.insert()==0)
         {
             this.baseController.serviceResponse.responseStat.status = false;
             this.baseController.serviceResponse.responseStat.msg = "Internal server error";

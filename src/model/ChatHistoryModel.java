@@ -11,7 +11,7 @@ import java.sql.SQLException;
  * Date: 11/3/15
  * Project Name:ImageTalk
  */
-public class ChatModel extends ImageTalkBaseModel {
+public class ChatHistoryModel extends ImageTalkBaseModel {
 
     private long id;
     private long chat_id;
@@ -26,7 +26,7 @@ public class ChatModel extends ImageTalkBaseModel {
 
     private Gson gson;
 
-    public ChatModel() {
+    public ChatHistoryModel() {
         this.tableName = "chat_history";
 
         id = 0;
