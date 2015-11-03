@@ -191,6 +191,12 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 "WHERE ((`from` ="+ this.from+" AND `to` ="+ this.to+") OR (`from` = "+this.to+" AND `to` = "+this.from+
                 ")) AND created_date>=DATE(NOW())-INTERVAL "+duration+" DAY ORDER BY created_date DESC";
 
+        if(this.limit>0)
+        {
+            this.offset = this.offset * this.limit;
+            query += " LIMIT " + this.offset + " ," + this.limit + " ";
+        }
+
         System.out.print(query);
         this.setQuery(query);
         this.getData();

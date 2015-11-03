@@ -84,6 +84,8 @@ public class ChatController extends HttpServlet {
         int to;
         int duration;
 
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+
         if(!this.baseController.checkParam("to",this.req,true))
         {
             this.baseController.serviceResponse.responseStat.msg = "receiver id is required";
@@ -135,7 +137,37 @@ public class ChatController extends HttpServlet {
             return;
         }
 
-        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                chatHistoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            chatHistoryModel.limit = 5;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                chatHistoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
         if(chatHistoryModel.getPreviousChatHistory(duration))
