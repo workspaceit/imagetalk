@@ -68,23 +68,21 @@ public class ChatController extends HttpServlet {
             case "/app/user/chat/show":
                 this.showChat();
                 break;
-            case "/app/user/chat/showLastSeven":
-                this.showLastSeven();
+            case "/app/user/chat/showPrevious":
+                this.showPreviousChat();
                 break;
-            case "/app/user/chat/showLastMonth":
-                this.showLastMonth();
-                break;
+
             default:
                 break;
         }
     }
 
-    private void showLastMonth() {
-    }
 
-    private void showLastSeven() {
+
+    private void showPreviousChat() {
 
         int to;
+        int duration;
 
         if(!this.baseController.checkParam("to",this.req,true))
         {
@@ -108,10 +106,39 @@ public class ChatController extends HttpServlet {
             }
         }
 
+        if(!this.baseController.checkParam("duration",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "duration for last chats is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try{
+                duration = Integer.parseInt(req.getParameter("duration"));
+            }
+            catch (Exception e)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "duration must be int type";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+        if(duration>5000 || duration<1)
+        {
+            this.baseController.serviceResponse.responseStat.msg = "duration can't be negative or greater than 13Years";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
-        if(chatHistoryModel.getLastSevenDaysHistory())
+        if(chatHistoryModel.getPreviousChatHistory(duration))
         {
             this.baseController.serviceResponse.responseStat.msg = "success";
             this.baseController.serviceResponse.responseStat.status = true;

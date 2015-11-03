@@ -178,11 +178,11 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }
         return true;
     }
-    public boolean getLastSevenDaysHistory()
+    public boolean getPreviousChatHistory(int duration)
     {
         String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
                 "WHERE ((`from` ="+ this.from+" AND `to` ="+ this.to+") OR (`from` = "+this.to+" AND `to` = "+this.from+
-                ")) AND created_date>=DATE(NOW())-INTERVAL 7 DAY ORDER BY created_date DESC";
+                ")) AND created_date>=DATE(NOW())-INTERVAL "+duration+" DAY ORDER BY created_date DESC";
 
         System.out.print(query);
         this.setQuery(query);
