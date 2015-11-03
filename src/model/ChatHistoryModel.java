@@ -150,7 +150,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     }
     public boolean updateReadStatusBychatId()
     {
-        String query = "UPDATE " + this.tableName + " SET `read_status`= 0  WHERE `chat_id`="+this.chat_id;
+        String query = "UPDATE " + this.tableName + " SET `read_status`= 1  WHERE `chat_id`="+this.chat_id;
         return this.updateData(query);
     }
     public boolean getChatHistory()
@@ -158,6 +158,12 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
                 " ORDER BY created_date DESC";
+
+        if(this.limit>0)
+        {
+            this.offset = this.offset * this.limit;
+            query += " LIMIT " + this.offset + " ," + this.limit + " ";
+        }
         System.out.println(query);
         this.setQuery(query);
         this.getData();

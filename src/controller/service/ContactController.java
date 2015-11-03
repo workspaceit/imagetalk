@@ -401,7 +401,6 @@ public class ContactController extends HttpServlet {
         }
 
         if(!this.baseController.checkParam("offset", this.req, true)){
-
             this.baseController.serviceResponse.responseStat.msg = "offset required";
             this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());

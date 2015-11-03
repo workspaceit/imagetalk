@@ -157,6 +157,7 @@ public class ChatController extends HttpServlet {
 
     private void showChat() {
 
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         int to;
 
         if(!this.baseController.checkParam("to",this.req,true))
@@ -181,7 +182,38 @@ public class ChatController extends HttpServlet {
             }
         }
 
-        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                chatHistoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            chatHistoryModel.limit = 5;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                chatHistoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
         if(chatHistoryModel.getChatHistory())
