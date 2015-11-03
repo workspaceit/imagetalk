@@ -68,9 +68,64 @@ public class ChatController extends HttpServlet {
             case "/app/user/chat/show":
                 this.showChat();
                 break;
+            case "/app/user/chat/showLastSeven":
+                this.showLastSeven();
+                break;
+            case "/app/user/chat/showLastMonth":
+                this.showLastMonth();
+                break;
             default:
                 break;
         }
+    }
+
+    private void showLastMonth() {
+    }
+
+    private void showLastSeven() {
+
+        int to;
+
+        if(!this.baseController.checkParam("to",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "receiver id is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try{
+                to = Integer.parseInt(req.getParameter("to"));
+            }
+            catch (Exception e)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "receiver id must be int";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+        chatHistoryModel.setFrom(this.baseController.appCredential.id);
+        chatHistoryModel.setTo(to);
+        if(chatHistoryModel.getLastSevenDaysHistory())
+        {
+            this.baseController.serviceResponse.responseStat.msg = "success";
+            this.baseController.serviceResponse.responseStat.status = true;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            this.baseController.serviceResponse.responseStat.msg = "Fail";
+            this.baseController.serviceResponse.responseStat.status = true;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
     }
 
     private void showChat() {

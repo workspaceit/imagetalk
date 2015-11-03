@@ -147,12 +147,44 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `read_status`='" + this.read_status + "' WHERE `id`="+this.id;
         return this.updateData(query);
     }
+    public boolean updateReadStatusBychatId()
+    {
+        String query = "UPDATE " + this.tableName + " SET `read_status`='" + this.read_status + "' WHERE `chat_id`="+this.chat_id;
+        return this.updateData(query);
+    }
     public boolean getChatHistory()
     {
         String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
                 " ORDER BY created_date DESC";
         System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+                System.out.print(this.resultSet.getInt("from"));
+                System.out.print("  ");
+                System.out.print(this.resultSet.getInt("to"));
+                System.out.print("  ");
+                System.out.print(this.resultSet.getString("chat_text"));
+                System.out.print("  ");
+                System.out.print(this.resultSet.getString("created_date"));
+                System.out.println();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+    public boolean getLastSevenDaysHistory()
+    {
+        String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
+                "WHERE ((`from` ="+ this.from+" AND `to` ="+ this.to+") OR (`from` = "+this.to+" AND `to` = "+this.from+
+                ")) AND created_date>=DATE(NOW())-INTERVAL 7 DAY ORDER BY created_date DESC";
+
+        System.out.print(query);
         this.setQuery(query);
         this.getData();
         try{
