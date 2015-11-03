@@ -104,6 +104,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Chat</servlet-name>
+        <servlet-class>controller.service.ChatController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Chat</servlet-name>
+        <url-pattern>/app/user/chat/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>PictureAccessRequest</servlet-name>
         <servlet-class>controller.service.PictureAndFileController</servlet-class>
     </servlet>
@@ -171,6 +180,15 @@
     <servlet-mapping>
         <servlet-name>ADMIN_DASHBOARD</servlet-name>
         <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>Sticker_category</servlet-name>
+        <jsp-file>/admin/stickersByCategoryID.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Sticker_category</servlet-name>
+        <url-pattern>/stickersByID</url-pattern>
     </servlet-mapping>
 
     <servlet>

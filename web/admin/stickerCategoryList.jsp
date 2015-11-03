@@ -87,7 +87,7 @@
                                         <a href="javascript:void(0)"
                                            onclick="deleteCategory(this,<%=stickerCategory.getId()%>);"><i
                                                 class="fa fa-trash-o"></i></a>
-                                        <a href=""><i class="fa fa-search"></i></a>
+                                        <a href="<%=imageTalkBaseController.getBaseUrl(request)+"stickersByID?ID=" +stickerCategory.getId()%>"><i class="fa fa-search"></i></a>
                                     </td>
                                     <% i++; %>
                                 </tr>
