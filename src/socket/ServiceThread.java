@@ -3,9 +3,9 @@ package socket;
 import com.google.gson.Gson;
 import helper.DateHelper;
 import model.AppLoginCredentialModel;
+import model.ChatHistoryModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
-import model.datamodel.app.Contact;
 import model.datamodel.app.socket.SocketResponse;
 import model.datamodel.app.socket.chat.TextChat;
 import model.datamodel.app.socket.chat.TextChatStatus;
@@ -135,11 +135,18 @@ public class ServiceThread extends Thread {
 
             this.socketResponse.responseStat.tag = "textchat";
 
+            int chatId = this.getMsgId();
+            int senderId = this.appCredential.id;
+            int receiverId = textChat.appCredential.id;
+            textChat.text = validateChatTextMsg( textChat.text);
+            String textMsg = textChat.text;
+
+
             if(contactServiceThread!=null){
 
                 if(contactServiceThread.isOnline()) {
                     // Send text msg
-                    textChat.id = this.getMsgId();
+                    textChat.id = chatId;
                     textChat.appCredential = this.appCredential;
                     this.socketResponse.responseData = textChat;
 
@@ -158,9 +165,10 @@ public class ServiceThread extends Thread {
             }else{
                 // Offline text msg
                 saveOfflineMsg(textChat);
-
-
             }
+            // Saving to database
+            saveInChatHistory(chatId,senderId,receiverId,textMsg);
+
         }catch (ClassCastException ex){
             this.socketResponse.responseStat.tag = "error";
             this.socketResponse.responseStat.status = false;
@@ -169,6 +177,26 @@ public class ServiceThread extends Thread {
 
             ex.printStackTrace();
         }
+    }
+    private void saveInChatHistory(int chatId,int senderId,int receiverId,String textMsg){
+
+        class DbOperationThread extends Thread{
+            @Override
+            public void run() {
+                ChatHistoryModel chatHistory = new ChatHistoryModel();
+                chatHistory.setChat_id(chatId);
+                chatHistory.setTo(senderId);
+                chatHistory.setFrom(receiverId);
+                chatHistory.setChat_text(textMsg);
+                chatHistory.insert();
+            }
+        };
+        new DbOperationThread().start();
+    }
+    private String validateChatTextMsg(String msg){
+        String tempMsg = msg.trim();
+
+        return tempMsg;
     }
     private void saveOfflineMsg(TextChat textChat){
         TextChatStatus textChatStatus = new TextChatStatus();

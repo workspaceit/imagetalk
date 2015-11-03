@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
 
@@ -75,7 +76,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     }
 
     public boolean setChat_text(String chat_text) {
-        this.chat_text = chat_text;
+        this.chat_text = StringEscapeUtils.escapeEcmaScript(chat_text.trim());
         return true;
     }
 
@@ -149,7 +150,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     }
     public boolean updateReadStatusBychatId()
     {
-        String query = "UPDATE " + this.tableName + " SET `read_status`='" + this.read_status + "' WHERE `chat_id`="+this.chat_id;
+        String query = "UPDATE " + this.tableName + " SET `read_status`= 0  WHERE `chat_id`="+this.chat_id;
         return this.updateData(query);
     }
     public boolean getChatHistory()
