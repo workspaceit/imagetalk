@@ -60,26 +60,127 @@ public class ChatController extends HttpServlet {
                 this.remvoeChat();
                 break;
             case "/app/user/chat/update":
-                this.updateChat();
+                this.updateReadStatus();
                 break;
             case "/app/user/chat/search":
                 this.searchChat();
+                break;
+            case "/app/user/chat/show":
+                this.showChat();
                 break;
             default:
                 break;
         }
     }
 
+    private void showChat() {
+
+        int to;
+
+        if(!this.baseController.checkParam("to",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "receiver id is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try{
+                to = Integer.parseInt(req.getParameter("to"));
+            }
+            catch (Exception e)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "receiver id must be int";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        ChatModel chatModel = new ChatModel();
+        chatModel.setFrom(this.baseController.appCredential.id);
+        chatModel.setTo(to);
+        if(chatModel.getChatHistory())
+        {
+            this.baseController.serviceResponse.responseStat.msg = "success";
+            this.baseController.serviceResponse.responseStat.status = true;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            this.baseController.serviceResponse.responseStat.msg = "Fail";
+            this.baseController.serviceResponse.responseStat.status = true;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+    }
+
     private void searchChat() {
     }
 
-    private void updateChat() {
+    private void updateReadStatus() {
+
+        int read_status=0;
+        int c_id;
+        if(!this.baseController.checkParam("id",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "Chat id is required to update";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try{
+                c_id = Integer.parseInt(req.getParameter("id"));
+            }
+            catch (Exception e)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "chat id must be int";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+        if(this.baseController.checkParam("read_status",this.req,true))
+        {
+            try{
+                read_status = Integer.parseInt(req.getParameter("read_status"));
+            }
+            catch (Exception e){
+                this.baseController.serviceResponse.responseStat.msg = "read_status must be int";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+
+        ChatModel chatModel = new ChatModel();
+        chatModel.setId(c_id);
+        chatModel.setRead_status(read_status);
+        if(!chatModel.updateReadStatus())
+        {
+            this.baseController.serviceResponse.responseStat.msg = "read_status not update ";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "read_status updated successfully ";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
+        return;
     }
 
     private void remvoeChat() {
     }
 
     private void addchat() {
+        long chat_id;
         int to;
         int from;
         String chat_text;
@@ -87,6 +188,28 @@ public class ChatController extends HttpServlet {
         String media_path;
         int type;
         String created_date;
+
+        if(!this.baseController.checkParam("chat_id",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "chat id is required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else {
+            try {
+                chat_id = Integer.parseInt(req.getParameter("chat_id"));
+            }
+            catch (Exception e)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "chat sender id must be long";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return;
+            }
+        }
+
 
         if(!this.baseController.checkParam("to",this.req,true))
         {
@@ -171,11 +294,13 @@ public class ChatController extends HttpServlet {
 
 
         ChatModel chatModel = new ChatModel();
+        chatModel.setChat_id(chat_id);
         chatModel.setTo(to);
         chatModel.setFrom(from);
         chatModel.setChat_text(chat_text);
         chatModel.setExtra(extra);
         chatModel.setMedia_path(media_path);
+        chatModel.setRead_status(0);
 
         if(chatModel.insert()==0)
         {
