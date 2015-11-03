@@ -17,4 +17,7 @@ public class BaseSocketController {
     public synchronized static void putServiceThread(int appCredentialId,ServiceThread serviceThread){
         serviceThreads.put(appCredentialId, serviceThread);
     }
+    public synchronized static void removeServiceThread(int appCredentialId){
+        serviceThreads.remove(appCredentialId);
+    }
 }

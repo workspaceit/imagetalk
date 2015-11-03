@@ -1,5 +1,6 @@
 package model.datamodel.app.socket.chat;
 
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.Contact;
 
 /**
@@ -7,13 +8,13 @@ import model.datamodel.app.Contact;
  */
 public class TextChatStatus {
     public int chatId;
-    public int appCredentialId;
+    public AppCredential appCredential;
     public boolean isRead;
     public boolean isOnline;
 
     public TextChatStatus() {
         this.chatId = 0;
-        this.appCredentialId = 0;
+        this.appCredential = new AppCredential();
         this.isRead = false;
         this.isOnline = false;
     }

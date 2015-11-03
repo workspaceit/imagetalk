@@ -1,5 +1,6 @@
 package model.datamodel.app.socket.chat;
 
+import model.datamodel.app.AppCredential;
 import model.datamodel.app.Contact;
 
 /**
@@ -7,14 +8,14 @@ import model.datamodel.app.Contact;
  */
 public class TextChat {
     public int id;
-    public Contact contact;
+    public AppCredential appCredential;
     public String text;
     public Object extra;
     public String createdDate;
 
     public TextChat() {
         this.id = 0;
-        this.contact = new Contact();
+        this.appCredential = new AppCredential();
         this.text = "";
         this.extra = new Object();
         this.createdDate = "";
