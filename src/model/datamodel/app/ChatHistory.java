@@ -5,20 +5,20 @@ package model.datamodel.app;
  * Created by mi on 11/3/15.
  */
 public class ChatHistory {
-    private long id;
-    private long chatId;
-    private int to;
-    private int from;
-    private String chatText;
-    private Object extra;
-    private Object mediaPath;
-    private int type;
-    private String createdDate;
-    private boolean readStatus;
+    public long id;
+    public String chatId;
+    public int to;
+    public int from;
+    public String chatText;
+    public Object extra;
+    public Object mediaPath;
+    public int type;
+    public String createdDate;
+    public boolean readStatus;
 
     public ChatHistory() {
         this.id = 0;
-        this.chatId = 0;
+        this.chatId = "";
         this.to = 0;
         this.from = 0;
         this.chatText = "";

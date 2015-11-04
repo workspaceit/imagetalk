@@ -1,9 +1,11 @@
 package model;
 
 import com.google.gson.Gson;
+import model.datamodel.app.ChatHistory;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -173,9 +175,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `read_status`= 1  WHERE `chat_id`="+this.chat_id;
         return this.updateData(query);
     }
-    public boolean getChatHistory()
+    public ArrayList<ChatHistory> getChatHistory()
     {
-        String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
+        ArrayList<ChatHistory> chatHistoryList = new ArrayList<>();
+        String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
                 " ORDER BY created_date DESC";
 
@@ -190,26 +193,39 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         try{
             while (this.resultSet.next())
             {
-                System.out.print(this.resultSet.getInt("from"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getInt("to"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getString("chat_text"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getString("created_date"));
-                System.out.println();
+
+                ChatHistory chatHistory = new ChatHistory();
+                chatHistory.id = this.resultSet.getLong("chat_history.id");
+                chatHistory.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chatHistory.to = this.resultSet.getInt("chat_history.to");
+                chatHistory.from = this.resultSet.getInt("chat_history.from");
+                chatHistory.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chatHistory.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chatHistory.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chatHistory.type = this.resultSet.getInt("chat_history.type");
+                try {
+                    chatHistory.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                }catch(Exception e) {
+                    chatHistory.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chatHistory.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+
+                chatHistoryList.add(chatHistory);
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }finally {
             this.closeConnection();
         }
-        return true;
+        return chatHistoryList;
     }
-    public boolean getPreviousChatHistory(int duration)
+    public ArrayList<ChatHistory> getPreviousChatHistory(int duration)
     {
-        String query = "SELECT `to`, `from`, `chat_text`,`created_date` FROM `chat_history` " +
+        ArrayList<ChatHistory> previousChatHistoryList = new ArrayList<>();
+
+        String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE ((`from` ="+ this.from+" AND `to` ="+ this.to+") OR (`from` = "+this.to+" AND `to` = "+this.from+
                 ")) AND created_date>=DATE(NOW())-INTERVAL "+duration+" DAY ORDER BY created_date DESC";
 
@@ -225,21 +241,32 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         try{
             while (this.resultSet.next())
             {
-                System.out.print(this.resultSet.getInt("from"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getInt("to"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getString("chat_text"));
-                System.out.print("  ");
-                System.out.print(this.resultSet.getString("created_date"));
-                System.out.println();
+
+                ChatHistory chatHistory = new ChatHistory();
+                chatHistory.id = this.resultSet.getLong("chat_history.id");
+                chatHistory.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chatHistory.to = this.resultSet.getInt("chat_history.to");
+                chatHistory.from = this.resultSet.getInt("chat_history.from");
+                chatHistory.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chatHistory.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chatHistory.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chatHistory.type = this.resultSet.getInt("chat_history.type");
+                try {
+                    chatHistory.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                }catch(Exception e) {
+                    chatHistory.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chatHistory.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+
+                previousChatHistoryList.add(chatHistory);
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
         }finally {
             this.closeConnection();
         }
-        return true;
+        return previousChatHistoryList;
     }
 }

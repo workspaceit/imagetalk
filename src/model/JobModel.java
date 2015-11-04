@@ -185,5 +185,4 @@ public class JobModel extends ImageTalkBaseModel {
         isSuccess = this.updateData(query);
         return isSuccess;
     }
-    
 }

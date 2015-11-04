@@ -2,13 +2,16 @@ package controller.service;
 
 import com.google.gson.Gson;
 import model.ChatHistoryModel;
+import model.datamodel.app.ChatHistory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Console;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -170,20 +173,19 @@ public class ChatController extends HttpServlet {
 
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
-        if(chatHistoryModel.getPreviousChatHistory(duration))
+        ArrayList<ChatHistory> previousChatHistoryArrayList = chatHistoryModel.getPreviousChatHistory(duration);
+        if(previousChatHistoryArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "success";
-            this.baseController.serviceResponse.responseStat.status = true;
+            this.baseController.serviceResponse.responseStat.msg = "No record found!";
+            this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
-        else
-        {
-            this.baseController.serviceResponse.responseStat.msg = "Fail";
-            this.baseController.serviceResponse.responseStat.status = true;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
+
+        this.baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
+        this.baseController.serviceResponse.responseStat.status = true;
+        this.pw.print(this.baseController.getResponse());
+        return;
 
     }
 
@@ -248,23 +250,24 @@ public class ChatController extends HttpServlet {
 
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
-        if(chatHistoryModel.getChatHistory())
+        ArrayList<ChatHistory> chatHistoryArrayList = chatHistoryModel.getChatHistory();
+        if(chatHistoryArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "success";
-            this.baseController.serviceResponse.responseStat.status = true;
+            this.baseController.serviceResponse.responseStat.msg = "No record found!";
+            this.baseController.serviceResponse.responseStat.status = false;
             this.pw.print(this.baseController.getResponse());
             return;
         }
-        else
-        {
-            this.baseController.serviceResponse.responseStat.msg = "Fail";
-            this.baseController.serviceResponse.responseStat.status = true;
-            this.pw.print(this.baseController.getResponse());
-            return;
-        }
+
+        this.baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
+        this.baseController.serviceResponse.responseStat.status = true;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
 
     private void searchChat() {
+
     }
 
     private void updateReadStatus() {
@@ -323,6 +326,7 @@ public class ChatController extends HttpServlet {
     }
 
     private void remvoeChat() {
+
     }
 
     private void addchat() {
