@@ -54,6 +54,7 @@ public class ChatController extends HttpServlet {
             this.pw.close();
             return;
         }
+
         switch (url)
         {
             case "/app/user/chat/add":

@@ -392,12 +392,13 @@ public class ContactModel extends ImageTalkBaseModel {
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                 " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + super.tableName + " " +
-                " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  " +
-                " join contact as secondContact on ( secondContact.owner_id = contact.contact_id and secondContact.contact_id = "+this.owner_id+" )"+
+                " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".owner_id  " +
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
-                " where  " + super.tableName + ".owner_id="+ this.owner_id;
+                " where  " + super.tableName + ".contact_id="+ this.owner_id+" AND "+super.tableName+".owner_id NOT IN " +
+                "( SELECT "+super.tableName+".contact_id " +
+                "FROM "+super.tableName+" WHERE "+super.tableName+".owner_id="+this.owner_id+")";
 
         if (this.keyword != null && this.keyword != "") {
             query += " and ( user_inf.f_name like '%" + this.keyword + "%' or user_inf.l_name like '%" + this.keyword + "%' )";

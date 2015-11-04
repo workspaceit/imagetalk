@@ -383,8 +383,7 @@ public class ContactController extends HttpServlet {
         contactModel.setOwner_id(this.baseController.appCredential.id);
 
 
-        ArrayList<Contact> contactList = contactModel.getWhoHasMyContactByOwnerId();
-        String respStr = (contactList.size()==0)?"No record found":"";
+
 
         if(this.baseController.checkParam("limit", this.req, true)) {
             try{
@@ -417,6 +416,8 @@ public class ContactController extends HttpServlet {
             }
         }
 
+        ArrayList<Contact> contactList = contactModel.getWhoHasMyContactByOwnerId();
+        String respStr = (contactList.size()==0)?"No record found":"";
 
         this.baseController.serviceResponse.responseStat.msg = respStr;
         this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
