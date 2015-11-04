@@ -46,7 +46,7 @@ public class ServiceThread extends Thread {
     }
     public String getMsgId(){
 
-        return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+        return new SimpleDateFormat("yyyyMMddHHmmssSSSSSS").format(new Date());
     }
     @Override
     public void run() {
