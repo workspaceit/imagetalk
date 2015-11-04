@@ -189,4 +189,14 @@ public class StickersModel extends ImageTalkBaseModel {
         return this.id;
     }
 
+    public boolean deleteStickers(int id) {
+        String sql = "DELETE FROM " + this.tableName + " WHERE sticker_category_id = '" + id + "'";
+        System.out.print(sql);
+        if (this.deleteData(sql) == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
 }

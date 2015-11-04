@@ -68,8 +68,11 @@ public class StickerController extends HttpServlet {
             case "/admin/sticker/operation/create":
                 this.insertSticker(req);
                 break;
+            case "/admin/sticker/operation/stickers/delete":
+                this.deleteAllByCategoryID(req);
+                break;
             default:
-                this.getSticker();
+                break;
         }
     }
 
@@ -165,12 +168,26 @@ public class StickerController extends HttpServlet {
         return;
     }
 
-    private void getSticker() {
 
-    }
-
-    public void deleteAllByCategoryID()
+    public void deleteAllByCategoryID(HttpServletRequest req)
     {
+        int categoryID = Integer.parseInt(req.getParameter("id"));
+
+        if (categoryID > 0) {
+            StickersModel stickersModel = new StickersModel();
+            if (stickersModel.deleteStickers(categoryID)) {
+                this.baseController.serviceResponse.responseStat.msg = "All Stickers of that category delete successfully";
+                this.baseController.serviceResponse.responseStat.status = true;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        this.baseController.serviceResponse.responseStat.msg = "stickers delete failed";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
+
+
 
     }
 }

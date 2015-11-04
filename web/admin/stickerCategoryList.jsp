@@ -246,6 +246,25 @@
                 if (data.responseStat.status) {
                     parentRow.css({'display': 'none'});
                     alert(data.responseStat.msg)
+                    deleteAllStickersByCategory(catId);
+                } else {
+                    alert(data.responseStat.msg)
+                }
+            }
+        });
+    }
+
+    function deleteAllStickersByCategory(catID){
+        var url = $("#base_url").val() + "admin/sticker/operation/stickers/delete";
+
+        $.ajax({
+            url:url,
+            dataType:"json",
+            method:"POST",
+            data:{"id":catID},
+            success:function(data){
+                if (data.responseStat.status) {
+                    alert(data.responseStat.msg)
                 } else {
                     alert(data.responseStat.msg)
                 }
