@@ -1,21 +1,22 @@
 package model.datamodel.app.socket.chat;
 
 import model.datamodel.app.AppCredential;
-import model.datamodel.app.Contact;
 
 /**
- * Created by mi on 10/29/15.
+ * Created by mi on 11/4/15.
  */
-public class TextChatStatus {
+public class BaseChat {
+    public int id;
     public String chatId;
     public AppCredential appCredential;
-    public boolean isRead;
-    public boolean isOnline;
+    public Object extra;
+    public String createdDate;
 
-    public TextChatStatus() {
+    public BaseChat() {
+        super();
+        this.id = 0;
         this.chatId = "";
         this.appCredential = new AppCredential();
-        this.isRead = false;
-        this.isOnline = false;
+        this.createdDate = "";
     }
 }

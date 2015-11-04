@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.logging.Level;
 
 /**
  * Created by mi on 10/1/15.
@@ -122,6 +123,98 @@ public class ImageHelper {
             pictures.original.type = "original";
             pictures.original.path = fileName;
 
+
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return pictures;
+        }
+        return pictures;
+    }
+    public static Pictures saveByteToChatVideo(byte[] b,int uId) throws IOException{
+        FileOutputStream fos;
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+
+        fileName = +System.nanoTime() + ".mp4";
+        path += uId;
+        createDirIfNotExist(path);
+        path += "/chat";
+        createDirIfNotExist(path);
+        path += "/media";
+        createDirIfNotExist(path);
+        path += "/video";
+        createDirIfNotExist(path);
+
+
+
+
+        try {
+            fos = new FileOutputStream(path+"/"+fileName);
+            fos.write(b);
+            fos.close();
+
+            fileName = uId + "/chat/media/video/" + fileName;
+            pictures.original.size.height = 0;
+            pictures.original.size.width = 0;
+            pictures.original.path = fileName;
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return pictures;
+    }
+    public static Pictures saveChatPicture(Object imgObj, int uId) {
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+        try {
+            fileName = +System.nanoTime() + ".jpg";
+            path += uId;
+            createDirIfNotExist(path);
+            path += "/chat";
+            createDirIfNotExist(path);
+            path += "/media";
+            createDirIfNotExist(path);
+            path += "/picture";
+            createDirIfNotExist(path);
+            path += "/" + fileName;
+            System.out.println(path);
+            File file = new File(path);
+            BufferedImage img;
+
+            if (imgObj.getClass().equals(BufferedImage.class)) {
+                img = (BufferedImage) imgObj;
+            } else if (imgObj.getClass().equals(String.class)) {
+                img = decodeToImage((String) imgObj);
+            }else{
+                img = decodeToImage((String) imgObj);
+            }
+
+            ImageIO.write(img, "jpg", file);
+
+            fileName = uId + "/chat/media/picture" + fileName;
+            pictures.original.size.height = img.getHeight();
+            pictures.original.size.width = img.getWidth();
+            pictures.original.path = fileName;
+
+
+            PictureDetails thumb1 = new PictureDetails();
+            thumb1.type = "thumbnail";
+            thumb1.path = createThumbnail(decodeToImage((String) imgObj), 100, 100, uId + "/chat/media/picture");
+
+            thumb1.size.width = 32;
+            thumb1.size.height = 32;
+
+            pictures.thumb.add(thumb1);
+
+            PictureDetails thumb2 = new PictureDetails();
+            thumb2.type = "thumbnail";
+            thumb2.path = createThumbnail(decodeToImage((String) imgObj), 200, 200, uId + "/chat/media/picture");
+            thumb2.size.width = 48;
+            thumb2.size.height = 48;
+
+            pictures.thumb.add(thumb2);
 
         } catch (Exception ex) {
             System.out.println(ex);
