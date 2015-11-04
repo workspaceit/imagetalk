@@ -155,6 +155,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Notifications</servlet-name>
+        <servlet-class>controller.service.NotificationController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Notifications</servlet-name>
+        <url-pattern>/app/user/notification/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>Admin_User</servlet-name>
         <servlet-class>controller.service.UserController</servlet-class>
     </servlet>
