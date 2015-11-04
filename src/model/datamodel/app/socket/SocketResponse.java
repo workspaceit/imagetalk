@@ -17,12 +17,14 @@ public class SocketResponse {
     public class ResponseStat {
         public boolean status;
         public String tag;
+        public String chatId;
         public String  msg;
 
         public ResponseStat() {
             this.status = true;
             this.tag = "";
             this.msg = "";
+            this.chatId = "";
         }
     }
 }

@@ -29,6 +29,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
     private Gson gson;
 
+    public static final int type_txtChat =0 ;
+    public static final int type_chatPic =1;
+    public static final int type_chatVideo =2 ;
+
     public ChatHistoryModel() {
         this.tableName = "chat_history";
 
@@ -36,12 +40,14 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         chat_id = "";
         to = 0;
         from = 0;
-        chat_text = "";
-        extra = "";
-        media_path = "";
+        chat_text = null;
+        extra = null;
+        media_path = null;
         type = 0;
         created_date = "";
         read_status = 0;
+
+
 
         this.gson = new Gson();
     }
