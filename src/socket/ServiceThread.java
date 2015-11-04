@@ -15,13 +15,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ServiceThread extends Thread {
     private Socket serviceSocket;
     private boolean authintic;
     private Gson gson;
     private AppCredential appCredential;
-    private int id;
+    private String id;
     BufferedReader input;
     PrintStream output;
     SocketResponse socketResponse;
@@ -37,22 +40,13 @@ public class ServiceThread extends Thread {
         this.input = null;
         this.output = null;
 
-        this.id = 0;
+        this.id = "";
         this.socketResponse = new SocketResponse();
 
     }
-    public int getMsgId(){
-        String idStr = String.valueOf(this.appCredential.id)+""+String.valueOf(this.id);
+    public String getMsgId(){
 
-        this.id++;
-        int tmpId= -1;
-        try{
-            tmpId = Integer.parseInt(idStr);
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-        System.out.println("MSG ID"+tmpId);
-        return tmpId;
+        return new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
     }
     @Override
     public void run() {
@@ -135,7 +129,7 @@ public class ServiceThread extends Thread {
 
             this.socketResponse.responseStat.tag = "textchat";
 
-            int chatId = this.getMsgId();
+            String chatId = this.getMsgId();
             int senderId = this.appCredential.id;
             int receiverId = textChat.appCredential.id;
             textChat.text = validateChatTextMsg( textChat.text);
@@ -146,7 +140,7 @@ public class ServiceThread extends Thread {
 
                 if(contactServiceThread.isOnline()) {
                     // Send text msg
-                    textChat.id = chatId;
+                    textChat.chatId = chatId;
                     textChat.appCredential = this.appCredential;
                     this.socketResponse.responseData = textChat;
 
@@ -178,7 +172,7 @@ public class ServiceThread extends Thread {
             ex.printStackTrace();
         }
     }
-    private void saveInChatHistory(int chatId,int senderId,int receiverId,String textMsg){
+    private void saveInChatHistory(String chatId,int senderId,int receiverId,String textMsg){
 
         class DbOperationThread extends Thread{
             @Override
@@ -189,6 +183,18 @@ public class ServiceThread extends Thread {
                 chatHistory.setFrom(receiverId);
                 chatHistory.setChat_text(textMsg);
                 chatHistory.insert();
+            }
+        };
+        new DbOperationThread().start();
+    }
+    private void markAsReadInChatHistory(String chatId){
+
+        class DbOperationThread extends Thread{
+            @Override
+            public void run() {
+                ChatHistoryModel chatHistory = new ChatHistoryModel();
+                chatHistory.setChat_id(chatId);
+                chatHistory.updateReadStatusBychatId();
             }
         };
         new DbOperationThread().start();
@@ -224,11 +230,11 @@ public class ServiceThread extends Thread {
 
     private void processTextChatStatus(Object dataObject){
         System.out.println("AT processTextChat");
-
+        TextChatStatus textChatStatus = new TextChatStatus();
         try{
             String jObjStr = this.gson.toJson(dataObject);
 
-            TextChatStatus textChatStatus = this.gson.fromJson(jObjStr, TextChatStatus.class);
+            textChatStatus = this.gson.fromJson(jObjStr, TextChatStatus.class);
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(textChatStatus.appCredential.id);
 
 
@@ -267,6 +273,12 @@ public class ServiceThread extends Thread {
 
             ex.printStackTrace();
         }
+        // Updating local database
+        System.out.println("textChatStatus.chatId : "+textChatStatus.chatId);
+        if(textChatStatus.chatId !=""){
+            markAsReadInChatHistory(textChatStatus.chatId);
+        }
+
     }
     private void processAuthentication(Object dataObject){
 
@@ -281,8 +293,11 @@ public class ServiceThread extends Thread {
                 this.appCredential = castAuthToAppCredential(authCredential);
                 this.socketResponse.responseStat.tag = "authentication_status";
                 this.socketResponse.responseStat.msg = "authentication success";
-                System.out.println("Putting obj in :"+authCredential.id);
-                BaseSocketController.putServiceThread(authCredential.id,this);
+                System.out.println("Putting obj in :" + authCredential.id);
+                BaseSocketController.putServiceThread(authCredential.id, this);
+                ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+                chatHistoryModel.setFrom(this.appCredential.id);
+
             }else{
                 this.socketResponse.responseStat.tag = "authentication_status";
                 this.socketResponse.responseStat.status = false;

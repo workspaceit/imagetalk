@@ -326,7 +326,7 @@ public class ChatController extends HttpServlet {
     }
 
     private void addchat() {
-        long chat_id;
+        String chat_id;
         int to;
         int from;
         String chat_text;
@@ -344,7 +344,7 @@ public class ChatController extends HttpServlet {
         }
         else {
             try {
-                chat_id = Integer.parseInt(req.getParameter("chat_id"));
+                chat_id = req.getParameter("chat_id");
             }
             catch (Exception e)
             {

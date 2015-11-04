@@ -8,6 +8,7 @@ import model.datamodel.app.Contact;
  */
 public class TextChat {
     public int id;
+    public String chatId;
     public AppCredential appCredential;
     public String text;
     public Object extra;
@@ -15,6 +16,7 @@ public class TextChat {
 
     public TextChat() {
         this.id = 0;
+        this.chatId = "";
         this.appCredential = new AppCredential();
         this.text = "";
         this.extra = new Object();

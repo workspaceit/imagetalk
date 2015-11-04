@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class ChatHistoryModel extends ImageTalkBaseModel {
 
     private long id;
-    private long chat_id;
+    private String chat_id;
     private int to;
     private int from;
     private String chat_text;
@@ -31,7 +31,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         this.tableName = "chat_history";
 
         id = 0;
-        chat_id = 0;
+        chat_id = "";
         to = 0;
         from = 0;
         chat_text = "";
@@ -125,19 +125,39 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         return true;
     }
 
-    public long getChat_id() {
+    public String getChat_id() {
         return chat_id;
     }
 
-    public boolean setChat_id(long chat_id) {
+    public boolean setChat_id(String chat_id) {
         this.chat_id = chat_id;
         return true;
     }
+    public long getLatestId(){
+        String query = "SELECT id FROM `chat_history` " +
+                "WHERE `from` ="+ this.from+" "+
+                " ORDER BY id DESC limit 1";
 
+
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+                return  this.resultSet.getLong("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return 0;
+    }
     public long insert()
     {
         String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
-                "VALUES ("+this.chat_id+","+this.to+","+this.from+","+"\""+this.chat_text+"\",'"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
+                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"\""+this.chat_text+"\",'"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
         System.out.print(query);
         this.id = this.insertData(query);
         return this.id;
@@ -182,6 +202,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }finally {
+            this.closeConnection();
         }
         return true;
     }
@@ -215,6 +237,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        }finally {
+            this.closeConnection();
         }
         return true;
     }
