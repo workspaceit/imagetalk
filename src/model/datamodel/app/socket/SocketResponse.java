@@ -6,8 +6,8 @@ package model.datamodel.app.socket;
 
 public class SocketResponse {
 
-    public ResponseStat responseStat = null;
-    public Object       responseData = null;
+    public ResponseStat responseStat;
+    public Object       responseData;
 
     public SocketResponse() {
         this.responseStat = new ResponseStat();

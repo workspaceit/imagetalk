@@ -2,13 +2,12 @@ package controller.service;
 
 import com.google.gson.Gson;
 import model.ChatHistoryModel;
-import model.datamodel.app.ChatHistory;
+import model.datamodel.app.Chat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.Console;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -174,8 +173,8 @@ public class ChatController extends HttpServlet {
 
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
-        ArrayList<ChatHistory> previousChatHistoryArrayList = chatHistoryModel.getPreviousChatHistory(duration);
-        if(previousChatHistoryArrayList.size()==0)
+        ArrayList<Chat> previousChatArrayList = chatHistoryModel.getPreviousChatHistory(duration);
+        if(previousChatArrayList.size()==0)
         {
             this.baseController.serviceResponse.responseStat.msg = "No record found!";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -251,8 +250,8 @@ public class ChatController extends HttpServlet {
 
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
         chatHistoryModel.setTo(to);
-        ArrayList<ChatHistory> chatHistoryArrayList = chatHistoryModel.getChatHistory();
-        if(chatHistoryArrayList.size()==0)
+        ArrayList<Chat> chatArrayList = chatHistoryModel.getChatHistory();
+        if(chatArrayList.size()==0)
         {
             this.baseController.serviceResponse.responseStat.msg = "No record found!";
             this.baseController.serviceResponse.responseStat.status = false;

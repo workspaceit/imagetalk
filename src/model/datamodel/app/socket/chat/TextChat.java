@@ -13,5 +13,6 @@ public class TextChat extends BaseChat {
     public TextChat() {
         super();
         this.text = "";
+        this.type = 0;
     }
 }

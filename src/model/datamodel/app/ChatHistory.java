@@ -1,31 +1,16 @@
 package model.datamodel.app;
 
+import java.util.ArrayList;
 
 /**
- * Created by mi on 11/3/15.
+ * Created by mi on 11/5/15.
  */
 public class ChatHistory {
-    public long id;
-    public String chatId;
-    public int to;
-    public int from;
-    public String chatText;
-    public Object extra;
-    public Object mediaPath;
-    public int type;
-    public String createdDate;
-    public boolean readStatus;
+    AppCredential appCredential;
+    ArrayList<ChatHistory> chatHistories;
 
     public ChatHistory() {
-        this.id = 0;
-        this.chatId = "";
-        this.to = 0;
-        this.from = 0;
-        this.chatText = "";
-        this.extra = new Object();
-        this.mediaPath = new Object();
-        this.type = 0;
-        this.createdDate = "";
-        this.readStatus = false;
+        this.appCredential = new AppCredential();
+        this.chatHistories = new ArrayList<ChatHistory>();
     }
 }

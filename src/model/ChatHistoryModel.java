@@ -1,7 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
-import model.datamodel.app.ChatHistory;
+import model.datamodel.app.Chat;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
@@ -181,9 +181,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `read_status`= 1  WHERE `chat_id`="+this.chat_id;
         return this.updateData(query);
     }
-    public ArrayList<ChatHistory> getChatHistory()
+    public ArrayList<Chat> getChatHistory()
     {
-        ArrayList<ChatHistory> chatHistoryList = new ArrayList<>();
+        ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
                 " ORDER BY created_date DESC";
@@ -200,24 +200,24 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             while (this.resultSet.next())
             {
 
-                ChatHistory chatHistory = new ChatHistory();
-                chatHistory.id = this.resultSet.getLong("chat_history.id");
-                chatHistory.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
-                chatHistory.to = this.resultSet.getInt("chat_history.to");
-                chatHistory.from = this.resultSet.getInt("chat_history.from");
-                chatHistory.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chatHistory.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
-                chatHistory.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
-                chatHistory.type = this.resultSet.getInt("chat_history.type");
+                Chat chat = new Chat();
+                chat.id = this.resultSet.getLong("chat_history.id");
+                chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chat.to = this.resultSet.getInt("chat_history.to");
+                chat.from = this.resultSet.getInt("chat_history.from");
+                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chat.type = this.resultSet.getInt("chat_history.type");
                 try {
-                    chatHistory.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
                 }catch(Exception e) {
-                    chatHistory.createdDate = "";
+                    chat.createdDate = "";
                     System.out.println(e.getMessage());
                 }
-                chatHistory.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+                chat.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
 
-                chatHistoryList.add(chatHistory);
+                chatList.add(chat);
 
             }
         } catch (SQLException e) {
@@ -225,11 +225,11 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }finally {
             this.closeConnection();
         }
-        return chatHistoryList;
+        return chatList;
     }
-    public ArrayList<ChatHistory> getPreviousChatHistory(int duration)
+    public ArrayList<Chat> getPreviousChatHistory(int duration)
     {
-        ArrayList<ChatHistory> previousChatHistoryList = new ArrayList<>();
+        ArrayList<Chat> previousChatList = new ArrayList<>();
 
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE ((`from` ="+ this.from+" AND `to` ="+ this.to+") OR (`from` = "+this.to+" AND `to` = "+this.from+
@@ -248,24 +248,24 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             while (this.resultSet.next())
             {
 
-                ChatHistory chatHistory = new ChatHistory();
-                chatHistory.id = this.resultSet.getLong("chat_history.id");
-                chatHistory.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
-                chatHistory.to = this.resultSet.getInt("chat_history.to");
-                chatHistory.from = this.resultSet.getInt("chat_history.from");
-                chatHistory.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chatHistory.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
-                chatHistory.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
-                chatHistory.type = this.resultSet.getInt("chat_history.type");
+                Chat chat = new Chat();
+                chat.id = this.resultSet.getLong("chat_history.id");
+                chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chat.to = this.resultSet.getInt("chat_history.to");
+                chat.from = this.resultSet.getInt("chat_history.from");
+                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chat.type = this.resultSet.getInt("chat_history.type");
                 try {
-                    chatHistory.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
                 }catch(Exception e) {
-                    chatHistory.createdDate = "";
+                    chat.createdDate = "";
                     System.out.println(e.getMessage());
                 }
-                chatHistory.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+                chat.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
 
-                previousChatHistoryList.add(chatHistory);
+                previousChatList.add(chat);
 
             }
         } catch (SQLException e) {
@@ -273,6 +273,6 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }finally {
             this.closeConnection();
         }
-        return previousChatHistoryList;
+        return previousChatList;
     }
 }

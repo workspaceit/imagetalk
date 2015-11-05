@@ -612,7 +612,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             i++;
             contactIdIn += "'"+contact+"'";
             if(i<this.contactList.size()){
-                contactIdIn +=",";
+                contactIdIn +="|";
             }
 
         }
@@ -630,7 +630,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
-                " where app_login_credential.phone_number in  (" + contactIdIn+" ) ";
+                " where app_login_credential.phone_number REGEXP  (" + contactIdIn+" ) ";
         String contactIdStr = contactModel.getContactInStrArray();
         if(contactIdStr!=""){
             query += " and app_login_credential.id not in ("+contactIdStr +")";
