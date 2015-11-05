@@ -63,6 +63,8 @@
                         <div class="box-header">
                             <h3 class="box-title">
                                 <h2>Sticker Category</h2>
+                                <a href="<%=imageTalkBaseController.getBaseUrl(request)+"admin/upload/image?catId="+categoryId%>">
+                                    <i class="fa fa-plus"></i> Add sticker in this category</a>
                             </h3>
                         </div>
                         <!-- /.box-header -->

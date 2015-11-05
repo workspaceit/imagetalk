@@ -22,6 +22,9 @@
 
     StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
     ArrayList<StickerCategoryModel> stickerCategoryList = stickerCategoryModel.getStickerCategoryList();
+
+    int tempCatId = Integer.parseInt(request.getParameter("catId"));
+
 %>
 <!DOCTYPE html>
 <html>
@@ -58,10 +61,14 @@
                                 <div class="col-sm-10">
                                     <select name="sticker_category_id" class="form-control" id="sticker_category_id">
                                         <option value="">Select One</option>
-                                        <% for (StickerCategoryModel stickerCategory : stickerCategoryList) { %>
+                                        <% for (StickerCategoryModel stickerCategory : stickerCategoryList) {
+                                            if(tempCatId==stickerCategory.getId()) {%>
+                                        <option value="<%=stickerCategory.getId()%>" selected><%=stickerCategory.getName()%>
+                                        <%} else {%>
                                         <option value="<%=stickerCategory.getId()%>"><%=stickerCategory.getName()%>
                                         </option>
-                                        <% } %>
+                                        <% }
+                                        } %>
                                     </select>
                                 </div>
                             </div>
