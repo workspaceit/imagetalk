@@ -12,6 +12,7 @@ import model.datamodel.app.socket.SocketResponse;
 import model.datamodel.app.socket.chat.ChatPhoto;
 import model.datamodel.app.socket.chat.ChatTransferStatus;
 import model.datamodel.app.socket.chat.TextChat;
+import model.datamodel.app.video.Videos;
 import model.datamodel.photo.Pictures;
 
 import java.io.*;
@@ -400,7 +401,7 @@ public class ServiceThread extends Thread {
                 byte[] b = gson.fromJson(byteStr,byte[].class);
 
                 try {
-                    Pictures videos = ImageHelper.saveByteToChatVideo(b, uId);
+                    Videos videos = ImageHelper.saveByteToChatVideo(b, uId);
                     ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
                     chatHistoryModel.setChat_id(chatId);
                     chatHistoryModel.setTo(senderId);

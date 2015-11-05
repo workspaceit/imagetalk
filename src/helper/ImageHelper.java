@@ -1,5 +1,6 @@
 package helper;
 
+import model.datamodel.app.video.Videos;
 import model.datamodel.photo.PictureDetails;
 import model.datamodel.photo.Pictures;
 import sun.misc.BASE64Decoder;
@@ -130,9 +131,9 @@ public class ImageHelper {
         }
         return pictures;
     }
-    public static Pictures saveByteToChatVideo(byte[] b,int uId) throws IOException{
+    public static Videos saveByteToChatVideo(byte[] b,int uId) throws IOException{
         FileOutputStream fos;
-        Pictures pictures = new Pictures();
+        Videos videos = new Videos();
         String   path     = GLOBAL_PATH;
         String   fileName = "";
 
@@ -155,14 +156,14 @@ public class ImageHelper {
             fos.close();
 
             fileName = uId + "/chat/media/video/" + fileName;
-            pictures.original.size.height = 0;
-            pictures.original.size.width = 0;
-            pictures.original.path = fileName;
+            videos.original.size = "";
+            videos.original.resolution = "";
+            videos.original.path = fileName;
 
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
-        return pictures;
+        return videos;
     }
     public static Pictures saveChatPicture(Object imgObj, int uId) {
         Pictures pictures = new Pictures();
