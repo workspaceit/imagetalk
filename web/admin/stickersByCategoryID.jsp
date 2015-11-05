@@ -82,6 +82,7 @@
                                     <th>Sticker ID</th>
                                     <th>Category Name</th>
                                     <th>Sticker Icon</th>
+                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -99,6 +100,10 @@
                                     </td>
                                     <td>
                                         <img src="/app/media/access/sticker?p=<%=stickersModel1.path%>" alter="image icon">
+                                    </td>
+                                    <td>
+                                        <a href=""><i class="fa fa-edit"></i> </a>
+                                        <a href="javascript:void(0)" onclick="deleteSticker(this,<%=stickersModel1.id%>);"><i class="fa fa-trash-o"></i></a>
                                     </td>
                                     <% i++; %>
                                 </tr>
@@ -148,6 +153,30 @@
 <script src="/assets/dist/js/app.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="/assets/dist/js/demo.js"></script>
+<script>
+
+    function deleteSticker(elem, stickerId) {
+        var parentRow = $(elem).parents("tr").first();
+        var url = $("#base_url").val() + "admin/sticker/operation/single/sticker/delete";
+
+        $.ajax({
+            url: url,
+            dataType: "json",
+            method: "POST",
+            data: {"id": stickerId},
+            success: function (data) {
+                if (data.responseStat.status) {
+                    parentRow.css({'display': 'none'});
+                    alert(data.responseStat.msg)
+                } else {
+                    alert(data.responseStat.msg)
+                }
+            }
+        });
+    }
+
+</script>
+
 
 </body>
 </html>

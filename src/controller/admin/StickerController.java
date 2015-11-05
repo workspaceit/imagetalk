@@ -4,6 +4,7 @@ import controller.service.ImageTalkBaseController;
 import model.StickerCategoryModel;
 import model.StickersModel;
 import model.datamodel.app.Login;
+import sun.rmi.server.InactiveGroupException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -71,10 +72,15 @@ public class StickerController extends HttpServlet {
             case "/admin/sticker/operation/stickers/delete":
                 this.deleteAllByCategoryID(req);
                 break;
+            case "/admin/sticker/operation/single/sticker/delete":
+                this.deleteByStickerId(req);
+                break;
             default:
                 break;
         }
     }
+
+
 
     @Override
     public void destroy() {
@@ -187,7 +193,24 @@ public class StickerController extends HttpServlet {
         this.baseController.serviceResponse.responseStat.status = false;
         this.pw.print(this.baseController.getResponse());
 
+    }
+    private void deleteByStickerId(HttpServletRequest req) {
 
+        int stickerID = Integer.parseInt(req.getParameter("id"));
 
+        if(stickerID>0)
+        {
+            StickersModel stickersModel = new StickersModel();
+            if(stickersModel.deleteSingleStickerById(stickerID)){
+                this.baseController.serviceResponse.responseStat.msg = "Sticker delete successfully";
+                this.baseController.serviceResponse.responseStat.status = true;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+            this.baseController.serviceResponse.responseStat.msg = "sticker delete failed";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+
+        }
     }
 }

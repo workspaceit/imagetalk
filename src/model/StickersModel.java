@@ -198,5 +198,14 @@ public class StickersModel extends ImageTalkBaseModel {
 
         return false;
     }
+    public boolean deleteSingleStickerById(int id) {
+        String sql = "DELETE FROM " + this.tableName + " WHERE id = '" + id + "'";
+        System.out.print(sql);
+        if (this.deleteData(sql) == 1) {
+            return true;
+        }
+
+        return false;
+    }
 
 }
