@@ -23,14 +23,18 @@
     StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
     ArrayList<StickerCategoryModel> stickerCategoryList = stickerCategoryModel.getStickerCategoryList();
 
-    int tempCatId = Integer.parseInt(request.getParameter("catId"));
+    String a = request.getParameter("catId");
+    int tempCatId=0;
+    if(a!=null)
+    {
+        tempCatId = Integer.parseInt(a);
+    }
 
 %>
 <!DOCTYPE html>
 <html>
 
 <%@include file="head.jsp" %>
-
 <link href="/assets/filer/css/jquery.filer.css" type="text/css" rel="stylesheet"/>
 <link href="/assets/filer/css/themes/jquery.filer-dragdropbox-theme.css" type="text/css" rel="stylesheet"/>
 
