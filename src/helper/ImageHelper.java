@@ -16,7 +16,7 @@ import java.util.logging.Level;
  */
 public class ImageHelper {
     private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
-    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
+    private final static String STICKER_GLOBAL_PATH = "/home/rajib/mi/Projects/j2ee/";
     public static String getGlobalPath() {
         return GLOBAL_PATH;
     }
