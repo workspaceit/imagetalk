@@ -2,6 +2,7 @@ package model;
 
 import com.google.gson.Gson;
 import model.datamodel.app.Chat;
+import model.datamodel.app.ChatHistory;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
@@ -274,5 +275,57 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
         return previousChatList;
+    }
+
+    public ChatHistory getChatsWithContact()
+    {
+       // ArrayList<ChatHistory> chatWithContactArrayList = new ArrayList<>();
+        ChatHistory chatHistory = new ChatHistory();
+
+        String query = "SELECT "+this.tableName+".* " +
+                "FROM "+this.tableName+
+                "WHERE id IN \n" +
+                "(SELECT MAX(id) AS id FROM (" +
+                "SELECT id, `from` AS id_with FROM "+this.tableName+" WHERE `to` = "+this.from+
+                "UNION ALL" +
+                "SELECT id, `to` AS id_with FROM "+this.tableName+" WHERE `from` = "+this.from+") t" +
+                "GROUP BY id_with)";
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next())
+            {
+
+                Chat chats = new Chat();
+                chats.id = this.resultSet.getLong("chat_history.id");
+                chats.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chats.to = this.resultSet.getInt("chat_history.to");
+                chats.from = this.resultSet.getInt("chat_history.from");
+                chats.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chats.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chats.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chats.type = this.resultSet.getInt("chat_history.type");
+                try {
+                    chats.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                }catch(Exception e) {
+                    chats.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chats.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+
+                chatHistory.chat.add(chats);
+
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+
+
+    return chatHistory;
     }
 }

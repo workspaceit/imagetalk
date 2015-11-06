@@ -3,6 +3,7 @@ package controller.service;
 import com.google.gson.Gson;
 import model.ChatHistoryModel;
 import model.datamodel.app.Chat;
+import model.datamodel.app.ChatHistory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -74,12 +75,36 @@ public class ChatController extends HttpServlet {
             case "/app/user/chat/showPrevious":
                 this.showPreviousChat();
                 break;
-
+            case "/app/user/chat/showLatest":
+               // this.showLatest();
+                break;
             default:
                 break;
         }
     }
 
+/*    private void showLatest() {
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+
+        chatHistoryModel.setFrom(this.baseController.appCredential.id);
+        ChatHistory chatHistory;
+        chatHistory = chatHistoryModel.getChatsWithContact();
+        if(chatHistory==null)
+        {
+            this.baseController.serviceResponse.responseStat.msg = "No Data Found";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "Data received";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
+
+        for (Chat chats:chatHistory.chat)
+
+        return;
+
+    }*/
 
 
     private void showPreviousChat() {
@@ -182,8 +207,9 @@ public class ChatController extends HttpServlet {
             return;
         }
 
-        this.baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
+        this.baseController.serviceResponse.responseStat.msg = "Records Found";
         this.baseController.serviceResponse.responseStat.status = true;
+        this.baseController.serviceResponse.responseData = previousChatArrayList;
         this.pw.print(this.baseController.getResponse());
         return;
 
@@ -261,6 +287,7 @@ public class ChatController extends HttpServlet {
 
         this.baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
         this.baseController.serviceResponse.responseStat.status = true;
+        this.baseController.serviceResponse.responseData = chatArrayList;
         this.pw.print(this.baseController.getResponse());
         return;
 
