@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 public class ChatHistory {
     Contact contact;
-    ArrayList<Chat> chat;
+    public ArrayList<Chat> chat;
 
     public ChatHistory() {
         this.contact = new Contact();
