@@ -228,6 +228,48 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }
         return chatList;
     }
+    public ArrayList<Chat> getChatHistory(int myId,int receiver)
+    {
+        ArrayList<Chat> chatList = new ArrayList<>();
+        String query = "SELECT chat_history.* FROM `chat_history` " +
+                "WHERE `from` ="+ myId+" AND `to` ="+ receiver+" OR `from` = "+receiver+" AND `to` = "+myId+
+                " ORDER BY created_date DESC LIMIT 1";
+
+
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+
+                Chat chat = new Chat();
+                chat.id = this.resultSet.getLong("chat_history.id");
+                chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chat.to = this.resultSet.getInt("chat_history.to");
+                chat.from = this.resultSet.getInt("chat_history.from");
+                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
+                chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chat.type = this.resultSet.getInt("chat_history.type");
+                try {
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                }catch(Exception e) {
+                    chat.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chat.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+
+                chatList.add(chat);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return chatList;
+    }
     public ArrayList<Chat> getPreviousChatHistory(int duration)
     {
         ArrayList<Chat> previousChatList = new ArrayList<>();
@@ -277,44 +319,43 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         return previousChatList;
     }
 
-    public ChatHistory getChatsWithContact()
+    public ArrayList<ChatHistory> getChatsWithContact(int myId)
     {
-       // ArrayList<ChatHistory> chatWithContactArrayList = new ArrayList<>();
-        ChatHistory chatHistory = new ChatHistory();
+        ArrayList<ChatHistory> chatWithContactArrayList = new ArrayList<>();
 
-        String query = "SELECT "+this.tableName+".* " +
+        /*String query = "SELECT "+this.tableName+".* " +
                 "FROM "+this.tableName+
-                "WHERE id IN \n" +
+                " WHERE id IN " +
                 "(SELECT MAX(id) AS id FROM (" +
                 "SELECT id, `from` AS id_with FROM "+this.tableName+" WHERE `to` = "+this.from+
-                "UNION ALL" +
-                "SELECT id, `to` AS id_with FROM "+this.tableName+" WHERE `from` = "+this.from+") t" +
-                "GROUP BY id_with)";
+                " UNION ALL " +
+                "SELECT id, `to` AS id_with FROM "+this.tableName+" WHERE `from` = "+this.from+") t " +
+                "GROUP BY id_with)";*/
+
+        String query = "SELECT IF (`from` = "+this.from+", `to`, `from`) AS recipients"+
+        " FROM "+this.tableName+
+        " WHERE "+this.from+" IN (`from`, `to`)"+
+        " GROUP BY recipients"+
+        " ORDER BY MAX(created_date) DESC";
+
         System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
             while (this.resultSet.next())
             {
+                ChatHistory chatHistory = new ChatHistory();
 
-                Chat chats = new Chat();
-                chats.id = this.resultSet.getLong("chat_history.id");
-                chats.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
-                chats.to = this.resultSet.getInt("chat_history.to");
-                chats.from = this.resultSet.getInt("chat_history.from");
-                chats.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chats.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
-                chats.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
-                chats.type = this.resultSet.getInt("chat_history.type");
-                try {
-                    chats.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
-                }catch(Exception e) {
-                    chats.createdDate = "";
-                    System.out.println(e.getMessage());
-                }
-                chats.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+                int recipient = this.resultSet.getInt("recipients");
+                System.out.println(recipient);
 
-                chatHistory.chat.add(chats);
+                ContactModel contactmodel = new ContactModel();
+                chatHistory.contact =  contactmodel.getContactByOwnerId(this.from,recipient);
+                ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+                ArrayList<Chat> chats = chatHistoryModel.getChatHistory(myId,recipient);
+                chatHistory.chat = chats;
+
+                chatWithContactArrayList.add(chatHistory);
 
             }
         }
@@ -326,6 +367,6 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
 
 
-    return chatHistory;
+    return chatWithContactArrayList;
     }
 }

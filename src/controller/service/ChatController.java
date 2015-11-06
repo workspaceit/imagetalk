@@ -76,35 +76,33 @@ public class ChatController extends HttpServlet {
                 this.showPreviousChat();
                 break;
             case "/app/user/chat/showLatest":
-               // this.showLatest();
+                this.showLatest();
                 break;
             default:
                 break;
         }
     }
 
-/*    private void showLatest() {
-        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+    private void showLatest() {
 
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         chatHistoryModel.setFrom(this.baseController.appCredential.id);
-        ChatHistory chatHistory;
-        chatHistory = chatHistoryModel.getChatsWithContact();
-        if(chatHistory==null)
+        ArrayList<ChatHistory> chatWithContactArrayList = chatHistoryModel.getChatsWithContact(this.baseController.appCredential.id);
+
+        if (chatWithContactArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "No Data Found";
-            this.baseController.serviceResponse.responseStat.status = false;
+            this.baseController.serviceResponse.responseStat.msg = "NO Data received";
+            this.baseController.serviceResponse.responseStat.status = true;
             this.pw.print(this.baseController.getResponse());
             return;
         }
         this.baseController.serviceResponse.responseStat.msg = "Data received";
-        this.baseController.serviceResponse.responseStat.status = false;
+        this.baseController.serviceResponse.responseStat.status = true;
+        this.baseController.serviceResponse.responseData = chatWithContactArrayList;
         this.pw.print(this.baseController.getResponse());
-
-        for (Chat chats:chatHistory.chat)
-
         return;
 
-    }*/
+    }
 
 
     private void showPreviousChat() {

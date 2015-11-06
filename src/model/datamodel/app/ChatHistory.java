@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by mi on 11/5/15.
  */
 public class ChatHistory {
-    Contact contact;
+    public Contact contact;
     public ArrayList<Chat> chat;
 
     public ChatHistory() {
