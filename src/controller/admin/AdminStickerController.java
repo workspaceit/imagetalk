@@ -22,13 +22,13 @@ import java.util.ArrayList;
  * Created Date     : 10/9/15
  */
 
-public class StickerController extends HttpServlet {
+public class AdminStickerController extends HttpServlet {
     private PrintWriter             pw;
     private String                  url;
     private Login                   login;
     private ImageTalkBaseController baseController;
 
-    public StickerController() {
+    public AdminStickerController() {
         this.login = new Login();
         this.baseController = new ImageTalkBaseController();
     }

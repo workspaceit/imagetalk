@@ -250,12 +250,22 @@
 
     <servlet>
         <servlet-name>Sticker</servlet-name>
-        <servlet-class>controller.admin.StickerController</servlet-class>
+        <servlet-class>controller.admin.AdminStickerController</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>Sticker</servlet-name>
         <url-pattern>/admin/sticker/operation/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>StickerController</servlet-name>
+        <servlet-class>controller.service.StickerController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>StickerController</servlet-name>
+        <url-pattern>/app/sticker/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
