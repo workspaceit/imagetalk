@@ -120,6 +120,44 @@ public class StickersModel extends ImageTalkBaseModel {
         }
         return stickerList;
     }
+    public ArrayList<Stickers> getAllForPost(){
+
+        ArrayList<Stickers> stickerList = new ArrayList<Stickers>();
+        String query =  " select *" +
+                " from " + super.tableName+
+                " join sticker_category on sticker_category.id ="+ super.tableName+".sticker_category_id ";
+        query +="where  "+ super.tableName+".is_paid = 0"+this.is_paid;
+        query +=  " UNION ";
+        query +=  " select  "+super.tableName+".*"+
+                " from " + super.tableName+
+                " join user_sticker_eligible on user_sticker_eligible.sticker_category_id ="+ super.tableName+".sticker_category_id ";
+
+
+        if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        }
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                Stickers stickers = new Stickers();
+                stickers.id = this.resultSet.getInt("id");
+                stickers.stickerCategoryId = this.resultSet.getInt("sticker_category_id");
+                stickers.categoryName = this.resultSet.getString("sticker_category.name");
+                stickers.path = this.resultSet.getString("path");
+
+
+                stickerList.add(stickers);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return stickerList;
+    }
     public ArrayList<Stickers> getAllByCategoryId(){
 
         ArrayList<Stickers> stickerList = new ArrayList<Stickers>();

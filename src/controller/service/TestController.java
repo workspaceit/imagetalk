@@ -7,6 +7,7 @@ import model.*;
 import model.datamodel.app.Places;
 import model.datamodel.app.StickerCategory;
 
+import model.datamodel.app.Stickers;
 import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
@@ -90,10 +91,46 @@ public class TestController extends  HttpServlet{
     }
     private void test(){
 
-        JobModel jobModel = new JobModel();
-        jobModel.setId(1);
-        this.baseController.serviceResponse.responseStat.msg = "Job added successfully";
-        this.baseController.serviceResponse.responseData = jobModel.getAllById();
+        StickersModel stickersModel = new StickersModel();
+
+
+
+        if(this.baseController.checkParam("limit", this.req, true)) {
+            try{
+                stickersModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }else{
+            stickersModel.limit = 30;
+        }
+
+        if(!this.baseController.checkParam("offset", this.req, true)){
+
+            this.baseController.serviceResponse.responseStat.msg = "offset required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }else {
+            try{
+                stickersModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        ArrayList<Stickers> stickers = stickersModel.getAll();
+
+        this.baseController.serviceResponse.responseData = stickers;
+        this.baseController.serviceResponse.responseStat.status =  (stickers.size()>0);
+        this.baseController.serviceResponse.responseStat.msg = (stickers.size()==0)?"No record found":"";
         this.pw.print(this.baseController.getResponse());
         return;
     }

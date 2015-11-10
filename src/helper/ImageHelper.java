@@ -38,7 +38,13 @@ public class ImageHelper {
             }
         }
     }
-
+    public static byte[] serialize(Object object)throws IOException {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = new ObjectOutputStream(b);
+        o.writeObject(object);
+        System.out.println("Completed Serializing");
+        return b.toByteArray();
+    }
     public static String saveFile(Object imgObj, String path, int uId) {
         if (path == null) {
             path = "/home/mi/pic/";
