@@ -20,6 +20,8 @@ public class StickersModel extends ImageTalkBaseModel {
     private int    created_by;
     private String created_date;
 
+    private int currentAppCredentialId;
+
     public StickersModel() {
         super();
         super.tableName = "stickers";
@@ -31,6 +33,8 @@ public class StickersModel extends ImageTalkBaseModel {
         this.is_paid = -1;
         this.created_by = 0;
         this.created_date = "";
+
+        this.currentAppCredentialId = 0;
     }
 
     public int getId() {
@@ -82,6 +86,14 @@ public class StickersModel extends ImageTalkBaseModel {
         return created_date;
     }
 
+    public int getCurrentAppCredentialId() {
+        return currentAppCredentialId;
+    }
+
+    public void setCurrentAppCredentialId(int currentAppCredentialId) {
+        this.currentAppCredentialId = currentAppCredentialId;
+    }
+
     public boolean setCreated_date(String created_date) {
         this.created_date = created_date;
         return true;
@@ -123,16 +135,19 @@ public class StickersModel extends ImageTalkBaseModel {
     public ArrayList<Stickers> getAllForPost(){
 
         ArrayList<Stickers> stickerList = new ArrayList<Stickers>();
-        String query =  " select *" +
+        String query =  " select "+super.tableName+".*,sticker_category.name  as catName"+
                 " from " + super.tableName+
                 " join sticker_category on sticker_category.id ="+ super.tableName+".sticker_category_id ";
-        query +="where  "+ super.tableName+".is_paid = 0"+this.is_paid;
+        query +="where  sticker_category.is_paid = 0 ";
         query +=  " UNION ";
-        query +=  " select  "+super.tableName+".*"+
+        query +=  " select  "+super.tableName+".*,sticker_category.name as catName"+
                 " from " + super.tableName+
-                " join user_sticker_eligible on user_sticker_eligible.sticker_category_id ="+ super.tableName+".sticker_category_id ";
+                " join user_sticker_eligible on user_sticker_eligible.sticker_category_id ="+ super.tableName+".sticker_category_id " +
+                " join sticker_category on sticker_category.id = user_sticker_eligible.sticker_category_id "+
+                " where user_sticker_eligible.app_login_credential_id ="+this.currentAppCredentialId+
+                " and user_sticker_eligible.usage = 1";
 
-
+        System.out.println(query);
         if(this.limit >0){
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
@@ -145,7 +160,7 @@ public class StickersModel extends ImageTalkBaseModel {
                 Stickers stickers = new Stickers();
                 stickers.id = this.resultSet.getInt("id");
                 stickers.stickerCategoryId = this.resultSet.getInt("sticker_category_id");
-                stickers.categoryName = this.resultSet.getString("sticker_category.name");
+                stickers.categoryName = this.resultSet.getString("catName");
                 stickers.path = this.resultSet.getString("path");
 
 

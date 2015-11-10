@@ -126,7 +126,9 @@ public class TestController extends  HttpServlet{
                 return;
             }
         }
-        ArrayList<Stickers> stickers = stickersModel.getAll();
+
+        stickersModel.setCurrentAppCredentialId(this.baseController.appCredential.id);
+        ArrayList<Stickers> stickers = stickersModel.getAllForPost();
 
         this.baseController.serviceResponse.responseData = stickers;
         this.baseController.serviceResponse.responseStat.status =  (stickers.size()>0);
