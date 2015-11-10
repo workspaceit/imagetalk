@@ -17,12 +17,21 @@ import java.util.logging.Level;
  */
 public class ImageHelper {
     private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
-    private final static String STICKER_GLOBAL_PATH = "/home/rajib/mi/Projects/j2ee/";
+    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
     public static String getGlobalPath() {
         return GLOBAL_PATH;
     }
     public static String getStickerGlobalPath() {
         return  STICKER_GLOBAL_PATH;
+    }
+
+
+    public static byte[] serialize(Object object)throws IOException {
+        ByteArrayOutputStream b = new ByteArrayOutputStream();
+        ObjectOutputStream o = new ObjectOutputStream(b);
+        o.writeObject(object);
+        System.out.println("Completed Serializing");
+        return b.toByteArray();
     }
 
     public static void createDirIfNotExist(String path) {
@@ -130,6 +139,40 @@ public class ImageHelper {
             return pictures;
         }
         return pictures;
+    }
+    public static Videos saveByteToFile(byte[] b,int uId) throws IOException{
+        FileOutputStream fos;
+        Videos videos = new Videos();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+
+        fileName = +System.nanoTime() + "";
+        path += uId;
+        createDirIfNotExist(path);
+        path += "/chat";
+        createDirIfNotExist(path);
+        path += "/media";
+        createDirIfNotExist(path);
+        path += "/video";
+        createDirIfNotExist(path);
+
+
+
+
+        try {
+            fos = new FileOutputStream(path+"/"+fileName);
+            fos.write(b);
+            fos.close();
+
+            fileName = uId + "/chat/media/video/" + fileName;
+            videos.original.size = "";
+            videos.original.resolution = "";
+            videos.original.path = fileName;
+
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        return videos;
     }
     public static Videos saveByteToChatVideo(byte[] b,int uId) throws IOException{
         FileOutputStream fos;

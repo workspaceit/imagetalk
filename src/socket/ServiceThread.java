@@ -26,6 +26,8 @@ public class ServiceThread extends Thread {
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
     final static String tag_chatPhoto = "chatphoto_transfer";
     final static String tag_chatVideo = "chatvideo_transfer";
+    final static String tag_chatVideoProto = "chatvideo_transfer_proto";
+    final static String tag_contact_online = "contact_online";
 
     private Socket serviceSocket;
     private boolean authintic;
@@ -60,7 +62,6 @@ public class ServiceThread extends Thread {
     public void run() {
         try {
             this.input = new BufferedReader(new InputStreamReader(this.serviceSocket.getInputStream()));
-            this.fileInput = this.serviceSocket.getInputStream();
             this.output =  new PrintStream(this.serviceSocket.getOutputStream());
             int count = 1;
 
@@ -78,6 +79,7 @@ public class ServiceThread extends Thread {
                         continue;
                     }
                     // Initializing with new obj
+                  //  System.out.println("Before process :"+recvStr);
                     this.socketResponse = this.gson.fromJson(recvStr, SocketResponse.class);
 
                     System.out.println("================================");
@@ -91,6 +93,9 @@ public class ServiceThread extends Thread {
                         case tag_authentication:
                             this.processAuthentication(this.socketResponse.responseData);
                             break;
+                        case tag_contact_online:
+                            this.isContactOnline(this.socketResponse.responseData);
+                            break;
                         case tag_textChat:
                             this.processTextChat(this.socketResponse.responseData);
                             break;
@@ -102,6 +107,9 @@ public class ServiceThread extends Thread {
                             break;
                         case tag_ChatAcknowledgement:
                             this.processChatAcknowledgement(this.socketResponse.responseData);
+                            break;
+                        case tag_chatVideoProto:
+                            this.processVideoProto(this.socketResponse.responseData);
                             break;
                         default:
                             break;
@@ -125,40 +133,68 @@ public class ServiceThread extends Thread {
         System.out.println("");
         System.out.println("");
     }
-    private void processAuthentication(Object dataObject){
-
+    private void isContactOnline(Object dataObject){
+        if(!this.checkForAuthentication()){
+            return;
+        }
         this.socketResponse = new SocketResponse();
+        String chatId = this.getMsgId();
         try{
             String jObjStr = this.gson.toJson(dataObject);
 
-            AuthCredential authCredential = this.gson.fromJson(jObjStr, AuthCredential.class);
-            this.authintic = authenticate(authCredential.accessToken);
+            TextChat textChat = this.gson.fromJson(jObjStr, TextChat.class);
+            ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(textChat.appCredential.id);
 
-            if(this.authintic){
-                this.appCredential = castAuthToAppCredential(authCredential);
-                this.socketResponse.responseStat.tag = "authentication_status";
-                this.socketResponse.responseStat.msg = "authentication success";
-                System.out.println("Putting obj in :" + authCredential.id);
-                BaseSocketController.putServiceThread(authCredential.id, this);
-                ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
-                chatHistoryModel.setFrom(this.appCredential.id);
+            if(contactServiceThread!=null){
 
+                if(contactServiceThread.isOnline()) {
+                    sendOnlineAcknowledgement(0, "0", false, true,textChat.appCredential);
+                }else{
+                    sendOnlineAcknowledgement(0, "0", false, false,textChat.appCredential);
+                }
             }else{
-                this.socketResponse.responseStat.tag = "authentication_status";
-                this.socketResponse.responseStat.status = false;
-                this.socketResponse.responseStat.msg = "Access token is wrong";
+                sendOnlineAcknowledgement(0,"0",false,false,textChat.appCredential);
             }
         }catch (ClassCastException ex){
-            sendError("0","Can not cast AuthCredential");
-            this.closeConnection();
-
+            sendError(chatId, "Can not cast the object");
             ex.printStackTrace();
         }
-        this.sendData(this.gson.toJson(this.socketResponse));
+    }
+    private void processVideoProto(Object dataObject){
 
-        if(!this.authintic){
-            this.closeConnection();
-        }
+        this.socketResponse = new SocketResponse();
+
+        String jObjStr = this.gson.toJson(dataObject);
+        TextChat textChat = this.gson.fromJson(jObjStr, TextChat.class);
+        System.out.println("On processVideoProto");
+        class VideoTransferThread extends Thread{
+            @Override
+            public  void run(){
+                //imagtalk_server_temp
+
+                try {
+                    fileInput = serviceSocket.getInputStream();
+                    OutputStream  out = new FileOutputStream("/home/mi/Projects/j2ee/imagtalk_server_temp/a.mp4");
+                    byte[] byt =  new byte[16*1024];
+
+                    int count = 0 ;
+                    System.out.println("On video byte transfer");
+                    while((count = fileInput.read(byt))>0){
+                        out.write(byt,0,count);
+                        out.close();
+                        fileInput.close();
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        new VideoTransferThread().start();
+
+
     }
     private void processTextChat(Object dataObject){
         if(!this.checkForAuthentication()){
@@ -371,6 +407,41 @@ public class ServiceThread extends Thread {
         }
 
     }
+    private void processAuthentication(Object dataObject){
+
+        this.socketResponse = new SocketResponse();
+        try{
+            String jObjStr = this.gson.toJson(dataObject);
+
+            AuthCredential authCredential = this.gson.fromJson(jObjStr, AuthCredential.class);
+            this.authintic = authenticate(authCredential.accessToken);
+
+            if(this.authintic){
+                this.appCredential = castAuthToAppCredential(authCredential);
+                this.socketResponse.responseStat.tag = "authentication_status";
+                this.socketResponse.responseStat.msg = "authentication success";
+                System.out.println("Putting obj in :" + authCredential.id);
+                BaseSocketController.putServiceThread(authCredential.id, this);
+                ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+                chatHistoryModel.setFrom(this.appCredential.id);
+
+            }else{
+                this.socketResponse.responseStat.tag = "authentication_status";
+                this.socketResponse.responseStat.status = false;
+                this.socketResponse.responseStat.msg = "Access token is wrong";
+            }
+        }catch (ClassCastException ex){
+            sendError("0","Can not cast AuthCredential");
+            this.closeConnection();
+
+            ex.printStackTrace();
+        }
+        this.sendData(this.gson.toJson(this.socketResponse));
+
+        if(!this.authintic){
+            this.closeConnection();
+        }
+    }
 
     private void savePhotoInChatHistory(String chatId,int senderId,int receiverId,String textMsg,String imgBase64Str){
 
@@ -398,7 +469,7 @@ public class ServiceThread extends Thread {
         class DbOperationThread extends Thread{
             @Override
             public void run() {
-                byte[] b = gson.fromJson(byteStr,byte[].class);
+                byte[] b = gson.fromJson(byteStr, byte[].class);
 
                 try {
                     Videos videos = ImageHelper.saveByteToChatVideo(b, uId);
@@ -484,7 +555,7 @@ public class ServiceThread extends Thread {
         return tempMsg;
     }
 
-    private void sendChatAcknowledgement(int id,String chatId,boolean isRead,boolean isOline){
+    private void sendChatAcknowledgement(int id,String chatId,boolean isRead,boolean isOnline){
         Acknowledgement acknowledgement = new Acknowledgement();
 
 
@@ -494,8 +565,32 @@ public class ServiceThread extends Thread {
         acknowledgement.id = id;
         acknowledgement.chatId  = chatId;
         acknowledgement.isRead =isRead;
-        acknowledgement.isOnline =isOline;
+        acknowledgement.isOnline =isOnline;
         acknowledgement.appCredential = this.appCredential;
+
+        this.socketResponse.responseData = acknowledgement;
+
+        this.sendData(this.gson.toJson(this.socketResponse));
+
+
+        System.out.println("********************************************");
+        System.out.println("Send text msg : to " + acknowledgement.appCredential.user.firstName);
+        System.out.println("Send text Object " + this.gson.toJson(this.socketResponse));
+        System.out.println(" Offline text msg and obj null");
+        System.out.println("********************************************");
+    }
+    private void sendOnlineAcknowledgement(int id,String chatId,boolean isRead,boolean isOnline,AppCredential appCredential){
+        Acknowledgement acknowledgement = new Acknowledgement();
+
+
+        this.socketResponse = new SocketResponse();
+        this.socketResponse.responseStat.tag = tag_contact_online;
+
+        acknowledgement.id = id;
+        acknowledgement.chatId  = chatId;
+        acknowledgement.isRead =isRead;
+        acknowledgement.isOnline =isOnline;
+        acknowledgement.appCredential = appCredential;
 
         this.socketResponse.responseData = acknowledgement;
 
