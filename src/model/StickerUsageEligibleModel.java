@@ -78,27 +78,39 @@ public class StickerUsageEligibleModel extends ImageTalkBaseModel {
         System.out.println(this.id);
         return this.id;
     }
-    public boolean updateStickerUsage(){
-
+    public int isExist()
+    {
         String query1 = "SELECT * FROM "+this.tableName+" WHERE "+this.tableName+".sticker_category_id="+this.sticker_category_id+
                 " AND "+this.tableName+".app_login_credential_id="+this.app_login_credential_id;
 
+        System.out.println(query1);
         this.setQuery(query1);
         this.getData();
         try {
             while (this.resultSet.next())
             {
                 this.id = this.resultSet.getInt("id");
-                this.sticker_category_id = this.resultSet.getInt("sticker_category_id");
-                this.app_login_credential_id = this.resultSet.getInt("app_login_credential_id");
-                this.usage = (this.resultSet.getInt("usage")==0)?1:0;
+                int us;
+                us = this.resultSet.getInt("usage");
+                if (us>0)
+                {
+                    return 1;
+                }
+                return id;
 
             }
         }
         catch (Exception e)
         {
-
+            e.printStackTrace();
         }
+        finally {
+            this.closeConnection();
+        }
+        return 0;
+    }
+
+    public boolean updateStickerUsage(){
 
         String query = "UPDATE " + this.tableName + " SET `usage`=" + this.usage + " WHERE `id`="+this.id;
 

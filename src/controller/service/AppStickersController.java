@@ -102,6 +102,48 @@ public class AppStickersController extends HttpServlet {
         stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
         stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
 
+        int id = stickerUsageEligibleModel.isExist();
+        if(id==0)
+        {
+            stickerUsageEligibleModel.setUsage(1);
+            if(stickerUsageEligibleModel.insert()==0)
+            {
+                this.baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+            else
+            {
+                this.baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully with usage=1";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+        else if(id==1)
+        {
+            this.baseController.serviceResponse.responseStat.msg = "sticker usability already updated";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
+        stickerUsageEligibleModel.setUsage(1);
+        if(stickerUsageEligibleModel.updateStickerUsage())
+        {
+            this.baseController.serviceResponse.responseStat.msg = "sticker usability Updated Successfully";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else {
+            this.baseController.serviceResponse.responseStat.msg = "sticker usability not updated";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+
     }
 
     private void addStickerUsability() {
