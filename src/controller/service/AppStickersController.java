@@ -1,6 +1,7 @@
 package controller.service;
 
 import model.StickerCategoryModel;
+import model.StickerUsageEligibleModel;
 import model.StickersModel;
 import model.datamodel.app.Stickers;
 
@@ -55,10 +56,93 @@ public class AppStickersController extends HttpServlet {
             case "/app/stickers/get/for/post":
                 this.getForPost(false);
                 break;
+            case "/app/stickers/add/stickerUsability":
+                this.addStickerUsability();
+                break;
+            case "/app/stickers/update/stickerUsability":
+                this.updateStickerUsability();
+                break;
             default:
                 break;
         }
         this.pw.close();
+    }
+
+    private void updateStickerUsability() {
+
+        int sticker_category_id;
+
+        if (!this.baseController.checkParam("sticker_category_id",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try
+            {
+                sticker_category_id = Integer.parseInt(req.getParameter("sticker_category_id"));
+            }
+            catch (Exception e)
+            {
+                System.out.println(e);
+                this.baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        StickerUsageEligibleModel stickerUsageEligibleModel = new StickerUsageEligibleModel();
+        stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
+        stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
+
+    }
+
+    private void addStickerUsability() {
+
+        int sticker_category_id;
+
+        if (!this.baseController.checkParam("sticker_category_id",this.req,true))
+        {
+            this.baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        else
+        {
+            try
+            {
+                sticker_category_id = Integer.parseInt(req.getParameter("sticker_category_id"));
+            }
+            catch (Exception e)
+            {
+                System.out.println(e);
+                this.baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }
+        }
+
+        StickerUsageEligibleModel stickerUsageEligibleModel = new StickerUsageEligibleModel();
+        stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
+        stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
+        if(stickerUsageEligibleModel.insert()==0)
+        {
+            this.baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
+            this.baseController.serviceResponse.responseStat.status = false;
+            this.pw.print(this.baseController.getResponse());
+            return;
+        }
+        this.baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully";
+        this.baseController.serviceResponse.responseStat.status = false;
+        this.pw.print(this.baseController.getResponse());
+        return;
+
     }
 
     private void getAllFree(boolean pagination){
