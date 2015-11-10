@@ -1,8 +1,5 @@
 package socket;
 
-import helper.ImageHelper;
-import model.datamodel.app.video.Videos;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,8 +26,6 @@ public class ImgTalkServerSocket {
                 System.out.println("Request arrived");
 
                 ServiceThread serviceThread = new ServiceThread(serviceSocket);
-
-
 
                 System.out.println("count :"+count);
                 count++;
