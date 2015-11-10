@@ -83,7 +83,7 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
         return this.id;
     }
 
-    public ArrayList<StickerCategory> getAll(boolean loadSticker) {
+    public ArrayList<StickerCategory> getAll() {
         ArrayList<StickerCategory> stickerCategoryList = new ArrayList<>();
         String                     query               = "SELECT * FROM sticker_category ";
         if (is_paid != -1) {
@@ -103,12 +103,9 @@ public class StickerCategoryModel extends ImageTalkBaseModel {
                 StickerCategory stickerCategory = new StickerCategory();
                 stickerCategory.id = resultSet.getInt("id");
                 stickerCategory.name = resultSet.getString("name");
-                stickerCategory.coverPicPath = resultSet.getString("cover_pic_path");
 
-                if(loadSticker){
-                    stickersModel.setSticker_category_id(stickerCategory.id);
-                    stickerCategory.stickers = stickersModel.getAllByCategoryId();
-                }
+                stickersModel.setSticker_category_id(stickerCategory.id);
+                stickerCategory.stickers = stickersModel.getAllByCategoryId();
 
                 stickerCategoryList.add(stickerCategory);
             }

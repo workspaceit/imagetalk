@@ -85,7 +85,3 @@ ALTER TABLE  `location` ADD  `icon` VARCHAR( 500 )  NULL AFTER  `place_id` ;
 ALTER TABLE  `location` ADD  `name` TEXT NULL AFTER  `icon` ;
 ALTER TABLE  `location` ADD  `google_place_id` VARCHAR( 200 ) NULL AFTER  `name` ;
 
-
-# Date of change 10th Nov 2015
-
-ALTER TABLE  `sticker_category` ADD  `cover_pic_path` TEXT NULL AFTER  `name` ;
