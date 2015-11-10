@@ -46,8 +46,14 @@ public class AppStickersController extends HttpServlet {
         }
 
         switch (url) {
+            case "/app/stickers/get/category":
+                this.getAllFree(true);
+                break;
             case "/app/stickers/get/free":
                 this.getAllFree(true);
+                break;
+            case "/app/stickers/get/paid":
+                this.getAllPaid(true);
                 break;
             case "/app/stickers/get/all/free":
                 this.getAllFree(false);
@@ -114,7 +120,64 @@ public class AppStickersController extends HttpServlet {
         }
 
         stickerCategoryModel.setIs_paid(0);
-        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll();
+        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll(true);
+        this.pw.print(this.baseController.getResponse());
+        return;
+    }
+    private void getAllPaid(boolean pagination){
+        StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
+
+
+        if(pagination){
+            if(this.baseController.checkParam("limit", this.req, true)) {
+                try{
+                    stickerCategoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                }catch (Exception ex){
+                    System.out.println(ex);
+                    this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+                }
+            }else{
+                stickerCategoryModel.limit = 3;
+            }
+
+            if(this.baseController.checkParam("sticker_limit", this.req, true)) {
+                try{
+                    stickerCategoryModel.stickersLimit = Integer.parseInt(this.req.getParameter("sticker_limit").trim());
+                }catch (Exception ex){
+                    System.out.println(ex);
+                    this.baseController.serviceResponse.responseStat.msg = "sticker_limit is not in valid format";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+                }
+            }else{
+                stickerCategoryModel.limit = 6;
+            }
+
+            if(!this.baseController.checkParam("offset", this.req, true)){
+
+                this.baseController.serviceResponse.responseStat.msg = "offset required";
+                this.baseController.serviceResponse.responseStat.status = false;
+                this.pw.print(this.baseController.getResponse());
+                return;
+            }else {
+                try{
+                    stickerCategoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                }catch (Exception ex){
+                    System.out.println(ex);
+                    this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                    this.baseController.serviceResponse.responseStat.status = false;
+                    this.pw.print(this.baseController.getResponse());
+                    return;
+                }
+            }
+        }
+
+        stickerCategoryModel.setIs_paid(1);
+        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll(true);
         this.pw.print(this.baseController.getResponse());
         return;
     }
