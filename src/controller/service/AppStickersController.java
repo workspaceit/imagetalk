@@ -17,10 +17,10 @@ import java.util.ArrayList;
  * Created by mi on 10/13/15.
  */
 public class AppStickersController extends HttpServlet {
-    ImageTalkBaseController baseController;
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
     @Override
     public void init() throws ServletException {
         super.init();
@@ -50,22 +50,22 @@ public class AppStickersController extends HttpServlet {
 
         switch (url) {
             case "/app/stickers/get/free":
-                this.getAllFree(true);
+                pw.print(this.getAllFree(req, true));
                 break;
             case "/app/stickers/get/all/free":
-                this.getAllFree(false);
+                pw.print(this.getAllFree(req, false));
                 break;
             case "/app/stickers/get/paid/category":
                 pw.print(this.getAllPaid(req, false));
                 break;
             case "/app/stickers/get/for/post":
-                pw.print(this.getForPost(req,false));
+                pw.print(this.getForPost(req, false));
                 break;
             case "/app/stickers/add/stickerUsability":
-                this.addStickerUsability();
+                pw.print(this.addStickerUsability(req));
                 break;
             case "/app/stickers/update/stickerUsability":
-                this.updateStickerUsability();
+                pw.print(this.updateStickerUsability(req));
                 break;
             default:
                 break;
@@ -74,16 +74,15 @@ public class AppStickersController extends HttpServlet {
         pw.close();
     }
 
-    private void updateStickerUsability() {
-
+    private String updateStickerUsability(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         int sticker_category_id;
 
-        if (!this.baseController.checkParam("sticker_category_id",req,true))
+        if (!baseController.checkParam("sticker_category_id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else
         {
@@ -94,16 +93,15 @@ public class AppStickersController extends HttpServlet {
             catch (Exception e)
             {
                 System.out.println(e);
-                this.baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         StickerUsageEligibleModel stickerUsageEligibleModel = new StickerUsageEligibleModel();
         stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
-        stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
+        stickerUsageEligibleModel.setApp_login_credential_id(baseController.appCredential.id);
 
         int id = stickerUsageEligibleModel.isExist();
         if(id==0)
@@ -111,54 +109,49 @@ public class AppStickersController extends HttpServlet {
             stickerUsageEligibleModel.setUsage(1);
             if(stickerUsageEligibleModel.insert()==0)
             {
-                this.baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
             else
             {
-                this.baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully with usage=1";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully with usage=1";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         else if(id==1)
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker usability already updated";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker usability already updated";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         stickerUsageEligibleModel.setUsage(1);
         if(stickerUsageEligibleModel.updateStickerUsage())
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker usability Updated Successfully";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker usability Updated Successfully";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else {
-            this.baseController.serviceResponse.responseStat.msg = "sticker usability not updated";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker usability not updated";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
     }
 
-    private void addStickerUsability() {
+    private String addStickerUsability(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         int sticker_category_id;
 
-        if (!this.baseController.checkParam("sticker_category_id",this.req,true))
+        if (!baseController.checkParam("sticker_category_id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else
         {
@@ -169,27 +162,25 @@ public class AppStickersController extends HttpServlet {
             catch (Exception e)
             {
                 System.out.println(e);
-                this.baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "sticker_category_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         StickerUsageEligibleModel stickerUsageEligibleModel = new StickerUsageEligibleModel();
         stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
-        stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
+        stickerUsageEligibleModel.setApp_login_credential_id(baseController.appCredential.id);
         if(stickerUsageEligibleModel.insert()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker usability couldn't insert";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully";
-        this.baseController.serviceResponse.responseStat.status = false;
-        this.pw.print(this.baseController.getResponse());
-        return;
+
+        baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully";
+        baseController.serviceResponse.responseStat.status = false;
+        return baseController.getResponse();
 
     }
     private String getAllPaid(HttpServletRequest req,boolean pagination){
@@ -201,7 +192,7 @@ public class AppStickersController extends HttpServlet {
         if(pagination){
             if(baseController.checkParam("limit", req, true)) {
                 try{
-                    stickerCategoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                    stickerCategoryModel.limit = Integer.parseInt(req.getParameter("limit").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
                     baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
@@ -214,7 +205,7 @@ public class AppStickersController extends HttpServlet {
 
             if(baseController.checkParam("sticker_limit", req, true)) {
                 try{
-                    stickerCategoryModel.stickersLimit = Integer.parseInt(this.req.getParameter("sticker_limit").trim());
+                    stickerCategoryModel.stickersLimit = Integer.parseInt(req.getParameter("sticker_limit").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
                     baseController.serviceResponse.responseStat.msg = "sticker_limit is not in valid format";
@@ -232,7 +223,7 @@ public class AppStickersController extends HttpServlet {
                 return baseController.getResponse();
             }else {
                 try{
-                    stickerCategoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                    stickerCategoryModel.offset = Integer.parseInt(req.getParameter("offset").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
                     baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
@@ -246,63 +237,61 @@ public class AppStickersController extends HttpServlet {
         baseController.serviceResponse.responseData = stickerCategoryModel.getAll(true);
         return baseController.getResponse();
     }
-    private void getAllFree(boolean pagination){
+    private String getAllFree(HttpServletRequest req,boolean pagination){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         StickerCategoryModel stickerCategoryModel = new StickerCategoryModel();
 
 
         if(pagination){
-            if(this.baseController.checkParam("limit", this.req, true)) {
+            if(baseController.checkParam("limit", req, true)) {
                 try{
-                    stickerCategoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                    stickerCategoryModel.limit = Integer.parseInt(req.getParameter("limit").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
-                    this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                    baseController.serviceResponse.responseStat.status = false;
+                    return baseController.getResponse();
                 }
             }else{
                 stickerCategoryModel.limit = 3;
             }
 
-            if(this.baseController.checkParam("sticker_limit", this.req, true)) {
+            if(baseController.checkParam("sticker_limit", req, true)) {
                 try{
-                    stickerCategoryModel.stickersLimit = Integer.parseInt(this.req.getParameter("sticker_limit").trim());
+                    stickerCategoryModel.stickersLimit = Integer.parseInt(req.getParameter("sticker_limit").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
-                    this.baseController.serviceResponse.responseStat.msg = "sticker_limit is not in valid format";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "sticker_limit is not in valid format";
+                    baseController.serviceResponse.responseStat.status = false;
+                    return baseController.getResponse();
                 }
             }else{
                 stickerCategoryModel.limit = 6;
             }
 
-            if(!this.baseController.checkParam("offset", this.req, true)){
+            if(!baseController.checkParam("offset", req, true)){
 
-                this.baseController.serviceResponse.responseStat.msg = "offset required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }else {
                 try{
-                    stickerCategoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                    stickerCategoryModel.offset = Integer.parseInt(req.getParameter("offset").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
-                    this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                    baseController.serviceResponse.responseStat.status = false;
+                    return baseController.getResponse();
                 }
             }
         }
 
         stickerCategoryModel.setIs_paid(0);
-        this.baseController.serviceResponse.responseData = stickerCategoryModel.getAll(true);
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = stickerCategoryModel.getAll(true);
+        return baseController.getResponse();
     }
+
+
     private String getForPost(HttpServletRequest req,boolean pagination){
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         StickersModel stickersModel = new StickersModel();
@@ -314,7 +303,7 @@ public class AppStickersController extends HttpServlet {
                 System.out.println(ex);
                 baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
                 baseController.serviceResponse.responseStat.status = false;
-                return this.baseController.getResponse();
+                return baseController.getResponse();
             }
         }else{
             stickersModel.limit = 30;

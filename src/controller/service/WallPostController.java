@@ -21,10 +21,11 @@ import java.util.HashMap;
  * Created by mi on 10/2/15.
  */
 public class WallPostController extends HttpServlet {
-    ImageTalkBaseController baseController;
+
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -34,16 +35,14 @@ public class WallPostController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
+        PrintWriter pw = res.getWriter();
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
@@ -55,77 +54,77 @@ public class WallPostController extends HttpServlet {
 
         switch (url) {
             case "/app/wallpost/create":
-                this.create();
+                pw.print(this.create(req));
                 break;
             case "/app/wallpost/get/own":
-                this.getOwnPost();
+                pw.print(this.getOwnPost(req));
                 break;
             case "/app/wallpost/get/favorite":
-                this.getFavoritePost();
+                this.getFavoritePost(req);
                 break;
             case "/app/wallpost/get/recent":
-                this.getRecentPost();
+                pw.print(this.getRecentPost(req));
                 break;
             case "/app/wallpost/get/others":
-                this.getOthersPost();
+                pw.print(this.getOthersPost(req));
                 break;
             case "/app/wallpost/test":
-                this.test();
+                pw.print(this.test(req));
                 break;
             case "/app/wallpost/create/comment":
-                this.creatComment();
+                pw.print(this.creatComment(req));
                 break;
             case "/app/wallpost/get/comment":
-                this.getComments(true);
+                pw.print(this.getComments(req, true));
                 break;
             case "/app/wallpost/get/comment/all":
-                this.getComments(false);
+                pw.print(this.getComments(req, false));
                 break;
             case "/app/wallpost/delete/comment":
-                this.deleteComment();
+                pw.print(this.deleteComment(req));
                 break;
             case "/app/wallpost/like":
-                this.likePost();
+                pw.print(this.likePost(req));
                 break;
             case "/app/wallpost/get/likes":
-                this.getLikes();
+                pw.print(this.getLikes(req));
                 break;
             case "/app/wallpost/get/comment/count":
-                this.getCommentCount();
+                pw.print(this.getCommentCount(req));
                 break;
             case "/app/wallpost/add/remove/favourite":
-                this.favourWallPost();
+                pw.print(this.favourWallPost(req));
                 break;
 
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
 
-    public void create(){
+    public String create(HttpServletRequest req){
 
-        System.out.println("description :'"+this.req.getParameter("description")+"'");
-        System.out.println("appCredential.id  :'"+this.baseController.appCredential.id+"'");
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+
+        System.out.println("description :'"+req.getParameter("description")+"'");
+        System.out.println("appCredential.id  :'"+baseController.appCredential.id+"'");
 
         System.out.println("01");
         String imgBase64 = "";
         String fileRelativePath = "";
         ArrayList<Integer> taggedList = new ArrayList<Integer>();
 
-        if(!this.baseController.checkParam("type", this.req, true)){
-            this.baseController.serviceResponse.responseStat.msg = "type required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("type", req, true)){
+            baseController.serviceResponse.responseStat.msg = "type required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-
-            if(this.baseController.checkParam("photo",this.req,true)) {
-                imgBase64 = this.req.getParameter("photo");
+            if(baseController.checkParam("photo",req,true)) {
+                imgBase64 = req.getParameter("photo");
                 fileRelativePath = "";
                 System.out.println("photo received");
-                Pictures pictures = ImageHelper.saveWallPostPicture(imgBase64, this.baseController.appCredential.id);
+                Pictures pictures = ImageHelper.saveWallPostPicture(imgBase64, baseController.appCredential.id);
                 System.out.println("photo Saved");
                 fileRelativePath= pictures.original.path;
                 Gson gson = new Gson();
@@ -133,18 +132,17 @@ public class WallPostController extends HttpServlet {
                 if (fileRelativePath == "") {
                     System.out.println("Unable to save the Image : "+fileRelativePath);
                     // Need roll back
-                    this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
+                    baseController.serviceResponse.responseStat.status = false;
+                    return baseController.getResponse();
                 }
             }
 
 
 
-        if(this.baseController.checkParam("tagged_list", this.req, true)){
+        if(baseController.checkParam("tagged_list", req, true)){
 
-            String tagged_listStr = this.req.getParameter("tagged_list");
+            String tagged_listStr = req.getParameter("tagged_list");
             System.out.println("At tagged_list  ");
             Gson gson = new Gson();
             try{
@@ -160,25 +158,23 @@ public class WallPostController extends HttpServlet {
                 }
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "tagged_list not in format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "tagged_list not in format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
-        if(taggedList.contains(this.baseController.appCredential.id)){
-            this.baseController.serviceResponse.responseStat.msg = "You are not allowed to tag you self";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(taggedList.contains(baseController.appCredential.id)){
+            baseController.serviceResponse.responseStat.msg = "You are not allowed to tag you self";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         /*===============  Insert location here ==============*/
         LocationModel locationModel = new LocationModel();
-        if(this.baseController.checkParam("places", this.req, true)){
+        if(baseController.checkParam("places", req, true)){
             System.out.println("At location  ");
-            String locationStr = this.req.getParameter("places");
+            String locationStr = req.getParameter("places");
 
             Gson gson = new Gson();
             try{
@@ -194,18 +190,16 @@ public class WallPostController extends HttpServlet {
                 locationModel.setFormatted_address(places.formattedAddress);
                 locationModel.setCountry(places.countryName);
                 if(locationModel.insert()==0){
-                    this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "Internal server error";
+                    baseController.serviceResponse.responseStat.status = false;
+                    return baseController.getResponse();
 
                 }
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "location is not in format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "location is not in format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         /*======================================================*/
@@ -215,20 +209,19 @@ public class WallPostController extends HttpServlet {
 
         WallPostModel wallPostModel = new WallPostModel();
 
-        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
 
-        if(this.baseController.checkParam("description", this.req, true)){
-            wallPostModel.setDescrption(this.req.getParameter("description"));
+        if(baseController.checkParam("description", req, true)){
+            wallPostModel.setDescrption(req.getParameter("description"));
         }
 
         try{
-            wallPostModel.setType(Integer.parseInt(this.req.getParameter("type")));
+            wallPostModel.setType(Integer.parseInt(req.getParameter("type")));
         }catch (Exception ex){
             ex.printStackTrace();
-            this.baseController.serviceResponse.responseStat.msg = "type int required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "type int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
 
         }
 
@@ -239,10 +232,9 @@ public class WallPostController extends HttpServlet {
 
 
         if(wallPostModel.insert()==0){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         /* ============== Insert Tagged user =============== */
@@ -255,302 +247,295 @@ public class WallPostController extends HttpServlet {
             tagListModel.insert();
         }
         /*===================================================*/
-        this.baseController.serviceResponse.responseStat.msg = "Wall post created";
-        this.baseController.serviceResponse.responseData = wallPostModel.getById();
-        this.pw.print(this.baseController.getResponse());
-        System.out.println("Response Sent");
-        return;
-    }
-    private void getRecentPost(){
+        baseController.serviceResponse.responseStat.msg = "Wall post created";
+        baseController.serviceResponse.responseData = wallPostModel.getById();
 
+        System.out.println("Response Sent");
+        return baseController.getResponse();
+    }
+    private String getRecentPost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         WallPostModel wallPostModel = new WallPostModel();
 
-
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             wallPostModel.limit = 3;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                wallPostModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
-        wallPostModel.setCurrentUserId(this.baseController.appCredential.id);
+        wallPostModel.setCurrentUserId(baseController.appCredential.id);
         ArrayList<WallPost> wallPostList =  wallPostModel.getAllRecent();
 
-        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
-        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  wallPostList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        baseController.serviceResponse.responseData =  wallPostList;
+        return baseController.getResponse();
     }
-    private void getOwnPost(){
 
+    private String getOwnPost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         WallPostModel wallPostModel = new WallPostModel();
 
-
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             wallPostModel.limit = 3;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                wallPostModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
-        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
         ArrayList<WallPost> wallPostList =  wallPostModel.getByOwner_id();
 
-        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
-        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  wallPostList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        baseController.serviceResponse.responseData =  wallPostList;
+        return baseController.getResponse();
     }
-    private void getFavoritePost(){
 
+    private String getFavoritePost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         WallPostModel wallPostModel = new WallPostModel();
 
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+
+                return baseController.getResponse();
             }
         }else{
             wallPostModel.limit = 3;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                wallPostModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
-        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
         ArrayList<WallPost> wallPostList =  wallPostModel.getAllFavoriteByOwnerId();
 
-        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
-        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  wallPostList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        baseController.serviceResponse.responseData =  wallPostList;
+        return baseController.getResponse();
     }
-    private void getOthersPost(){
+    private String getOthersPost(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         WallPostModel wallPostModel = new WallPostModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                wallPostModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             wallPostModel.limit = 3;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                wallPostModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                wallPostModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }
 
 
-        if(!this.baseController.checkParam("other_app_credential_id", this.req, true)){
+        if(!baseController.checkParam("other_app_credential_id", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "other_app_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "other_app_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }else{
             try{
-                wallPostModel.setOwner_id(Integer.parseInt(this.req.getParameter("other_app_credential_id")));
+                wallPostModel.setOwner_id(Integer.parseInt(req.getParameter("other_app_credential_id")));
             }catch (Exception ex){
-                this.baseController.serviceResponse.responseStat.msg = "other_app_credential_id not integer required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "other_app_credential_id not integer required";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }
-        wallPostModel.setCurrentUserId(this.baseController.appCredential.id);
+        wallPostModel.setCurrentUserId(baseController.appCredential.id);
         ArrayList<WallPost> wallPostList =  wallPostModel.getByOwner_id();
-        this.baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
-        this.baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  wallPostList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
+        baseController.serviceResponse.responseStat.status = (wallPostList.size()<=0)?false:true;
+        baseController.serviceResponse.responseData =  wallPostList;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
     }
 
 
 
-    public void creatComment(){
-        if(!this.baseController.checkParam("post_id", this.req, true)){
+    public String creatComment(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("post_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        if(!this.baseController.checkParam("comment", this.req, true)){
+        if(!baseController.checkParam("comment", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "comment required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "comment required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         PostCommentModel postCommentModel = new PostCommentModel();
-        postCommentModel.setComment(this.req.getParameter("comment"));
-        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
+        postCommentModel.setComment(req.getParameter("comment"));
+        postCommentModel.setCommenter_id(baseController.appCredential.id);
 
         try{
-            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+            postCommentModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setId(postCommentModel.getPost_id());
 
         if(!wallPostModel.isIdExist()){
-            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         if(postCommentModel.insert()==0){
-            this.baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
 
 
-        this.baseController.serviceResponse.responseStat.msg = "Comment posted";
-        this.baseController.serviceResponse.responseData = postCommentModel.getByPostId();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Comment posted";
+        baseController.serviceResponse.responseData = postCommentModel.getByPostId();
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    public void likePost(){
-        if(!this.baseController.checkParam("post_id", this.req, true)){
+    public String likePost(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        if(!baseController.checkParam("post_id",req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         PostLikeModel postLikeModel = new PostLikeModel();
-        postLikeModel.setLiker_id(this.baseController.appCredential.id);
+        postLikeModel.setLiker_id(baseController.appCredential.id);
         try{
 
-            postLikeModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+            postLikeModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         String msg = "";
         boolean isLiked = false;
         if(postLikeModel.isAlreadyLiked()){
             if(postLikeModel.delete()==0){
-                this.baseController.serviceResponse.responseStat.msg = "Database error on delete";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Database error on delete";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
             msg = "You have undo your like";
         }else{
             if(postLikeModel.insert()==0){
-                this.baseController.serviceResponse.responseStat.msg = "Unable to like the post,database error";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Unable to like the post,database error";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }else{
                 msg = "Successfully liked";
                 isLiked = true;
@@ -561,159 +546,155 @@ public class WallPostController extends HttpServlet {
         respObj.addProperty("likeCount", postLikeModel.getLikeCountByPostId());
         respObj.addProperty("isLiked",isLiked);
 
-        this.baseController.serviceResponse.responseStat.msg = msg;
-        this.baseController.serviceResponse.responseData = respObj;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = msg;
+        baseController.serviceResponse.responseData = respObj;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    public void getLikes(){
+    public String getLikes(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
-        if(!this.baseController.checkParam("post_id", this.req, true)){
+        if(!baseController.checkParam("post_id", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         PostLikeModel postLikeModel = new PostLikeModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                postLikeModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                postLikeModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }else{
             postLikeModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset",req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }else {
             try{
-                postLikeModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                postLikeModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }
 
-
         try{
 
-            postLikeModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+            postLikeModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseData = postLikeModel.getLikersByPostId();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = postLikeModel.getLikersByPostId();
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    public void getCommentCount(){
+    public String getCommentCount(HttpServletRequest req){
 
-
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         PostCommentModel postCommentModel = new PostCommentModel();
 
-        if(!this.baseController.checkParam("post_id", this.req, true)){
-
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("post_id", req, true)){
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-
-
         try{
-            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+            postCommentModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         HashMap<String,Integer> commnetCountResponse = new HashMap();
         commnetCountResponse.put("likeCount",postCommentModel.getCountByPostId());
 
-        this.baseController.serviceResponse.responseData = commnetCountResponse;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = commnetCountResponse;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    public void getComments(boolean pagination){
+    public String getComments(HttpServletRequest req, boolean pagination){
 
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
+        if(!baseController.checkParam("post_id", req, true)){
 
-
-        if(!this.baseController.checkParam("post_id", this.req, true)){
-
-            this.baseController.serviceResponse.responseStat.msg = "post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         PostCommentModel postCommentModel = new PostCommentModel();
 
         try{
-            postCommentModel.setPost_id(Integer.parseInt(this.req.getParameter("post_id")));
+            postCommentModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "post_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         if(pagination){
-            if(this.baseController.checkParam("limit", this.req, true)) {
+            if(baseController.checkParam("limit", req, true)) {
                 try{
-                    postCommentModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                    postCommentModel.limit = Integer.parseInt(req.getParameter("limit").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
-                    this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                    baseController.serviceResponse.responseStat.status = false;
+                    //this.pw.print(this.baseController.getResponse());
+                    return baseController.getResponse();
                 }
             }else{
                 postCommentModel.limit = 3;
             }
 
-            if(!this.baseController.checkParam("offset", this.req, true)){
+            if(!baseController.checkParam("offset", req, true)){
 
-                this.baseController.serviceResponse.responseStat.msg = "offset required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset required";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }else {
                 try{
-                    postCommentModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                    postCommentModel.offset = Integer.parseInt(req.getParameter("offset").trim());
                 }catch (Exception ex){
                     System.out.println(ex);
-                    this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                    this.baseController.serviceResponse.responseStat.status = false;
-                    this.pw.print(this.baseController.getResponse());
-                    return;
+                    baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                    baseController.serviceResponse.responseStat.status = false;
+                    //this.pw.print(this.baseController.getResponse());
+                    return baseController.getResponse();
                 }
             }
         }
@@ -723,155 +704,145 @@ public class WallPostController extends HttpServlet {
         wallPostModel.setId(postCommentModel.getPost_id());
 
         if(!wallPostModel.isIdExist()){
-            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         ArrayList<PostComment> postComments = new ArrayList();
         postComments  = postCommentModel.getByPostId();
-        this.baseController.serviceResponse.responseStat.status = (postComments.size()>0);
-        this.baseController.serviceResponse.responseStat.msg = (postComments.size()>0)?"":"No comment found";
-        this.baseController.serviceResponse.responseData = postComments;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.status = (postComments.size()>0);
+        baseController.serviceResponse.responseStat.msg = (postComments.size()>0)?"":"No comment found";
+        baseController.serviceResponse.responseData = postComments;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    public void deleteComment(){
+    public String deleteComment(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
+        if(!baseController.checkParam("comment_id", req, true)){
 
-
-
-        if(!this.baseController.checkParam("comment_id", this.req, true)){
-
-            this.baseController.serviceResponse.responseStat.msg = "comment_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "comment_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         PostCommentModel postCommentModel = new PostCommentModel();
 
         try{
-            postCommentModel.setId(Integer.parseInt(this.req.getParameter("comment_id")));
+            postCommentModel.setId(Integer.parseInt(req.getParameter("comment_id")));
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "comment_id int format required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "comment_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-        postCommentModel.setCommenter_id(this.baseController.appCredential.id);
+        postCommentModel.setCommenter_id(baseController.appCredential.id);
 
         WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setId(postCommentModel.getPostIdById());
-        wallPostModel.setOwner_id(this.baseController.appCredential.id);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
 
         if(!wallPostModel.isIdExist()){
-            this.baseController.serviceResponse.responseStat.msg = "Post id does not exist";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         boolean commenter = false;
         if(!postCommentModel.isCommenter()){
-            this.baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-
-            return;
+            baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
             commenter = true;
         }
 
         if(!commenter && !wallPostModel.isWallPostOwner()){
-            this.baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "You are not owner nor the commenter";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         postCommentModel.startTransaction();
 
         if(postCommentModel.deleteById()==0){
             postCommentModel.rollBack();
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
         postCommentModel.commitTransaction();
 
-        this.baseController.serviceResponse.responseStat.msg ="Comment deleted";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg ="Comment deleted";
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
-    private void test(){
-        if(!this.baseController.checkParam("phone_number", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Phone number required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+    private String test(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        if(!baseController.checkParam("phone_number", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "Phone number required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        if(!this.baseController.checkParam("token",this.req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Token required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("token",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "Token required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        if(!this.baseController.checkParam("first_name",this.req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Name required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("first_name",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "Name required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         ActivationModel activationModel = new ActivationModel();
 
-        if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
-            this.baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!activationModel.setPhoneNumber(req.getParameter("phone_number"))){
+            baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-        System.out.println("'" + this.req.getParameter("token")+"'");
-        System.out.println("'"+this.req.getParameter("phone_number")+"'");
-        activationModel.setActivationCode(this.req.getParameter("token"));
+        System.out.println("'" + req.getParameter("token")+"'");
+        System.out.println("'"+req.getParameter("phone_number")+"'");
+        activationModel.setActivationCode(req.getParameter("token"));
 
         if(!activationModel.isTokenValid()){
-            this.baseController.serviceResponse.responseStat.msg = "Token miss matched";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Token miss matched";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         UserInfModel userInfModel = new UserInfModel();
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         String imgBase64 = "";
 
-        userInfModel.setF_name(this.req.getParameter("first_name"));
-        userInfModel.setL_name(this.req.getParameter("last_name"));
+        userInfModel.setF_name(req.getParameter("first_name"));
+        userInfModel.setL_name(req.getParameter("last_name"));
 
          /*  transaction started */
 
         //  userInfModel.startTransaction();
         userInfModel.insertData();
         if(userInfModel.getId()==0){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         //  appLoginCredentialModel.startTransaction();
         appLoginCredentialModel.setU_id(userInfModel.getId());
         appLoginCredentialModel.setPhone_number(activationModel.getPhoneNumber());
         if(appLoginCredentialModel.isNumberExist()){
-            this.baseController.serviceResponse.responseStat.msg = "Number already used";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Number already used";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
          /*  transaction started */
 
@@ -880,13 +851,12 @@ public class WallPostController extends HttpServlet {
         System.out.println("02");
         if(appLoginCredentialModel.getId()==0){
             //       userInfModel.rollBack();
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        if(this.baseController.checkParam("photo",this.req,true)) {
-            imgBase64 = this.req.getParameter("photo");
+        if(baseController.checkParam("photo",req,true)) {
+            imgBase64 = req.getParameter("photo");
             Pictures pictures = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
             Gson gson = new Gson();
             String fileName =gson.toJson(pictures);
@@ -897,10 +867,10 @@ public class WallPostController extends HttpServlet {
                 //    userInfModel.rollBack();
                 //    appLoginCredentialModel.rollBack();
 
-                this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.this.ba.getResponse());
+                return baseController.getResponse();
             }
 
             userInfModel.setPicPath(fileName);
@@ -910,10 +880,10 @@ public class WallPostController extends HttpServlet {
                 //    userInfModel.rollBack();
                 //    appLoginCredentialModel.rollBack();
 
-                this.baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.this.ba.getResponse());
+                return baseController.getResponse();
             }
         }
         /* Commit database transaction */
@@ -922,49 +892,50 @@ public class WallPostController extends HttpServlet {
         // appLoginCredentialModel.commitTransaction();
 
 
-        this.baseController.serviceResponse.responseStat.msg = "Registration success";
-        this.baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Registration success";
+        baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
+        //this.pw.print(this.this.ba.getResponse());
+        return baseController.getResponse();
     }
-    private void favourWallPost(){
-        if(!this.baseController.checkParam("wall_post_id", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "wall_post_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+    private String favourWallPost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        if(!baseController.checkParam("wall_post_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
 
 
         WallPostFavoriteModel wallPostFavoriteModel = new WallPostFavoriteModel();
 
-        wallPostFavoriteModel.setOwner_id(this.baseController.appCredential.id);
+        wallPostFavoriteModel.setOwner_id(baseController.appCredential.id);
 
         try{
-            wallPostFavoriteModel.setWall_post_id(Integer.parseInt(this.req.getParameter("wall_post_id")));
+            wallPostFavoriteModel.setWall_post_id(Integer.parseInt(req.getParameter("wall_post_id")));
         }catch (Exception ex){
             ex.printStackTrace();
-            this.baseController.serviceResponse.responseStat.msg = "wall_post_id int required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "wall_post_id int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         wallPostFavoriteModel.changeFavoriteState();
         if(wallPostFavoriteModel.errorObj.errStatus){
-            this.baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.errorObj.msg;
-            this.baseController.serviceResponse.responseStat.status =  !wallPostFavoriteModel.errorObj.errStatus;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.errorObj.msg;
+            baseController.serviceResponse.responseStat.status =  !wallPostFavoriteModel.errorObj.errStatus;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         HashMap<String,Object> respObj = new HashMap<>();
 
         respObj.put("isFavorite",wallPostFavoriteModel.isFavorite);
-        this.baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.operationStatus.msg;
-        this.baseController.serviceResponse.responseData = respObj;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.operationStatus.msg;
+        baseController.serviceResponse.responseData = respObj;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
 }

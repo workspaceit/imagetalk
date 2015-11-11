@@ -298,7 +298,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                 " app_login_credential.created_date as app_login_credential_c_date,job.*" +
                 "  from " + this.tableName + " " +
-                " join app_login_credential on  app_login_credential.id  = " + this.tableName + ".owner_id  "+
+                " join app_login_credential on  app_login_credential.id  = " + this.tableName + ".contact_id  "+
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
