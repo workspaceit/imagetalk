@@ -34,6 +34,7 @@ public class ContactController extends HttpServlet {
         this.req = req;
         this.res = res;
         res.setContentType("application/json");
+
         this.baseController = new ImageTalkBaseController();
         this.pw = res.getWriter();
 

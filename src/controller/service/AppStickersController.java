@@ -78,7 +78,7 @@ public class AppStickersController extends HttpServlet {
 
         int sticker_category_id;
 
-        if (!this.baseController.checkParam("sticker_category_id",this.req,true))
+        if (!this.baseController.checkParam("sticker_category_id",req,true))
         {
             this.baseController.serviceResponse.responseStat.msg = "sticker_category_id required";
             this.baseController.serviceResponse.responseStat.status = false;
@@ -307,11 +307,9 @@ public class AppStickersController extends HttpServlet {
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         StickersModel stickersModel = new StickersModel();
 
-
-
-        if(baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                stickersModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                stickersModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
                 baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
@@ -322,14 +320,14 @@ public class AppStickersController extends HttpServlet {
             stickersModel.limit = 30;
         }
 
-        if(!baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
             baseController.serviceResponse.responseStat.msg = "offset required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }else {
             try{
-                stickersModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                stickersModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
                 baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
