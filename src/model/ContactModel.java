@@ -369,7 +369,10 @@ public class ContactModel extends ImageTalkBaseModel {
         }
         catch (Exception e)
         {
-
+            e.printStackTrace();
+        }
+        finally {
+            this.closeConnection();
         }
         return contact;
     }
