@@ -106,7 +106,7 @@ public class ContactController extends HttpServlet {
                     contacts.add(contact);
                 }
             } catch (Exception ex){
-                System.out.println(ex);
+                ex.printStackTrace();
                 this.baseController.serviceResponse.responseStat.msg = "contacts is not in valid format";
                 this.baseController.serviceResponse.responseStat.status = false;
                 this.pw.print(this.baseController.getResponse());
@@ -118,9 +118,12 @@ public class ContactController extends HttpServlet {
         appLoginCredentialModel.setId(this.baseController.appCredential.id);
         appLoginCredentialModel.setContactList(contacts);
 
-
-        this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getMatchedPhoneNumber();
+        ArrayList<AppCredential> respObj = appLoginCredentialModel.getMatchedPhoneNumber();
+        this.baseController.serviceResponse.responseData = respObj ;
         this.pw.print(this.baseController.getResponse());
+
+        System.out.println("respObj Size" + respObj.size());
+        System.out.println("respObj str"+respObj.toString());
         return;
 
     }

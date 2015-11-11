@@ -111,7 +111,7 @@ public class StickersModel extends ImageTalkBaseModel {
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         }
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try {
@@ -130,6 +130,7 @@ public class StickersModel extends ImageTalkBaseModel {
         }finally {
             this.closeConnection();
         }
+        System.out.println("END OF FUNCTION");
         return stickerList;
     }
     public ArrayList<Stickers> getAllForPost(){

@@ -608,9 +608,11 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         ArrayList<AppCredential> appCredentialList = new ArrayList<>();
         String contactIdIn = "";
         int i = 0;
+        System.out.println("contactList Size : "+contactList.size());
+
         for(String contact : this.contactList){
             i++;
-            contactIdIn += "'"+contact+"'";
+            contactIdIn += contact;
             if(i<this.contactList.size()){
                 contactIdIn +="|";
             }
@@ -630,13 +632,13 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                 " join user_inf on user_inf.id = app_login_credential.u_id  " +
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
-                " where app_login_credential.phone_number REGEXP  (" + contactIdIn+" ) ";
+                " where app_login_credential.phone_number REGEXP  ('" + contactIdIn+"') ";
         String contactIdStr = contactModel.getContactInStrArray();
         if(contactIdStr!=""){
             query += " and app_login_credential.id not in ("+contactIdStr +")";
         }
 
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
 
@@ -690,6 +692,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             }
         } catch (Exception ex) {
             System.out.println(ex);
+        }finally {
+            this.closeConnection();
         }
         return appCredentialList;
     }
