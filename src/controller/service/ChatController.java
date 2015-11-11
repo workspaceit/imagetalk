@@ -21,10 +21,10 @@ import java.util.ArrayList;
  * Project Name:ImageTalk
  */
 public class ChatController extends HttpServlet {
-    ImageTalkBaseController baseController;
+   /* ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
     Gson gson;
 
     @Override
@@ -33,13 +33,14 @@ public class ChatController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        this.req = req;
-        this.res = resp;
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+       /* this.req = req;
+        this.res = resp;*/
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
         this.gson = new Gson();
 
@@ -49,75 +50,73 @@ public class ChatController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
         switch (url)
         {
             case "/app/user/chat/add":
-                this.addchat();
-                break;
-            case "/app/user/chat/remove":
-                this.remvoeChat();
+                pw.print(this.addchat(req));
                 break;
             case "/app/user/chat/update":
-                this.updateReadStatus();
-                break;
-            case "/app/user/chat/search":
-                this.searchChat();
+                pw.print(this.updateReadStatus(req));
                 break;
             case "/app/user/chat/show":
-                this.showChat();
+                pw.print(this.showChat(req));
                 break;
             case "/app/user/chat/showPrevious":
-                this.showPreviousChat();
+                pw.print(this.showPreviousChat(req));
                 break;
             case "/app/user/chat/showLatest":
-                this.showLatest();
+                pw.print(this.showLatest(req));
                 break;
             default:
                 break;
         }
     }
 
-    private void showLatest() {
+    private String showLatest(HttpServletRequest req) {
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
-        chatHistoryModel.setFrom(this.baseController.appCredential.id);
-        ArrayList<ChatHistory> chatWithContactArrayList = chatHistoryModel.getChatsWithContact(this.baseController.appCredential.id);
+        chatHistoryModel.setFrom(baseController.appCredential.id);
+        ArrayList<ChatHistory> chatWithContactArrayList = chatHistoryModel.getChatsWithContact(baseController.appCredential.id);
 
         if (chatWithContactArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "NO Data received";
-            this.baseController.serviceResponse.responseStat.status = true;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "NO Data received";
+            baseController.serviceResponse.responseStat.status = true;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "Data received";
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseData = chatWithContactArrayList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+
+        baseController.serviceResponse.responseStat.msg = "Data received";
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseData = chatWithContactArrayList;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
 
 
-    private void showPreviousChat() {
+    private String showPreviousChat(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         int to;
         int duration;
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
 
-        if(!this.baseController.checkParam("to",this.req,true))
+        if(!baseController.checkParam("to",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "receiver id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "receiver id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         else
         {
@@ -126,20 +125,20 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "receiver id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "receiver id must be int";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
-        if(!this.baseController.checkParam("duration",this.req,true))
+        if(!baseController.checkParam("duration",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "duration for last chats is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "duration for last chats is required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         else
         {
@@ -148,82 +147,83 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "duration must be int type";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "duration must be int type";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
         if(duration>5000 || duration<1)
         {
-            this.baseController.serviceResponse.responseStat.msg = "duration can't be negative or greater than 13Years";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "duration can't be negative or greater than 13Years";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                chatHistoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                chatHistoryModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }else{
             chatHistoryModel.limit = 5;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("offset", req, true)){
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+           // this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }else {
             try{
-                chatHistoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                chatHistoryModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }
 
-        chatHistoryModel.setFrom(this.baseController.appCredential.id);
+        chatHistoryModel.setFrom(baseController.appCredential.id);
         chatHistoryModel.setTo(to);
         ArrayList<Chat> previousChatArrayList = chatHistoryModel.getPreviousChatHistory(duration);
         if(previousChatArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "No record found!";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "No record found!";
+            baseController.serviceResponse.responseStat.status = false;
+           // this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseStat.msg = "Records Found";
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseData = previousChatArrayList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Records Found";
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseData = previousChatArrayList;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
 
-    private void showChat() {
+    private String showChat(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         int to;
 
-        if(!this.baseController.checkParam("to",this.req,true))
+        if(!baseController.checkParam("to",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "receiver id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "receiver id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         else
         {
@@ -232,62 +232,62 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "receiver id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "receiver id must be int";
+                baseController.serviceResponse.responseStat.status = false;
+               // this.pw.print(this.baseController.getResponse());
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                chatHistoryModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                chatHistoryModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }else{
-            chatHistoryModel.limit = 5;
+            chatHistoryModel.limit = 15;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("offset", req, true)){
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+           // this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }else {
             try{
-                chatHistoryModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                chatHistoryModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
+                return baseController.getResponse();
             }
         }
 
 
-        chatHistoryModel.setFrom(this.baseController.appCredential.id);
+        chatHistoryModel.setFrom(baseController.appCredential.id);
         chatHistoryModel.setTo(to);
         ArrayList<Chat> chatArrayList = chatHistoryModel.getChatHistory();
         if(chatArrayList.size()==0)
         {
-            this.baseController.serviceResponse.responseStat.msg = "No record found!";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "No record found!";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseData = chatArrayList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseData = chatArrayList;
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
 
     }
 
@@ -295,16 +295,17 @@ public class ChatController extends HttpServlet {
 
     }
 
-    private void updateReadStatus() {
+    private String updateReadStatus(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         int read_status=0;
         int c_id;
-        if(!this.baseController.checkParam("id",this.req,true))
+        if(!baseController.checkParam("id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "Chat id is required to update";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Chat id is required to update";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
         else
         {
@@ -313,24 +314,24 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "chat id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "chat id must be int";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
-        if(this.baseController.checkParam("read_status",this.req,true))
+        if(baseController.checkParam("read_status",req,true))
         {
             try{
                 read_status = Integer.parseInt(req.getParameter("read_status"));
             }
             catch (Exception e){
-                this.baseController.serviceResponse.responseStat.msg = "read_status must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "read_status must be int";
+                baseController.serviceResponse.responseStat.status = false;
+                //this.pw.print(this.baseController.getResponse());
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
@@ -339,22 +340,20 @@ public class ChatController extends HttpServlet {
         chatHistoryModel.setRead_status(read_status);
         if(!chatHistoryModel.updateReadStatus())
         {
-            this.baseController.serviceResponse.responseStat.msg = "read_status not update ";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "read_status not update ";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "read_status updated successfully ";
-        this.baseController.serviceResponse.responseStat.status = false;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "read_status updated successfully ";
+        baseController.serviceResponse.responseStat.status = false;
+        return baseController.getResponse();
     }
 
-    private void remvoeChat() {
 
-    }
+    private String addchat(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
-    private void addchat() {
         String chat_id;
         int to;
         int from;
@@ -364,12 +363,11 @@ public class ChatController extends HttpServlet {
         int type;
         String created_date;
 
-        if(!this.baseController.checkParam("chat_id",this.req,true))
+        if(!baseController.checkParam("chat_id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "chat id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "chat id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else {
             try {
@@ -377,21 +375,19 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "chat sender id must be long";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "chat sender id must be long";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
 
-        if(!this.baseController.checkParam("to",this.req,true))
+        if(!baseController.checkParam("to",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "chat sender id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "chat sender id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else {
             try {
@@ -399,20 +395,18 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "chat sender id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "chat sender id must be int";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
-        if(!this.baseController.checkParam("from",this.req,true))
+        if(!baseController.checkParam("from",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "chat receiver id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "chat receiver id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else {
             try {
@@ -420,47 +414,45 @@ public class ChatController extends HttpServlet {
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "chat receiver id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "chat receiver id must be int";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
-        if(this.baseController.checkParam("chat_text",this.req,true))
+        if(baseController.checkParam("chat_text",req,true))
         {
             chat_text = req.getParameter("chat_text");
         }
         else
             chat_text = "";
 
-        if(this.baseController.checkParam("extra",this.req,true))
+        if(baseController.checkParam("extra",req,true))
         {
             extra = req.getParameter("extra");
         }
         else
             extra = "";
 
-        if(this.baseController.checkParam("media_path",this.req,true))
+        if(baseController.checkParam("media_path",req,true))
         {
             media_path = req.getParameter("media_path");
         }
         else
             media_path = "";
 
-        if(this.baseController.checkParam("type",this.req,true))
+        if(baseController.checkParam("type",req,true))
         {
             try {
                 type = Integer.parseInt(req.getParameter("type"));
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "Type should be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "Type should be int";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
 
         }
@@ -479,15 +471,13 @@ public class ChatController extends HttpServlet {
 
         if(chatHistoryModel.insert()==0)
         {
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "Chat added successfully";
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Chat added successfully";
+        baseController.serviceResponse.responseStat.status = true;
+        return baseController.getResponse();
 
 
     }

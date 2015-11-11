@@ -17,12 +17,20 @@ public class ImageTalkBaseController {
     private Gson gson            = null;
 
 
+
     public ImageTalkBaseController() {
         this.gson = new Gson();
         this.serviceResponse = new ServiceResponse();
         this.appCredential = new AppCredential();
     }
+    public ImageTalkBaseController(HttpServletRequest req) {
+        this.gson = new Gson();
+        this.serviceResponse = new ServiceResponse();
+        this.appCredential = new AppCredential();
 
+        // Initilize App Credential Id
+        isAppSessionValid(req);
+    }
     public String getResponse() {
         return this.gson.toJson(this.serviceResponse);
     }
