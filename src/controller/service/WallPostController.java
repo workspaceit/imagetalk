@@ -104,7 +104,7 @@ public class WallPostController extends HttpServlet {
 
     public String create(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         System.out.println("description :'"+req.getParameter("description")+"'");
         System.out.println("appCredential.id  :'"+baseController.appCredential.id+"'");
@@ -297,7 +297,7 @@ public class WallPostController extends HttpServlet {
 
     private String getOwnPost(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         WallPostModel wallPostModel = new WallPostModel();
 
         if(baseController.checkParam("limit", req, true)) {
@@ -340,7 +340,7 @@ public class WallPostController extends HttpServlet {
 
     private String getFavoritePost(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         WallPostModel wallPostModel = new WallPostModel();
 
 
@@ -446,7 +446,7 @@ public class WallPostController extends HttpServlet {
 
 
     public String creatComment(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         if(!baseController.checkParam("post_id", req, true)){
 
@@ -500,7 +500,7 @@ public class WallPostController extends HttpServlet {
 
     }
     public String likePost(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         if(!baseController.checkParam("post_id",req, true)){
 
             baseController.serviceResponse.responseStat.msg = "post_id required";
@@ -553,7 +553,7 @@ public class WallPostController extends HttpServlet {
 
     }
     public String getLikes(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         if(!baseController.checkParam("post_id", req, true)){
 
@@ -614,7 +614,7 @@ public class WallPostController extends HttpServlet {
     }
     public String getCommentCount(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         PostCommentModel postCommentModel = new PostCommentModel();
 
@@ -644,7 +644,7 @@ public class WallPostController extends HttpServlet {
     }
     public String getComments(HttpServletRequest req, boolean pagination){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         if(!baseController.checkParam("post_id", req, true)){
 
@@ -719,7 +719,7 @@ public class WallPostController extends HttpServlet {
 
     }
     public String deleteComment(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         if(!baseController.checkParam("comment_id", req, true)){
 
@@ -786,7 +786,7 @@ public class WallPostController extends HttpServlet {
 
     }
     private String test(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         if(!baseController.checkParam("phone_number", req, true)) {
             baseController.serviceResponse.responseStat.msg = "Phone number required";
             baseController.serviceResponse.responseStat.status = false;
@@ -899,7 +899,7 @@ public class WallPostController extends HttpServlet {
     }
     private String favourWallPost(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         if(!baseController.checkParam("wall_post_id", req, true)) {
             baseController.serviceResponse.responseStat.msg = "wall_post_id required";
             baseController.serviceResponse.responseStat.status = false;

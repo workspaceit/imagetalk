@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -187,7 +188,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
-                " ORDER BY created_date ASC";
+                " ORDER BY created_date DESC";
 
         if(this.limit>0)
         {
@@ -226,6 +227,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }finally {
             this.closeConnection();
         }
+
+        Collections.reverse(chatList);
         return chatList;
     }
     public ArrayList<Chat> getChatHistory(int myId,int receiver)
