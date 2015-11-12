@@ -187,7 +187,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
-                " ORDER BY created_date DESC";
+                " ORDER BY created_date ASC";
 
         if(this.limit>0)
         {
