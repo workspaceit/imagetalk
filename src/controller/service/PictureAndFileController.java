@@ -7,6 +7,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.*;
 import java.net.URLDecoder;
 
@@ -14,10 +15,10 @@ import java.net.URLDecoder;
  * Created by mi on 10/7/15.
  */
 public class PictureAndFileController extends HttpServlet {
-    ImageTalkBaseController baseController;
+   /* ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -27,11 +28,9 @@ public class PictureAndFileController extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-
+        PrintWriter pw = res.getWriter();
         String url = req.getRequestURI().toString();
 
         if (url.endsWith("/")) {
@@ -42,12 +41,13 @@ public class PictureAndFileController extends HttpServlet {
 
         switch (url) {
             default:
-                this.readPicture();
+                this.readPicture(req,res);
                 break;
         }
 
     }
-    private void readPicture(){
+    private void readPicture(HttpServletRequest req, HttpServletResponse res){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         ServletOutputStream out = null;
         InputStream in = null;
 
@@ -55,19 +55,19 @@ public class PictureAndFileController extends HttpServlet {
 // do the following in a finally block:
         try {
 
-            if(!this.baseController.checkParam("p", this.req, true)){
+            if(!baseController.checkParam("p", req, true)){
                 return;
             }
-            out = this.res.getOutputStream();
-            System.out.println(this.req.getParameter("p"));
-            picRelativePath = URLDecoder.decode(this.req.getParameter("p"), "UTF-8");
+            out = res.getOutputStream();
+            System.out.println(req.getParameter("p"));
+            picRelativePath = URLDecoder.decode(req.getParameter("p"), "UTF-8");
             System.out.println(picRelativePath);
             in = new FileInputStream(ImageHelper.getGlobalPath()+picRelativePath);
             String mimeType = "image/jpeg";
             byte[] bytes = new byte[1024];
             int bytesRead;
 
-            this.res.setContentType(mimeType);
+            res.setContentType(mimeType);
 
             while ((bytesRead = in.read(bytes)) != -1) {
                 out.write(bytes, 0, bytesRead);

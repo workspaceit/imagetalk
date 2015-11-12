@@ -1,14 +1,8 @@
 package controller.service;
 
-import com.google.gson.*;
-import controller.thirdparty.google.geoapi.GoogleGeoApi;
-import helper.ImageHelper;
 import model.*;
-import model.datamodel.app.Places;
-import model.datamodel.app.StickerCategory;
 
 import model.datamodel.app.Stickers;
-import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +13,6 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 /**
  * Created by mi on 10/2/15.
@@ -30,10 +23,10 @@ import java.util.TimeZone;
  */
 public class TestController extends  HttpServlet{
 
-    ImageTalkBaseController baseController;
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -43,17 +36,14 @@ public class TestController extends  HttpServlet{
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
-
-
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
@@ -65,17 +55,17 @@ public class TestController extends  HttpServlet{
 
         switch (url) {
             case "/app/test/dbmodel":
-                this.test();
+                pw.print(this.test(req));
                 break;
             case "/app/test/test":
-                this.test();
+                pw.print(this.test(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    private void testSticker(){
+    private String testSticker(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 //Here you say to java the initial timezone. This is the secret
@@ -87,53 +77,47 @@ public class TestController extends  HttpServlet{
         dateFormat.setTimeZone(TimeZone.getDefault());
 //Will print on your default Timezone
         System.out.println(dateFormat.format(new Date()));
-        return;
+        return "";
     }
-    private void test(){
-
+    private String test(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         StickersModel stickersModel = new StickersModel();
 
-
-
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                stickersModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                stickersModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             stickersModel.limit = 30;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                stickersModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                stickersModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
-        stickersModel.setCurrentAppCredentialId(this.baseController.appCredential.id);
+        stickersModel.setCurrentAppCredentialId(baseController.appCredential.id);
         ArrayList<Stickers> stickers = stickersModel.getAllForPost();
 
-        this.baseController.serviceResponse.responseData = stickers;
-        this.baseController.serviceResponse.responseStat.status =  (stickers.size()>0);
-        this.baseController.serviceResponse.responseStat.msg = (stickers.size()==0)?"No record found":"";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = stickers;
+        baseController.serviceResponse.responseStat.status =  (stickers.size()>0);
+        baseController.serviceResponse.responseStat.msg = (stickers.size()==0)?"No record found":"";
+        return baseController.getResponse();
     }
 }

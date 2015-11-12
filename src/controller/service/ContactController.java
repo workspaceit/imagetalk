@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -18,10 +19,10 @@ import java.util.ArrayList;
  * Created by mi on 10/12/15.
  */
 public class ContactController extends HttpServlet {
-    ImageTalkBaseController baseController;
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -31,11 +32,10 @@ public class ContactController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();
 
@@ -43,550 +43,518 @@ public class ContactController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
         switch (url) {
             case "/app/contact/findmatch":
-                this.findmatchContact();
+                pw.print(this.findmatchContact(req));
                 break;
             case "/app/contact/add":
-                this.addContacts();
+                pw.print(this.addContacts(req));
                 break;
             case "/app/contact/remove":
-                this.removeContacts();
+                pw.print(this.removeContacts(req));
                 break;
             case "/app/contact/block":
-                this.blockContacts();
+                pw.print(this.blockContacts(req));
                 break;
             case "/app/contact/unblock":
-                this.unBlockContacts();
+                pw.print(this.unBlockContacts(req));
                 break;
             case "/app/contact/favorite":
-                this.favoritesContacts();
+                pw.print(this.favoritesContacts(req));
                 break;
             case "/app/contact/unfavorite":
-                this.unFavoritesContacts();
+                pw.print(this.unFavoritesContacts(req));
                 break;
             case "/app/contact/who/has/mine":
-                this.getWhoHasMyNumber();
+                pw.print(this.getWhoHasMyNumber(req));
                 break;
             case "/app/contact/doesnot/have/mine":
-                this.getWhoDoesNotHasMyNumber();
+                pw.print(this.getWhoDoesNotHasMyNumber(req));
                 break;
             case "/app/contact/who/blocked/me":
-                this.getWhoBlockedMe();
+                pw.print(this.getWhoBlockedMe(req));
                 break;
             case "/app/contact/whom/i/blocked":
-                this.getWhomIBlocked();
+                pw.print(this.getWhomIBlocked(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    private void findmatchContact(){
+    private String findmatchContact(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         ArrayList<String> contacts = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("contacts", this.req, true)) {
+        if(!baseController.checkParam("contacts", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "contacts required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "contacts required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                String [] contactsArray = gson.fromJson(this.req.getParameter("contacts").trim(),String[].class);
+                String [] contactsArray = gson.fromJson(req.getParameter("contacts").trim(),String[].class);
                 for(String contact : contactsArray){
                     contacts.add(contact);
                 }
             } catch (Exception ex){
                 ex.printStackTrace();
-                this.baseController.serviceResponse.responseStat.msg = "contacts is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "contacts is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+        appLoginCredentialModel.setId(baseController.appCredential.id);
         appLoginCredentialModel.setContactList(contacts);
 
         ArrayList<AppCredential> respObj = appLoginCredentialModel.getMatchedPhoneNumber();
-        this.baseController.serviceResponse.responseData = respObj ;
-        this.pw.print(this.baseController.getResponse());
+        baseController.serviceResponse.responseData = respObj ;
 
         System.out.println("respObj Size" + respObj.size());
         System.out.println("respObj str"+respObj.toString());
-        return;
+        return baseController.getResponse();
 
     }
-    private void addContacts(){
+    private String addContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.addContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"added successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"added successfully";
+        return baseController.getResponse();
 
     }
-    private void removeContacts(){
+    private String removeContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.removeContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"removed successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"removed successfully";
+        return baseController.getResponse();
 
     }
-    private void blockContacts(){
+    private String blockContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.blockContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "blocked successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "blocked successfully";
+        return baseController.getResponse();
 
     }
-    private void unBlockContacts(){
+    private String unBlockContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController =  new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.unBlockContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unblocked successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unblocked successfully";
+        return baseController.getResponse();
 
     }
-    private void favoritesContacts(){
+    private String favoritesContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
-
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.favoriteContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "favorite successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "favorite successfully";
+        return baseController.getResponse();
 
     }
-    private void unFavoritesContacts(){
+    private String unFavoritesContacts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();
         Gson gson = new Gson();
-        if(!this.baseController.checkParam("app_login_credential_id", this.req, true)) {
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
 
-                Integer [] contactsArray = gson.fromJson(this.req.getParameter("app_login_credential_id").trim(),Integer[].class);
+                Integer [] contactsArray = gson.fromJson(req.getParameter("app_login_credential_id").trim(),Integer[].class);
                 for(int contact : contactsArray){
                     contactIdList.add(contact);
                 }
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "app_login_credential_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         ContactModel contactModel = new ContactModel();
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         contactModel.setContactIdList(contactIdList);
 
         if(!contactModel.unFavoriteContact()){
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
         }
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
-        this.baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unfavorite successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Contact"+suffix+ "unfavorite successfully";
+        return baseController.getResponse();
 
     }
-    private void getWhoHasMyNumber() {
+    private String getWhoHasMyNumber(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ContactModel contactModel = new ContactModel();
 
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
         contactModel.setKeyword(keyword);
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
 
 
 
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("offset", req, true)){
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         ArrayList<Contact> contactList = contactModel.getWhoHasMyContactByOwnerId();
         String respStr = (contactList.size()==0)?"No record found":"";
 
-        this.baseController.serviceResponse.responseStat.msg = respStr;
-        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
-        this.baseController.serviceResponse.responseData = contactList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = respStr;
+        baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        baseController.serviceResponse.responseData = contactList;
+        return baseController.getResponse();
 
     }
-    private void getWhoDoesNotHasMyNumber(){
+    private String getWhoDoesNotHasMyNumber(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ContactModel contactModel = new ContactModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
         contactModel.setKeyword(keyword);
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
 
         ArrayList<Contact> contactList = contactModel.getWhoDoesNotHasMyContactByOwnerId();
         String respStr = (contactList.size()==0)?"No record found":"";
 
-        this.baseController.serviceResponse.responseStat.msg = respStr;
-        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
-        this.baseController.serviceResponse.responseData = contactList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = respStr;
+        baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        baseController.serviceResponse.responseData = contactList;
+        return baseController.getResponse();
 
     }
-    private void getWhoBlockedMe(){
+    private String getWhoBlockedMe(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ContactModel contactModel = new ContactModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
         contactModel.setKeyword(keyword);
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
 
 
         ArrayList<Contact> contactList = contactModel.getWhoBlockedMeByOwnerId();
         String respStr = (contactList.size()==0)?"No record found":"";
 
-        this.baseController.serviceResponse.responseStat.msg = respStr;
-        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
-        this.baseController.serviceResponse.responseData = contactList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = respStr;
+        baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        baseController.serviceResponse.responseData = contactList;
+        return baseController.getResponse();
 
     }
-    private void getWhomIBlocked(){
+    private String getWhomIBlocked(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ContactModel contactModel = new ContactModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         String keyword="";
-        if(this.baseController.checkParam("keyword",this.req,true))
+        if(baseController.checkParam("keyword",req,true))
         {
             keyword = req.getParameter("keyword").trim();
         }
 
         contactModel.setKeyword(keyword);
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
 
 
         ArrayList<Contact> contactList = contactModel.getWhomIBlockedByOwnerId();
         String respStr = (contactList.size()==0)?"No record found":"";
 
-        this.baseController.serviceResponse.responseStat.msg = respStr;
-        this.baseController.serviceResponse.responseStat.status = (contactList.size()>0);
-        this.baseController.serviceResponse.responseData = contactList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = respStr;
+        baseController.serviceResponse.responseStat.status = (contactList.size()>0);
+        baseController.serviceResponse.responseData = contactList;
+        return baseController.getResponse();
 
     }
 

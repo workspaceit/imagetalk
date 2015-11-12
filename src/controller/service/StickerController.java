@@ -18,11 +18,11 @@ import java.io.PrintWriter;
  * Project Name:ImageTalk
  */
 public class StickerController extends HttpServlet{
-    ImageTalkBaseController baseController;
+  /*  ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
     HttpServletResponse res;
-
+*/
 
     @Override
     public void init() throws ServletException {
@@ -30,13 +30,12 @@ public class StickerController extends HttpServlet{
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = resp;
+
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();
 
@@ -44,36 +43,35 @@ public class StickerController extends HttpServlet{
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
         switch (url) {
             case "/app/sticker/user_sticker":
-                this.userStickerEligibleAdd();
+                pw.print(this.userStickerEligibleAdd(req));
                 break;
             case "/app/sticker/update_usage":
-                this.stickerUsageUpdate();
+                pw.print(this.stickerUsageUpdate(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
 
 
     }
 
-    private void stickerUsageUpdate() {
+    private String stickerUsageUpdate(HttpServletRequest req) {
         int id;
-
-        if(!this.baseController.checkParam("id",this.req,true))
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!baseController.checkParam("id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else
         {
@@ -82,11 +80,10 @@ public class StickerController extends HttpServlet{
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "id must be int";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
 
         }
@@ -96,29 +93,26 @@ public class StickerController extends HttpServlet{
         stickerUsageEligibleModel.setId(id);
         if(stickerUsageEligibleModel.updateStickerUsage())
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker usage updated successfully";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker usage updated successfully";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseStat.msg = "sticker usage not updated";
-        this.baseController.serviceResponse.responseStat.status = false;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "sticker usage not updated";
+        baseController.serviceResponse.responseStat.status = false;
+        return baseController.getResponse();
 
     }
 
-    private void userStickerEligibleAdd() {
-
+    private String userStickerEligibleAdd(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         int sticker_category_id;
 
-        if(!this.baseController.checkParam("sticker_category_id",this.req,true))
+        if(!baseController.checkParam("sticker_category_id",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "sticker_category_id is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "sticker_category_id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else {
             try {
@@ -126,31 +120,28 @@ public class StickerController extends HttpServlet{
             }
             catch (Exception e)
             {
-                this.baseController.serviceResponse.responseStat.msg = "sticker_category_id must be int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
+                baseController.serviceResponse.responseStat.msg = "sticker_category_id must be int";
+                baseController.serviceResponse.responseStat.status = false;
                 e.printStackTrace();
-                return;
+                return baseController.getResponse();
             }
         }
 
 
         StickerUsageEligibleModel stickerUsageEligibleModel = new StickerUsageEligibleModel();
         stickerUsageEligibleModel.setSticker_category_id(sticker_category_id);
-        stickerUsageEligibleModel.setApp_login_credential_id(this.baseController.appCredential.id);
+        stickerUsageEligibleModel.setApp_login_credential_id(baseController.appCredential.id);
 
         if(stickerUsageEligibleModel.insert()==0)
         {
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseStat.msg = "user sticker eligibility added successfully";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseStat.msg = "user sticker eligibility added successfully";
+        return baseController.getResponse();
 
     }
 }

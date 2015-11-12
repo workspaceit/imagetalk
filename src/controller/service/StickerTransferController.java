@@ -17,10 +17,10 @@ import java.net.URLDecoder;
  * Created by mi on 10/13/15.
  */
 public class StickerTransferController extends HttpServlet {
-    ImageTalkBaseController baseController;
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -30,10 +30,8 @@ public class StickerTransferController extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
 
         String url = req.getRequestURI().toString();
 
@@ -41,36 +39,33 @@ public class StickerTransferController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-
-
         switch (url) {
             default:
-                this.readPicture();
+                this.readPicture(req,res);
                 break;
         }
 
     }
-    private void readPicture(){
+    private void readPicture(HttpServletRequest req,HttpServletResponse res){
         ServletOutputStream out = null;
         InputStream in = null;
-
-
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 // do the following in a finally block:
         try {
 
-            if(!this.baseController.checkParam("p", this.req, true)){
+            if(!baseController.checkParam("p", req, true)){
                 return;
             }
-            out = this.res.getOutputStream();
-            System.out.println("Value of p : "+this.req.getParameter("p"));
-            String picRelativePath = URLDecoder.decode(this.req.getParameter("p").trim(), "UTF-8");
+            out = res.getOutputStream();
+            System.out.println("Value of p : " + req.getParameter("p"));
+            String picRelativePath = URLDecoder.decode(req.getParameter("p").trim(), "UTF-8");
             System.out.println(picRelativePath);
             in = new FileInputStream(ImageHelper.getStickerGlobalPath()+picRelativePath);
             String mimeType = "image/jpeg";
             byte[] bytes = new byte[1024];
             int bytesRead;
 
-            this.res.setContentType(mimeType);
+            res.setContentType(mimeType);
 
             while ((bytesRead = in.read(bytes)) != -1) {
                 out.write(bytes, 0, bytesRead);

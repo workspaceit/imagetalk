@@ -18,10 +18,10 @@ import java.io.PrintWriter;
  * Project Name:ImageTalk
  */
 public class NotificationController extends HttpServlet {
-    ImageTalkBaseController baseController;
+/*    ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
     Gson gson;
 
     @Override
@@ -30,12 +30,11 @@ public class NotificationController extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        this.req = req;
-        this.res = resp;
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
         this.gson = new Gson();
 
@@ -45,62 +44,60 @@ public class NotificationController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
         
         switch (url)
         {
             case "/app/user/notification/add":
-                this.addNotifications();
+                pw.print(this.addNotifications(req));
                 break;
             default:break;
         }
 
     }
 
-    private void addNotifications() {
+    private String addNotifications(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         String msg;
         String tag;
         int is_read;
         String data_object;
 
-        if(!this.baseController.checkParam("msg",this.req,true))
+        if(!baseController.checkParam("msg",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "Notification msg is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Notification msg is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else
         {
             msg = req.getParameter("msg");
         }
 
-        if(!this.baseController.checkParam("tag",this.req,true))
+        if(!baseController.checkParam("tag",req,true))
         {
-            this.baseController.serviceResponse.responseStat.msg = "Notification tag is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Notification tag is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         else
         {
             tag = req.getParameter("tag");
         }
 
-        if(this.baseController.checkParam("is_read",this.req,true))
+        if(baseController.checkParam("is_read",req,true))
         {
             try {
                 is_read = Integer.parseInt(req.getParameter("is_read"));
             }
             catch (Exception e) {
-                this.baseController.serviceResponse.responseStat.msg = "is_read is int";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "is_read is int";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         else
@@ -108,7 +105,7 @@ public class NotificationController extends HttpServlet {
            is_read = 0;
         }
 
-        if(this.baseController.checkParam("data_object",this.req,true))
+        if(baseController.checkParam("data_object",req,true))
         {
             data_object = req.getParameter("data_object");
         }
@@ -125,17 +122,13 @@ public class NotificationController extends HttpServlet {
 
         if(notificationModel.insert()==0)
         {
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "Notification added successfully";
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.pw.print(this.baseController.getResponse());
-        return;
-
-
+        baseController.serviceResponse.responseStat.msg = "Notification added successfully";
+        baseController.serviceResponse.responseStat.status = true;
+        return baseController.getResponse();
 
     }
 

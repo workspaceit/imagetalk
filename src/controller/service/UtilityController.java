@@ -14,10 +14,10 @@ import java.io.PrintWriter;
  * Created by mi on 10/1/15.
  */
 public class UtilityController extends HttpServlet {
-    ImageTalkBaseController baseController;
+ /*   ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
     @Override
     public void init() throws ServletException {
         super.init();
@@ -34,12 +34,8 @@ public class UtilityController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
-
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();
 
@@ -49,17 +45,17 @@ public class UtilityController extends HttpServlet {
 
         switch (url) {
            case "/utility/get/countries":
-                this.getCountries();
+                pw.print(this.getCountries());
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    private void getCountries(){
+    private String getCountries(){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         CountryModel countryModel = new CountryModel();
-        this.baseController.serviceResponse.responseData = countryModel.getAll();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = countryModel.getAll();
+        return baseController.getResponse();
     }
 }

@@ -21,10 +21,10 @@ import java.util.HashMap;
  * Created by mi on 10/15/15.
  */
 public class ProfileControllery extends HttpServlet {
-    ImageTalkBaseController baseController;
+    /*ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -34,11 +34,9 @@ public class ProfileControllery extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();
 
@@ -46,77 +44,75 @@ public class ProfileControllery extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
         switch (url) {
             case "/app/profile/change/status":
-                this.changeTextStatus();
+                pw.print(this.changeTextStatus(req));
                 break;
             case "/app/profile/change/picture":
-                this.changePicture();
+                pw.print(this.changePicture(req));
                 break;
             case "/app/profile/change/phone/number":
-                this.changePhoneNumber();
+                pw.print(this.changePhoneNumber(req));
                 break;
             case "/app/profile/get/entities/count":
-                this.getCounts();
+                pw.print(this.getCounts(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    private void changeTextStatus(){
-        System.out.println("Inside status change " + this.baseController.appCredential.id);
+    private String changeTextStatus(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        System.out.println("Inside status change " + baseController.appCredential.id);
 
-        if(!this.baseController.checkParam("text_status", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "text_status is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("text_status", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "text_status is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
 
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        appLoginCredentialModel.setText_status(this.req.getParameter("text_status"));
-        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+        appLoginCredentialModel.setText_status(req.getParameter("text_status"));
+        appLoginCredentialModel.setId(baseController.appCredential.id);
 
         HashMap<String,String> textStatusResponse = new HashMap<String,String>();
 
         if(!appLoginCredentialModel.updateUserTextStatus()){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on text status update";
-            this.baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Internal server error on text status update";
+            baseController.serviceResponse.responseStat.status = false;
             textStatusResponse.put("textStatus",appLoginCredentialModel.getUserTextStatusById());
-            this.baseController.serviceResponse.responseData = textStatusResponse;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseData = textStatusResponse;
+            return baseController.getResponse();
         }
         textStatusResponse.put("textStatus",appLoginCredentialModel.getUserTextStatusById());
 
 
-        this.baseController.serviceResponse.responseStat.msg = "Text status Successfully updated";
-        this.baseController.serviceResponse.responseData = textStatusResponse;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Text status Successfully updated";
+        baseController.serviceResponse.responseData = textStatusResponse;
+        return baseController.getResponse();
     }
-    private void changePicture(){
-        if(!this.baseController.checkParam("photo",this.req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "photo is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+    private String changePicture(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!baseController.checkParam("photo",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "photo is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         UserInfModel userInfModel = new UserInfModel();
 
-        userInfModel.setId(this.baseController.appCredential.user.id);
+        userInfModel.setId(baseController.appCredential.user.id);
         userInfModel.startTransaction();
 
-        String imgBase64 = this.req.getParameter("photo");
+        String imgBase64 = req.getParameter("photo");
         Pictures pictures = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
         Gson gson = new Gson();
         String fileName =gson.toJson(pictures);
@@ -127,104 +123,96 @@ public class ProfileControllery extends HttpServlet {
             //    userInfModel.rollBack();
             //    appLoginCredentialModel.rollBack();
 
-            this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         userInfModel.setPicPath(fileName);
         if(!userInfModel.updatePicPath()){
             userInfModel.rollBack();
 
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         userInfModel.commitTransaction();
 
-        this.baseController.serviceResponse.responseStat.msg = "Picture Success fully updated";
-        this.baseController.serviceResponse.responseData = userInfModel.getById();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Picture Success fully updated";
+        baseController.serviceResponse.responseData = userInfModel.getById();
+        return baseController.getResponse();
 
     }
-    private void changePhoneNumber() {
-        if (!this.baseController.checkParam("phone_number", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "phone_number is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+    private String changePhoneNumber(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if (!baseController.checkParam("phone_number", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "phone_number is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
 
-        appLoginCredentialModel.setId(this.baseController.appCredential.id);
-        appLoginCredentialModel.setPhone_number(this.req.getParameter("phone_number"));
+        appLoginCredentialModel.setId(baseController.appCredential.id);
+        appLoginCredentialModel.setPhone_number(req.getParameter("phone_number"));
 
         if(appLoginCredentialModel.isPhoneNumberOthers()){
-            this.baseController.serviceResponse.responseStat.msg = "phone_number is already been used";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "phone_number is already been used";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         appLoginCredentialModel.startTransaction();
         if(!appLoginCredentialModel.updatePhoneNumber()){
             appLoginCredentialModel.rollBack();
-            this.baseController.serviceResponse.responseStat.msg = "Data base error while updating Phone number";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Data base error while updating Phone number";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         appLoginCredentialModel.commitTransaction();
 
-        this.baseController.serviceResponse.responseStat.msg = "Phone number successfully update";
-        this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialById();
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Phone number successfully update";
+        baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialById();
+        return baseController.getResponse();
 
     }
-    private void getCounts(){
-        if(!this.baseController.checkParam("count_params",this.req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "count_params is required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+    private String getCounts(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!baseController.checkParam("count_params",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "count_params is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
         int ownerId = 0;
 
-        if(this.baseController.checkParam("user_credential_id",this.req,true)) {
+        if(baseController.checkParam("user_credential_id",req,true)) {
             try{
-                ownerId = Integer.parseInt(this.req.getParameter("user_credential_id"));
+                ownerId = Integer.parseInt(req.getParameter("user_credential_id"));
             }catch (Exception ex){
                 ex.printStackTrace();
-                this.baseController.serviceResponse.responseStat.msg = "user_credential_id is not integer";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "user_credential_id is not integer";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
 
         }else{
-            ownerId = this.baseController.appCredential.id;
+            ownerId = baseController.appCredential.id;
         }
 
         Gson gson = new Gson();
         ArrayList<String> countList = new ArrayList();
         try{
-            String[] countParams = gson.fromJson(this.req.getParameter("count_params"), String[].class);
+            String[] countParams = gson.fromJson(req.getParameter("count_params"), String[].class);
 
             for(String countParam : countParams){
                 countList.add(countParam);
             }
 
         }catch(Exception ex){
-            this.baseController.serviceResponse.responseStat.msg = "count_params is not in format";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "count_params is not in format";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
         HashMap<String,Integer> countResponse =  new HashMap();
 
@@ -238,9 +226,8 @@ public class ProfileControllery extends HttpServlet {
             countResponse.put("wallPost",wallPostModel.getCountByOwnerId());
         }
 
-        this.baseController.serviceResponse.responseData = countResponse;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = countResponse;
+        return baseController.getResponse();
 
     }
 }

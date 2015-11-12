@@ -15,8 +15,8 @@ import java.io.PrintWriter;
  */
 public class UserController extends HttpServlet {
     Login login;
-    ImageTalkBaseController baseController;
-    PrintWriter pw;
+/*    ImageTalkBaseController baseController;
+    PrintWriter pw;*/
     @Override
     public void init() throws ServletException {
         super.init();
@@ -25,17 +25,18 @@ public class UserController extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
 
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         String url = req.getRequestURI().toString();
-        this.baseController = new ImageTalkBaseController();
+        baseController = new ImageTalkBaseController();
         this.login = new Login();
-        this.pw = resp.getWriter();
+        PrintWriter pw = resp.getWriter();
 
-        if(!this.baseController.isSessionValid(req)) {
-            this.pw.print(this.baseController.getResponse());
+        if(!baseController.isSessionValid(req)) {
+            pw.print(baseController.getResponse());
             return;
         }
 
-        login = this.baseController.getUserLoginFromSession(req);
+        login = baseController.getUserLoginFromSession(req);
 
         if(url.endsWith("/")){
             url = url.substring(0, url.length()-1);
@@ -43,70 +44,64 @@ public class UserController extends HttpServlet {
 
         switch (url) {
             case "/admin/user/update/type/teamlead":
-                this.makeTeamLead(req);
+                pw.print(this.makeTeamLead(req));
                 break;
             case "/admin/user/update/type/user":
-                this.makeUser(req);
+                pw.print(this.makeUser(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    public void makeTeamLead(HttpServletRequest req){
+    public String makeTeamLead(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         AdminLoginModel adminLoginModel = new AdminLoginModel();
-        if (!this.baseController.checkParam("login_id", req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if (!baseController.checkParam("login_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "Id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
             try{
                 adminLoginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
             }catch (NumberFormatException e){
-                this.baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         if(!adminLoginModel.updateTypeToTeamLead()){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "Successfully updated";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Successfully updated";
+        return baseController.getResponse();
 
     }
-    public void makeUser(HttpServletRequest req){
+    public String makeUser(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         AdminLoginModel adminLoginModel = new AdminLoginModel();
-        if (!this.baseController.checkParam("login_id",req,true)) {
-            this.baseController.serviceResponse.responseStat.msg = "Id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if (!baseController.checkParam("login_id",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "Id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
             try{
                 adminLoginModel.login.id = Integer.parseInt(req.getParameter("login_id").trim());
             }catch (NumberFormatException e){
-                this.baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Login id not valid format, int required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
         if(!adminLoginModel.updateTypeToUser()){
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
-        this.baseController.serviceResponse.responseStat.msg = "Successfully updated";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "Successfully updated";
+        return baseController.getResponse();
 
     }
 }

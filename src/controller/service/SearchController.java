@@ -20,10 +20,10 @@ import java.util.HashMap;
  * Created by mi on 10/2/15.
  */
 public class SearchController extends HttpServlet {
-    ImageTalkBaseController baseController;
+   /* ImageTalkBaseController baseController;
     PrintWriter pw;
     HttpServletRequest req;
-    HttpServletResponse res;
+    HttpServletResponse res;*/
 
     @Override
     public void init() throws ServletException {
@@ -33,11 +33,11 @@ public class SearchController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+        /*this.req = req;
+        this.res = res;*/
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();
 
@@ -45,257 +45,238 @@ public class SearchController extends HttpServlet {
             url = url.substring(0, url.length() - 1);
         }
 
-        if(!this.baseController.isAppSessionValid(this.req)){
-            this.pw.print(this.baseController.getResponse());
-            this.pw.close();
+        if(!baseController.isAppSessionValid(req)){
+            pw.print(baseController.getResponse());
+            pw.close();
             return;
         }
 
         switch (url) {
             case "/app/search/alluser/by/keyword":
-                this.getUserForTag();
+                pw.print(this.getUserForTag(req));
                 break;
             case "/app/search/location/by/keyword":
-                this.getLocationByKeyword();
+                pw.print(this.getLocationByKeyword(req));
                 break;
             case "/app/search/location/by/latlng":
-                this.getLocationByLattLng();
+                pw.print(this.getLocationByLattLng(req));
                 break;
             case "/app/search/places/by/latlng":
-                this.getPlacesByLatLng();
+                pw.print(this.getPlacesByLatLng(req));
                 break;
             case "/app/search/contact/by/keyword":
-                this.getContactByKeyword();
+                pw.print(this.getContactByKeyword(req));
                 break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
-    private void getLocationByLattLng(){
+    private String getLocationByLattLng(HttpServletRequest req) {
         double lat= 0;
         double lng= 0;
+        ImageTalkBaseController baseController  = new ImageTalkBaseController(req);
 
+        if(!baseController.checkParam("lat", req, true)) {
 
-        if(!this.baseController.checkParam("lat", this.req, true)) {
-
-            this.baseController.serviceResponse.responseStat.msg = "lat required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "lat required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
-                lat = Double.parseDouble(this.req.getParameter("lat").trim());
+                lat = Double.parseDouble(req.getParameter("lat").trim());
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
-        if(!this.baseController.checkParam("lng", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "lng required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("lng", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "lng required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
             try{
-                lng = Double.parseDouble(this.req.getParameter("lng").trim());
+                lng = Double.parseDouble(req.getParameter("lng").trim());
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
 
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
-        this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData =  googleGeoApi.getLocationByLatLng(lat,lng);
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "";
+        baseController.serviceResponse.responseData =  googleGeoApi.getLocationByLatLng(lat,lng);
+        return baseController.getResponse();
     }
-    private void getAllUserByKeyword(){
-
+    private String getAllUserByKeyword(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                appLoginCredentialModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                appLoginCredentialModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             appLoginCredentialModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                appLoginCredentialModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                appLoginCredentialModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
 
-        appLoginCredentialModel.setId(this.baseController.appCredential.id);
+        appLoginCredentialModel.setId(baseController.appCredential.id);
         ArrayList<AppCredential> appCredentialsList =  appLoginCredentialModel.getAppCredentialByKeyword(keyword);
 
         if(appCredentialsList.size()==0){
-            this.baseController.serviceResponse.responseStat.msg = "No record found";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "No record found";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseData = appCredentialsList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = appCredentialsList;
+        return baseController.getResponse();
     }
-    private void getUserForTag(){
-
+    private String getUserForTag(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
         ContactModel contactModel  = new ContactModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
 
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         ArrayList<Contact> appCredentialsList =  contactModel.getContactByKeyword(keyword);
 
         if(appCredentialsList.size()==0){
-            this.baseController.serviceResponse.responseStat.msg = "No record found";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "No record found";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseData = appCredentialsList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = appCredentialsList;
+        return baseController.getResponse();
     }
-    private void getContactByKeyword(){
-
+    private String getContactByKeyword(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         String keyword="";
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
         System.out.println("keyword :"+keyword);
         ContactModel contactModel  = new ContactModel();
 
-        if(this.baseController.checkParam("limit", this.req, true)) {
+        if(baseController.checkParam("limit", req, true)) {
             try{
-                contactModel.limit = Integer.parseInt(this.req.getParameter("limit").trim());
+                contactModel.limit = Integer.parseInt(req.getParameter("limit").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }else{
             contactModel.limit = 10;
         }
 
-        if(!this.baseController.checkParam("offset", this.req, true)){
+        if(!baseController.checkParam("offset", req, true)){
 
-            this.baseController.serviceResponse.responseStat.msg = "offset required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else {
             try{
-                contactModel.offset = Integer.parseInt(this.req.getParameter("offset").trim());
+                contactModel.offset = Integer.parseInt(req.getParameter("offset").trim());
             }catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
 
-        contactModel.setOwner_id(this.baseController.appCredential.id);
+        contactModel.setOwner_id(baseController.appCredential.id);
         ArrayList<Contact> contactList =  contactModel.getContactByKeyword(keyword);
 
         if(contactList.size()==0){
-            this.baseController.serviceResponse.responseStat.msg = "No record found";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "No record found";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseData = contactList;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseData = contactList;
+        return baseController.getResponse();
     }
-    private void getLocationByKeyword(){
+    private String getLocationByKeyword(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
         String keyword="";
-        if(!this.baseController.checkParam("keyword", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "keyword required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("keyword", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "keyword required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
-            keyword = this.req.getParameter("keyword").trim();
+            keyword = req.getParameter("keyword").trim();
         }
 
 
@@ -305,8 +286,8 @@ public class SearchController extends HttpServlet {
 
         HashMap<String,Object> respObj =  new HashMap<>();
         HashMap<String,Object> extraObj =  new HashMap<>();
-        if(this.baseController.checkParam("next_page_token", this.req, true)) {
-            googleGeoApi.pagetoken = this.req.getParameter("next_page_token").trim();
+        if(baseController.checkParam("next_page_token", req, true)) {
+            googleGeoApi.pagetoken = req.getParameter("next_page_token").trim();
         }
         ArrayList<Location> addressList = googleGeoApi.getLocationByKeyword();
 
@@ -319,63 +300,59 @@ public class SearchController extends HttpServlet {
         respObj.put("extra",extraObj);
 
 
-        this.baseController.serviceResponse.responseStat.msg =(addressList.size()<=0)?"No record found":"";
-        this.baseController.serviceResponse.responseStat.status = (addressList.size()<=0)?false:true;
-        this.baseController.serviceResponse.responseData =  respObj;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg =(addressList.size()<=0)?"No record found":"";
+        baseController.serviceResponse.responseStat.status = (addressList.size()<=0)?false:true;
+        baseController.serviceResponse.responseData =  respObj;
+        return baseController.getResponse();
 
     }
-    private void getPlacesByLatLng(){
+    private String getPlacesByLatLng(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         double lat= 0;
         double lng= 0;
 
         String keyword="";
 
-        if(this.baseController.checkParam("keyword", this.req, true)) {
-            keyword = this.req.getParameter("keyword").trim();
+        if(baseController.checkParam("keyword", req, true)) {
+            keyword = req.getParameter("keyword").trim();
         }
 
-        if(!this.baseController.checkParam("lat", this.req, true)) {
+        if(!baseController.checkParam("lat", req, true)) {
 
-            this.baseController.serviceResponse.responseStat.msg = "lat required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "lat required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
 
             try{
-                lat = Double.parseDouble(this.req.getParameter("lat").trim());
+                lat = Double.parseDouble(req.getParameter("lat").trim());
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
-        if(!this.baseController.checkParam("lng", this.req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "lng required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if(!baseController.checkParam("lng", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "lng required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
         }else{
             try{
-                lng = Double.parseDouble(this.req.getParameter("lng").trim());
+                lng = Double.parseDouble(req.getParameter("lng").trim());
             } catch (Exception ex){
                 System.out.println(ex);
-                this.baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
             }
         }
 
         GoogleGeoApi googleGeoApi = new GoogleGeoApi();
         googleGeoApi.setKeyWord(keyword);
 
-        if(this.baseController.checkParam("next_page_token", this.req, true)) {
-            googleGeoApi.pagetoken = this.req.getParameter("next_page_token").trim();
+        if(baseController.checkParam("next_page_token", req, true)) {
+            googleGeoApi.pagetoken = req.getParameter("next_page_token").trim();
         }
 
         HashMap<String,Object> respObj =  new HashMap<>();
@@ -392,10 +369,9 @@ public class SearchController extends HttpServlet {
 
         respObj.put("extra",extraObj);
 
-        this.baseController.serviceResponse.responseStat.msg = "";
-        this.baseController.serviceResponse.responseData = respObj ;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "";
+        baseController.serviceResponse.responseData = respObj ;
+        return baseController.getResponse();
     }
 
 }
