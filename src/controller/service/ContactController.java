@@ -160,6 +160,8 @@ public class ContactController extends HttpServlet {
             baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
             return baseController.getResponse();
         }
+        contactModel.addReverseContact();
+
         String suffix = (contactIdList.size()>1)?"s are ":" is ";
         baseController.serviceResponse.responseStat.msg = "Contact"+suffix+"added successfully";
         return baseController.getResponse();

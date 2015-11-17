@@ -28,9 +28,7 @@ public class PictureAndFileController extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
-        res.setContentType("application/json");
-        PrintWriter pw = res.getWriter();
+
         String url = req.getRequestURI().toString();
 
         if (url.endsWith("/")) {
@@ -52,7 +50,7 @@ public class PictureAndFileController extends HttpServlet {
         InputStream in = null;
 
         String picRelativePath = "";
-// do the following in a finally block:
+        // do the following in a finally block:
         try {
 
             if(!baseController.checkParam("p", req, true)){

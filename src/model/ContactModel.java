@@ -208,6 +208,30 @@ public class ContactModel extends ImageTalkBaseModel {
         System.out.println(contactStr);
         return contactStr;
     }
+    public  ArrayList<Integer> getContactIdByOwnerId() {
+
+        ArrayList<Integer> contactsId = new ArrayList();
+
+        String query = "select contact_id  from " + super.tableName + " " +
+                " where  " + super.tableName + ".owner_id="+ this.owner_id;
+        System.out.println(query);
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                contactsId.add(this.resultSet.getInt("contact_id"));
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+
+        return contactsId;
+    }
     public ArrayList<AppCredential> getContactByOwnerId() {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
         String query = "select user_inf.id as user_inf_id," +
@@ -376,6 +400,95 @@ public class ContactModel extends ImageTalkBaseModel {
         }
         return contact;
     }
+
+    public Contact getContactByByContactId(int recipient)
+    {
+        Contact contact = new Contact();
+        String query = "select "+
+                " user_inf.id as user_inf_id," +
+                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
+                " from app_login_credential "+
+                " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
+                " where   app_login_credential.id ="+recipient;
+
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next())
+            {
+//                Byte tempFavorites = this.resultSet.getByte(this.tableName + ".favorites");
+//                Byte tempIsBlock =this.resultSet.getByte(this.tableName + ".is_block");
+//
+//
+//
+//                contact.contactId = this.resultSet.getInt(this.tableName + ".id");
+//                contact.nickName = this.resultSet.getString(this.tableName + ".nickname");
+//                contact.favorites = (tempFavorites.intValue()>0);
+//                contact.isBlock = (tempIsBlock.intValue()>0);
+//                contact.rating = this.resultSet.getInt(this.tableName + ".rating");
+
+                contact.id = this.resultSet.getInt("app_login_credential_id");
+                contact.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                contact.phoneNumber = this.resultSet.getString("phone_number");
+                contact.user.id = this.resultSet.getInt("user_inf_id");
+                contact.user.firstName = this.resultSet.getString("f_name");
+                contact.user.lastName = this.resultSet.getString("l_name");
+
+                try {
+                    contact.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                } catch (Exception ex) {
+                    System.out.println("Parse error on picture appCid " + contact.id);
+                    contact.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
+                    ex.printStackTrace();
+                }
+                contact.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+
+                contact.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                contact.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                contact.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
+                contact.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                contact.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+
+                //job details
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
+                try {
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    contact.job.createdDate = "";
+                }
+                //end job details
+
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally {
+            this.closeConnection();
+        }
+        return contact;
+    }
+
     public ArrayList<Contact> getContactByKeyword(String keyword) {
         ArrayList<Contact> contactList = new ArrayList<Contact>();
         String query = "select " +super.tableName+".*,"+
@@ -925,10 +1038,51 @@ public class ContactModel extends ImageTalkBaseModel {
                 this.errorObj.msg = "Internal server error";
                 return false;
             }
+
+
         }
         this.commitTransaction();
         return true;
     }
+
+    public boolean addReverseContact(){
+        this.startTransaction();
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        int tempOwnerId = this.owner_id;
+        for(int contactId : this.contactIdList ){
+            this.setOwner_id(this.contact_id);
+            this.setContact_id(tempOwnerId);
+
+            appLoginCredentialModel.setId(this.contact_id);
+            if(this.contact_id == this.owner_id){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "You are not allowed to add yourself in contact";
+                return false;
+            }
+            if(!appLoginCredentialModel.isIdExist()){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Contact id ' "+this.contact_id +" ' not found in system";
+                return false;
+            }
+            if(this.isExist()){
+                this.rollBack();
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Already in contact list, id "+this.contact_id;
+                return false;
+            }
+            if(this.insert()==0){
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error";
+                return false;
+            }
+        }
+        this.commitTransaction();
+        return true;
+    }
+
+
     public boolean removeContact(){
         this.startTransaction();
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();

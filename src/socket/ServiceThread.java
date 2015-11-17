@@ -5,8 +5,10 @@ import helper.DateHelper;
 import helper.ImageHelper;
 import model.AppLoginCredentialModel;
 import model.ChatHistoryModel;
+import model.ContactModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
+import model.datamodel.app.Contact;
 import model.datamodel.app.socket.Acknowledgement;
 import model.datamodel.app.socket.SocketResponse;
 import model.datamodel.app.socket.chat.ChatPhoto;
@@ -18,12 +20,15 @@ import model.datamodel.photo.Pictures;
 import java.io.*;
 import java.net.Socket;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ServiceThread extends Thread {
     final static String tag_authentication = "authentication";
     final static String tag_textChat = "textchat";
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
+    final static String tag_UserOnline = "user_online";
+    final static String tag_ContactOnline = "contact_online";
     final static String tag_chatPhoto = "chatphoto_transfer";
     final static String tag_chatVideo = "chatvideo_transfer";
 
@@ -102,6 +107,12 @@ public class ServiceThread extends Thread {
                             break;
                         case tag_ChatAcknowledgement:
                             this.processChatAcknowledgement(this.socketResponse.responseData);
+                            break;
+                        case tag_ContactOnline:
+                            this.processUserOnline(this.socketResponse.responseData);
+                            break;
+                        case tag_UserOnline:
+                            this.processUserOnline(this.socketResponse.responseData);
                             break;
                         default:
                             break;
@@ -251,7 +262,7 @@ public class ServiceThread extends Thread {
 
                     System.out.println("================================");
                     System.out.println("Send photo msg : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
-                    //System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
+                    System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
                     System.out.println("================================");
 
                     sendChatAcknowledgement(0, chatId, false, true);
@@ -368,6 +379,102 @@ public class ServiceThread extends Thread {
         System.out.println("chatTransferStatus.chatId : "+ acknowledgement.chatId);
         if(acknowledgement.chatId !=""){
             markAsReadInChatHistory(acknowledgement.chatId);
+        }
+
+    }
+    private void processContactOnline(Object dataObject) {
+
+
+        try {
+            ContactModel contactModel = new ContactModel();
+            contactModel.setOwner_id(this.appCredential.id);
+            ArrayList<Integer> contactIdList = contactModel.getContactIdByOwnerId();
+
+            for(int appCredentialId : contactIdList){
+
+                ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(appCredentialId);
+                Acknowledgement acknowledgement = new Acknowledgement();
+                if(contactServiceThread!=null){
+                    if(contactServiceThread.isOnline()) {
+                        acknowledgement.isOnline = true;
+                    }else{
+                        acknowledgement.isOnline = false;
+                    }
+                    acknowledgement.appCredential = contactServiceThread.appCredential;
+                }else{
+                    acknowledgement.isOnline = false;
+                    System.out.println("Obj is null");
+                    acknowledgement.appCredential.id = appCredentialId;
+                }
+
+
+                this.socketResponse = new SocketResponse();
+                this.socketResponse.responseStat.tag = tag_ContactOnline;
+
+
+
+                this.socketResponse.responseData = acknowledgement;
+                this.sendData(this.gson.toJson(this.socketResponse));
+                System.out.println("********************************************");
+                System.out.println("Send text msg  to : " + this.appCredential.user.firstName);
+                System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
+                System.out.println("********************************************");
+            }
+
+        }catch (ClassCastException ex){
+            this.sendError("0","Internal error");
+
+            ex.printStackTrace();
+        }
+
+    }
+
+    private void processUserOnline(Object dataObject) {
+
+
+        try {
+            ContactModel contactModel = new ContactModel();
+            contactModel.setOwner_id(this.appCredential.id);
+            System.out.println(dataObject);
+            String jObjStr = this.gson.toJson(dataObject);
+            System.out.println(jObjStr);
+            Integer[] contactIdList = this.gson.fromJson(jObjStr, Integer[].class);
+
+            for(int appCredentialId : contactIdList){
+
+                ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(appCredentialId);
+                Acknowledgement acknowledgement = new Acknowledgement();
+                if(contactServiceThread!=null){
+                    if(contactServiceThread.isOnline()) {
+                        acknowledgement.isOnline = true;
+                    }else{
+                        acknowledgement.isOnline = false;
+                    }
+                    acknowledgement.appCredential = contactServiceThread.appCredential;
+                }else{
+                    acknowledgement.isOnline = false;
+                    System.out.println("Obj is null");
+                    acknowledgement.appCredential.id = appCredentialId;
+                }
+
+
+                this.socketResponse = new SocketResponse();
+                this.socketResponse.responseStat.tag = tag_UserOnline;
+
+
+
+                this.socketResponse.responseData = acknowledgement;
+                this.sendData(this.gson.toJson(this.socketResponse));
+                System.out.println("********************************************");
+                System.out.println("Send text msg  to : " + this.appCredential.user.firstName);
+                System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
+                System.out.println("********************************************");
+            }
+
+        }catch (ClassCastException ex){
+            this.sendError("0","Internal error");
+
+            ex.printStackTrace();
         }
 
     }

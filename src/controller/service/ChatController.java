@@ -76,6 +76,7 @@ public class ChatController extends HttpServlet {
             default:
                 break;
         }
+        pw.close();
     }
 
     private String showLatest(HttpServletRequest req) {

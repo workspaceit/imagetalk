@@ -3,6 +3,8 @@ package model;
 import com.google.gson.Gson;
 import model.datamodel.app.Chat;
 import model.datamodel.app.ChatHistory;
+import model.datamodel.app.Contact;
+import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.sql.SQLException;
@@ -208,11 +210,18 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
                 chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
-                chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chat.extra = (this.resultSet.getObject("chat_history.extra")==null
+                        || this.resultSet.getString("chat_history.extra").equals("null"))? new Object() : this.resultSet.getString("chat_history.extra");
                 chat.type = this.resultSet.getInt("chat_history.type");
+
+                if(chat.type==1){
+
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                                      || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }
                 try {
-                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
                 }catch(Exception e) {
                     chat.createdDate = "";
                     System.out.println(e.getMessage());
@@ -252,11 +261,18 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
                 chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
-                chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
+                chat.extra = (this.resultSet.getObject("chat_history.extra")==null
+                        || this.resultSet.getString("chat_history.extra").toString().equals("null"))? new Object() : this.resultSet.getString("chat_history.extra");
                 chat.type = this.resultSet.getInt("chat_history.type");
+
+                if(chat.type==1){
+
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }
+
                 try {
-                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
                 }catch(Exception e) {
                     chat.createdDate = "";
                     System.out.println(e.getMessage());
@@ -339,7 +355,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         " FROM "+this.tableName+
         " WHERE "+this.from+" IN (`from`, `to`)"+
         " GROUP BY recipients"+
-        " ORDER BY MAX(created_date) DESC";
+        " ORDER BY MAX(id) DESC";
 
         System.out.println(query);
         this.setQuery(query);
@@ -353,7 +369,13 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 System.out.println(recipient);
 
                 ContactModel contactmodel = new ContactModel();
-                chatHistory.contact =  contactmodel.getContactByOwnerId(this.from,recipient);
+                Contact tempContact = new Contact();
+
+
+
+                tempContact =  contactmodel.getContactByOwnerId(this.from,recipient);
+                chatHistory.contact = (tempContact.id==0)?contactmodel.getContactByByContactId(recipient):tempContact;
+
                 ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
                 ArrayList<Chat> chats = chatHistoryModel.getChatHistory(myId,recipient);
                 chatHistory.chat = chats;

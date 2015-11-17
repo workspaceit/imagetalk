@@ -200,7 +200,7 @@ public class ImageHelper {
 
             ImageIO.write(img, "jpg", file);
 
-            fileName = uId + "/chat/media/picture" + fileName;
+            fileName = uId + "/chat/media/picture/" + fileName;
             pictures.original.size.height = img.getHeight();
             pictures.original.size.width = img.getWidth();
             pictures.original.path = fileName;
