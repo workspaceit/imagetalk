@@ -4,11 +4,11 @@ import java.sql.*;
 
 public class _ImageTalkBaseModel {
     static final private String DBDriver   = "com.mysql.jdbc.Driver";
-    static final private String DBHost     = "127.0.0.1";
+    static final private String DBHost     = "localhost";
     static final private String DBPort     = "3306";
     static final private String DBName     = "imagetalk";
     static final private String Url_Prefix = "jdbc:mysql:";
-    static final private String DBUrl      = Url_Prefix + "//" + DBHost  + "/" + DBName; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
+    static final private String DBUrl      =  Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;//Url_Prefix + "//" + DBHost  + "/" + DBName;
     static final private String DBUser     = "root";
     static final private String DBPassword = "";
 
@@ -23,9 +23,12 @@ public class _ImageTalkBaseModel {
     public _ImageTalkBaseModel() {
         try {
             Class.forName(DBDriver);
-            con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+           // con = DriverManager.getConnection("jdbc:mysql://localhost:3306/imagetalk?user=root&password=rajib");
+            con = DriverManager.getConnection(DBUrl,DBUser,DBPassword);
             stmt = con.createStatement();
+            System.out.print("Connection Established with database");
         } catch (Exception ex) {
+            System.out.print("Connection couldn't establish");
             ex.printStackTrace();
         }
     }
