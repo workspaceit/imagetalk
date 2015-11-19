@@ -88,7 +88,7 @@ public class ServiceThread extends Thread {
                     System.out.println("================================");
                     System.out.println("From : "+this.appCredential.user.firstName+" "+this.appCredential.user.lastName);
                     System.out.println("TAG : "+this.socketResponse.responseStat.tag);
-                    // System.out.println("ObjStr : "+recvStr);
+                     System.out.println("ObjStr : "+recvStr);
                     System.out.println("================================");
 
 
@@ -234,8 +234,9 @@ public class ServiceThread extends Thread {
 
         try{
             String jObjStr = this.gson.toJson(dataObject);
-
+            System.out.println("Recepent :"+jObjStr);
             ChatPhoto chatPhoto = this.gson.fromJson(jObjStr, ChatPhoto.class);
+            System.out.println("chatPhoto.appCredential.id :"+jObjStr);
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(chatPhoto.appCredential.id);
 
             this.socketResponse.responseStat.tag = tag_chatPhoto;
@@ -248,7 +249,9 @@ public class ServiceThread extends Thread {
 
             chatPhoto.recevice = true;
             chatPhoto.send = false;
-
+            Pictures pictures = ImageHelper.saveChatPicture(chatPhoto.base64Img,senderId);
+            chatPhoto.base64Img = "";
+            chatPhoto.pictures = pictures;
             if(contactServiceThread!=null){
 
                 if(contactServiceThread.isOnline()) {
@@ -273,7 +276,7 @@ public class ServiceThread extends Thread {
                 sendChatAcknowledgement(0,chatId,false,false);
             }
             // Saving to database
-            savePhotoInChatHistory(chatId, senderId, receiverId, textMsg, chatPhoto.base64Img);
+            savePhotoInChatHistory(chatId, senderId, receiverId, textMsg, pictures);
         }catch (ClassCastException ex){
             sendError(chatId,"Can not cast the object");
             ex.printStackTrace();
@@ -479,13 +482,13 @@ public class ServiceThread extends Thread {
 
     }
 
-    private void savePhotoInChatHistory(String chatId,int senderId,int receiverId,String textMsg,String imgBase64Str){
+    private void savePhotoInChatHistory(String chatId,int senderId,int receiverId,String textMsg,Pictures pictures){
 
         int uId = this.appCredential.id;
         class DbOperationThread extends Thread{
             @Override
             public void run() {
-                Pictures pictures = ImageHelper.saveChatPicture(imgBase64Str, uId);
+
 
                 ChatHistoryModel chatHistory = new ChatHistoryModel();
                 chatHistory.setChat_id(chatId);
