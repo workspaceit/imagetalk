@@ -3,6 +3,19 @@ package model;
 import java.sql.*;
 
 public class _ImageTalkBaseModel {
+
+  /*Local database setting
+    static final private String DBDriver = "com.mysql.jdbc.Driver";
+    static final private String DBHost = "127.0.0.1";
+    static final private String DBPort = "3306";
+    static final private String DBName = "imagetalk";
+    static final private String Url_Prefix = "jdbc:mysql:";
+    static final private String timeZoneParam = "?useLegacyDatetimeCode=false";
+    static final private String DBUrl = Url_Prefix + "//" + DBHost + "/" + DBName + timeZoneParam; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
+    static final private String DBUser = "root";
+    static final private String DBPassword = "";*/
+
+    //database settings for mysql server digital ocean
     static final private String DBDriver   = "com.mysql.jdbc.Driver";
     static final private String DBHost     = "localhost";
     static final private String DBPort     = "3306";
@@ -11,6 +24,8 @@ public class _ImageTalkBaseModel {
     static final private String DBUrl      =  Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;//Url_Prefix + "//" + DBHost  + "/" + DBName;
     static final private String DBUser     = "root";
     static final private String DBPassword = "";
+
+    //end configuration setting
 
     protected String tableName = null;
 
