@@ -269,6 +269,16 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>Google html</servlet-name>
+        <jsp-file>/admin/GoogleConfim.jsp</jsp-file>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>Google html</servlet-name>
+        <url-pattern>/google0eb110db924bcd00.html</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>New Category</servlet-name>
         <jsp-file>/admin/stickerCategoryForm.jsp</jsp-file>
     </servlet>
