@@ -53,7 +53,8 @@ public class ImageHelper {
     }
     public static String saveFile(Object imgObj, String path, int uId) {
         if (path == null) {
-            path = "/home/mi/pic/";
+            //path = "/home/mi/pic/";
+            path = "/home/wsit/pic";
         }
         String fileName = "";
         try {
