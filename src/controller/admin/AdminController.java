@@ -418,7 +418,7 @@ public class AdminController extends HttpServlet {
         boolean isMultipart;
         String  saveDir     = "ImageTalk_sticker/";
 //        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
-        String  filePath    = "/home/rajib/mi/Projects/j2ee/" + saveDir;
+        String  filePath    = "/home/wsit/Projects/j2ee/" + saveDir;
 
 
         int     maxFileSize = 250 * 1024 * 1024;

@@ -3,6 +3,7 @@ package controller.service;
 import model.*;
 
 import model.datamodel.app.Stickers;
+import socket.ImgTalkServerSocket;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,7 +33,22 @@ public class TestController extends  HttpServlet{
     public void init() throws ServletException {
         super.init();
     }
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
 
+        class testRead extends Thread{
+
+            @Override
+            public void run() {
+
+                ImgTalkServerSocket imgTalkServerSocket = new ImgTalkServerSocket();
+                imgTalkServerSocket.startServer();
+            }
+        };
+        new testRead().start();
+
+    }
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
