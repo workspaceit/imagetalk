@@ -36,7 +36,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     public static final int type_txtChat =0 ;
     public static final int type_chatPic =1;
     public static final int type_chatVideo =2 ;
-
+    public static final int type_chatLocation =3 ;
     public ChatHistoryModel() {
         this.tableName = "chat_history";
 

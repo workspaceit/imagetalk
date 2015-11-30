@@ -85,3 +85,7 @@ ALTER TABLE  `location` ADD  `icon` VARCHAR( 500 )  NULL AFTER  `place_id` ;
 ALTER TABLE  `location` ADD  `name` TEXT NULL AFTER  `icon` ;
 ALTER TABLE  `location` ADD  `google_place_id` VARCHAR( 200 ) NULL AFTER  `name` ;
 
+
+# Date of change 30th Nov 2015
+
+ALTER TABLE  `chat_history` CHANGE  `type`  `type` INT( 11 ) NOT NULL DEFAULT  '0' COMMENT  'textChat = 0 , PhotoChat = 1,  VideoFile = 2 , Location = 3, Contact = 4 ';

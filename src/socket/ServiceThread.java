@@ -9,10 +9,12 @@ import model.ContactModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.Contact;
+import model.datamodel.app.Places;
 import model.datamodel.app.socket.Acknowledgement;
 import model.datamodel.app.socket.SocketResponse;
 import model.datamodel.app.socket.chat.ChatPhoto;
 import model.datamodel.app.socket.chat.ChatTransferStatus;
+import model.datamodel.app.socket.chat.LocationShare;
 import model.datamodel.app.socket.chat.TextChat;
 import model.datamodel.app.video.Videos;
 import model.datamodel.photo.Pictures;
@@ -26,12 +28,13 @@ import java.util.Date;
 public class ServiceThread extends Thread {
     final static String tag_authentication = "authentication";
     final static String tag_textChat = "textchat";
+    final static String tag_chatPhoto = "chatphoto_transfer";
+    final static String tag_chatLocation = "chatlocation_share";
+    final static String tag_chatVideo = "chatvideo_transfer";
+    final static String tag_ContactOnline = "contact_online";
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
     final static String tag_ChatReceived = "chat_received";
     final static String tag_UserOnline = "user_online";
-    final static String tag_ContactOnline = "contact_online";
-    final static String tag_chatPhoto = "chatphoto_transfer";
-    final static String tag_chatVideo = "chatvideo_transfer";
 
     private Socket serviceSocket;
     private boolean authintic;
@@ -105,6 +108,8 @@ public class ServiceThread extends Thread {
                             break;
                         case tag_chatVideo:
                             this.processChatVideoTransfer(this.socketResponse.responseData);
+                        case tag_chatLocation:
+                            this.processLocationChat(this.socketResponse.responseData);
                             break;
                         case tag_ChatAcknowledgement:
                             this.processChatAcknowledgement(this.socketResponse.responseData);
@@ -356,6 +361,72 @@ public class ServiceThread extends Thread {
             ex.printStackTrace();
         }
     }
+    private void processLocationChat(Object dataObject){
+        if(!this.checkForAuthentication()){
+            return;
+        }
+        this.socketResponse = new SocketResponse();
+        String chatId = this.getMsgId();
+
+
+
+        try{
+            String jObjStr = this.gson.toJson(dataObject);
+            LocationShare locationShare = this.gson.fromJson(jObjStr, LocationShare.class);
+            sendChatReceivedAcknowledgement(0, locationShare.tmpChatId,chatId, false,false);
+
+            System.out.println("Recepent :"+jObjStr);
+            System.out.println("chatPhoto.appCredential.id :" + jObjStr);
+            ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(locationShare.appCredential.id);
+
+            this.socketResponse.responseStat.tag = tag_chatPhoto;
+            this.socketResponse.responseStat.chatId = chatId;
+
+            int senderId = this.appCredential.id;
+            int receiverId = locationShare.appCredential.id;
+            locationShare.caption = validateChatTextMsg( locationShare.caption);
+            String textMsg = locationShare.caption;
+
+            locationShare.recevice = true;
+            locationShare.send = false;
+            Pictures pictures = ImageHelper.saveChatLocationPicture(locationShare.base64Img, senderId);
+            locationShare.base64Img = "";
+            locationShare.pictures = pictures;
+
+            locationShare.chatId = chatId;
+            this.socketResponse.responseData = locationShare;
+
+            // Received ackonwledgement
+
+            if(contactServiceThread!=null){
+                if(contactServiceThread.isOnline()) {
+                    this.sendData(this.gson.toJson(this.socketResponse));
+
+                    // Send text msg
+                    locationShare.appCredential = this.appCredential;
+                    contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
+
+
+                    System.out.println("================================");
+                    System.out.println("Send photo msg : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
+                    System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
+                    System.out.println("================================");
+
+                    sendChatAcknowledgement(0, locationShare.tmpChatId, chatId, false, true);
+                }else{
+                    sendChatAcknowledgement(0,locationShare.tmpChatId,chatId,false,false);
+                }
+            }else{
+                sendChatAcknowledgement(0,locationShare.tmpChatId,chatId,false,false);
+            }
+            // Saving to database
+            saveChatLocationInChatHistory(chatId, senderId, receiverId, pictures,locationShare.places);
+        }catch (ClassCastException ex){
+            sendError(chatId,"Can not cast the object");
+            ex.printStackTrace();
+        }
+
+    }
     private void processChatAcknowledgement(Object dataObject) {
 
         Acknowledgement acknowledgement = new Acknowledgement();
@@ -513,6 +584,28 @@ public class ServiceThread extends Thread {
                 chatHistory.setMedia_path(gson.toJson(pictures));
                 chatHistory.setFrom(senderId);
                 chatHistory.setChat_text(textMsg);
+                chatHistory.insert();
+            }
+        };
+        new DbOperationThread().start();
+    }
+    private void saveChatLocationInChatHistory(String chatId,int senderId,int receiverId,Pictures pictures,Places places){
+
+        int uId = this.appCredential.id;
+        class DbOperationThread extends Thread{
+            @Override
+            public void run() {
+
+
+                ChatHistoryModel chatHistory = new ChatHistoryModel();
+                chatHistory.setChat_id(chatId);
+                chatHistory.setTo(receiverId);
+                chatHistory.setType(ChatHistoryModel.type_chatLocation);
+                chatHistory.setMedia_path(gson.toJson(pictures));
+                chatHistory.setFrom(senderId);
+                chatHistory.setExtra(gson.toJson(places));
+
+
                 chatHistory.insert();
             }
         };
