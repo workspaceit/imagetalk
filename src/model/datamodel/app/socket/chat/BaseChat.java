@@ -8,6 +8,7 @@ import model.datamodel.app.AppCredential;
 public class BaseChat {
     public int id;
     public String chatId;
+    public String tmpChatId;
     public AppCredential appCredential;
     public Object extra;
     public boolean recevice;
@@ -20,6 +21,7 @@ public class BaseChat {
         super();
         this.id = 0;
         this.chatId = "";
+        this.tmpChatId = "";
         this.appCredential = new AppCredential();
         this.extra = new Object();
         this.createdDate = "";

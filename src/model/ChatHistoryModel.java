@@ -245,7 +245,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ myId+" AND `to` ="+ receiver+" OR `from` = "+receiver+" AND `to` = "+myId+
-                " ORDER BY created_date DESC LIMIT 1";
+                " ORDER BY ID DESC LIMIT 1";
 
 
         System.out.println(query);
@@ -288,6 +288,30 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
         return chatList;
+    }
+    public int getChatUnreadHistory(int myId,int receiver)
+    {
+
+        String query = "SELECT count(chat_history.id) as historyCount FROM `chat_history` " +
+                " WHERE `from` = "+receiver+" AND `to` = "+myId+
+                " AND read_status = 0 ORDER BY ID DESC LIMIT 11";
+
+
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+                return this.resultSet.getInt("historyCount");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return 0;
     }
     public ArrayList<Chat> getPreviousChatHistory(int duration)
     {
@@ -378,7 +402,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
                 ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
                 ArrayList<Chat> chats = chatHistoryModel.getChatHistory(myId,recipient);
+
                 chatHistory.chat = chats;
+                chatHistory.unRead = chatHistoryModel.getChatUnreadHistory(myId,recipient);
 
                 chatWithContactArrayList.add(chatHistory);
 
@@ -394,4 +420,5 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
     return chatWithContactArrayList;
     }
+
 }

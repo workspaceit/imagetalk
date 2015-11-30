@@ -8,6 +8,7 @@ import model.datamodel.app.AppCredential;
 public class Acknowledgement{
     public int id;
     public String chatId;
+    public String tmpChatId;
     public AppCredential appCredential;
     public boolean isRead;
     public boolean isOnline;

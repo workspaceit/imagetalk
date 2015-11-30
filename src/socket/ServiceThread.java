@@ -27,6 +27,7 @@ public class ServiceThread extends Thread {
     final static String tag_authentication = "authentication";
     final static String tag_textChat = "textchat";
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
+    final static String tag_ChatReceived = "chat_received";
     final static String tag_UserOnline = "user_online";
     final static String tag_ContactOnline = "contact_online";
     final static String tag_chatPhoto = "chatphoto_transfer";
@@ -184,7 +185,7 @@ public class ServiceThread extends Thread {
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(textChat.appCredential.id);
 
             this.socketResponse.responseStat.tag = tag_textChat;
-
+            this.socketResponse.responseStat.chatId = chatId;
 
             int senderId = this.appCredential.id;
             int receiverId = textChat.appCredential.id;
@@ -193,13 +194,19 @@ public class ServiceThread extends Thread {
 
             textChat.recevice = true;
             textChat.send = false;
+            textChat.chatId = chatId;
+            this.socketResponse.responseData = textChat;
+            // Received acknowledgement
+            sendChatReceivedAcknowledgement(0, textChat.tmpChatId,chatId, false,false);
+
             if(contactServiceThread!=null){
 
                 if(contactServiceThread.isOnline()) {
+
+
+
                     // Send text msg
-                    textChat.chatId = chatId;
                     textChat.appCredential = this.appCredential;
-                    this.socketResponse.responseData = textChat;
 
                     contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
 
@@ -209,13 +216,13 @@ public class ServiceThread extends Thread {
                     System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
                     System.out.println("================================");
                 }else{
-                    sendChatAcknowledgement(0,chatId,false,false);
+                    sendChatAcknowledgement(0,textChat.tmpChatId,chatId,false,false);
                 }
             }else{
-                sendChatAcknowledgement(0,chatId,false,false);
+                sendChatAcknowledgement(0,textChat.tmpChatId,chatId,false,false);
             }
             // Saving to database
-            saveInChatHistory(chatId,senderId,receiverId,textMsg);
+            saveInChatHistory(chatId, senderId, receiverId, textMsg);
 
         }catch (ClassCastException ex){
             sendError(chatId, "Can not cast the object");
@@ -240,7 +247,7 @@ public class ServiceThread extends Thread {
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(chatPhoto.appCredential.id);
 
             this.socketResponse.responseStat.tag = tag_chatPhoto;
-
+            this.socketResponse.responseStat.chatId = chatId;
 
             int senderId = this.appCredential.id;
             int receiverId = chatPhoto.appCredential.id;
@@ -252,14 +259,19 @@ public class ServiceThread extends Thread {
             Pictures pictures = ImageHelper.saveChatPicture(chatPhoto.base64Img,senderId);
             chatPhoto.base64Img = "";
             chatPhoto.pictures = pictures;
+
+            chatPhoto.chatId = chatId;
+            this.socketResponse.responseData = chatPhoto;
+
+            // Received ackonwledgement
+            sendChatReceivedAcknowledgement(0, chatPhoto.tmpChatId,chatId, false,false);
+
             if(contactServiceThread!=null){
-
                 if(contactServiceThread.isOnline()) {
-                    // Send text msg
-                    chatPhoto.chatId = chatId;
-                    chatPhoto.appCredential = this.appCredential;
-                    this.socketResponse.responseData = chatPhoto;
+                    this.sendData(this.gson.toJson(this.socketResponse));
 
+                    // Send text msg
+                    chatPhoto.appCredential = this.appCredential;
                     contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
 
 
@@ -268,12 +280,12 @@ public class ServiceThread extends Thread {
                     System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
                     System.out.println("================================");
 
-                    sendChatAcknowledgement(0, chatId, false, true);
+                    sendChatAcknowledgement(0, chatPhoto.tmpChatId, chatId, false, true);
                 }else{
-                    sendChatAcknowledgement(0,chatId,false,false);
+                    sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
                 }
             }else{
-                sendChatAcknowledgement(0,chatId,false,false);
+                sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
             }
             // Saving to database
             savePhotoInChatHistory(chatId, senderId, receiverId, textMsg, pictures);
@@ -322,16 +334,16 @@ public class ServiceThread extends Thread {
                     System.out.println("Send video : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
                     //System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
                     System.out.println("================================");
-                    sendChatAcknowledgement(0, chatId, false, true);
+                    sendChatAcknowledgement(0,chatPhoto.tmpChatId, chatId, false, true);
 
                 }else{
                     //  saveOfflineMsg(textChat);
-                    sendChatAcknowledgement(0,chatId,false,false);
+                    sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
                 }
             }else{
                 // Offline text msg
                 //   saveOfflineMsg(textChat);
-                sendChatAcknowledgement(0,chatId,false,false);
+                sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
             }
             // Saving to database
             saveVideoInChatHistory(chatId, senderId, receiverId, textMsg, chatPhoto.base64Img);
@@ -559,9 +571,9 @@ public class ServiceThread extends Thread {
             public void run() {
                 ChatHistoryModel chatHistory = new ChatHistoryModel();
                 chatHistory.setChat_id(chatId);
-                chatHistory.setTo(senderId);
+                chatHistory.setTo(receiverId);
                 chatHistory.setType(ChatHistoryModel.type_txtChat);
-                chatHistory.setFrom(receiverId);
+                chatHistory.setFrom(senderId);
                 chatHistory.setChat_text(textMsg);
                 chatHistory.insert();
             }
@@ -594,14 +606,44 @@ public class ServiceThread extends Thread {
         return tempMsg;
     }
 
-    private void sendChatAcknowledgement(int id,String chatId,boolean isRead,boolean isOline){
+    private void sendChatAcknowledgement(int id,String tmpChatId,String chatId,boolean isRead,boolean isOline){
         Acknowledgement acknowledgement = new Acknowledgement();
 
 
         this.socketResponse = new SocketResponse();
         this.socketResponse.responseStat.tag = tag_ChatAcknowledgement;
 
+        this.socketResponse.responseStat.chatId = chatId;
+
         acknowledgement.id = id;
+        acknowledgement.tmpChatId = tmpChatId;
+        acknowledgement.chatId  = chatId;
+        acknowledgement.isRead =isRead;
+        acknowledgement.isOnline =isOline;
+        acknowledgement.appCredential = this.appCredential;
+
+        this.socketResponse.responseData = acknowledgement;
+
+        this.sendData(this.gson.toJson(this.socketResponse));
+
+
+        System.out.println("********************************************");
+        System.out.println("Send text msg : to " + acknowledgement.appCredential.user.firstName);
+        System.out.println("Send text Object " + this.gson.toJson(this.socketResponse));
+        System.out.println(" Offline text msg and obj null");
+        System.out.println("********************************************");
+    }
+    private void sendChatReceivedAcknowledgement(int id,String tmpChatId,String chatId,boolean isRead,boolean isOline){
+        Acknowledgement acknowledgement = new Acknowledgement();
+
+
+        this.socketResponse = new SocketResponse();
+        this.socketResponse.responseStat.tag = tag_ChatReceived;
+
+        this.socketResponse.responseStat.chatId = chatId;
+
+        acknowledgement.id = id;
+        acknowledgement.tmpChatId = tmpChatId;
         acknowledgement.chatId  = chatId;
         acknowledgement.isRead =isRead;
         acknowledgement.isOnline =isOline;
