@@ -93,7 +93,7 @@ public class AppLoginController extends HttpServlet {
         throws ServletException,IOException{
         Login login = new Login();
         ImageTalkBaseController baseController = new ImageTalkBaseController();
-        if(baseController.isAppSessionValid(req)){
+        if(!baseController.isAppSessionValid(req)){
             this.baseController.serviceResponse.responseStat.status=false;
             this.baseController.serviceResponse.responseStat.msg = "Session Expired";
             this.baseController.serviceResponse.responseStat.isLogin=false;
