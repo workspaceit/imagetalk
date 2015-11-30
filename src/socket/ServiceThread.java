@@ -179,9 +179,13 @@ public class ServiceThread extends Thread {
         this.socketResponse = new SocketResponse();
         String chatId = this.getMsgId();
         try{
+
             String jObjStr = this.gson.toJson(dataObject);
 
             TextChat textChat = this.gson.fromJson(jObjStr, TextChat.class);
+// Send received ackoledgement
+            sendChatReceivedAcknowledgement(0, textChat.tmpChatId,chatId, false,false);
+
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(textChat.appCredential.id);
 
             this.socketResponse.responseStat.tag = tag_textChat;
@@ -197,7 +201,6 @@ public class ServiceThread extends Thread {
             textChat.chatId = chatId;
             this.socketResponse.responseData = textChat;
             // Received acknowledgement
-            sendChatReceivedAcknowledgement(0, textChat.tmpChatId,chatId, false,false);
 
             if(contactServiceThread!=null){
 
@@ -241,9 +244,11 @@ public class ServiceThread extends Thread {
 
         try{
             String jObjStr = this.gson.toJson(dataObject);
-            System.out.println("Recepent :"+jObjStr);
             ChatPhoto chatPhoto = this.gson.fromJson(jObjStr, ChatPhoto.class);
-            System.out.println("chatPhoto.appCredential.id :"+jObjStr);
+            sendChatReceivedAcknowledgement(0, chatPhoto.tmpChatId,chatId, false,false);
+
+            System.out.println("Recepent :"+jObjStr);
+            System.out.println("chatPhoto.appCredential.id :" + jObjStr);
             ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(chatPhoto.appCredential.id);
 
             this.socketResponse.responseStat.tag = tag_chatPhoto;
@@ -264,7 +269,6 @@ public class ServiceThread extends Thread {
             this.socketResponse.responseData = chatPhoto;
 
             // Received ackonwledgement
-            sendChatReceivedAcknowledgement(0, chatPhoto.tmpChatId,chatId, false,false);
 
             if(contactServiceThread!=null){
                 if(contactServiceThread.isOnline()) {
@@ -504,10 +508,10 @@ public class ServiceThread extends Thread {
 
                 ChatHistoryModel chatHistory = new ChatHistoryModel();
                 chatHistory.setChat_id(chatId);
-                chatHistory.setTo(senderId);
+                chatHistory.setTo(receiverId);
                 chatHistory.setType(ChatHistoryModel.type_chatPic);
                 chatHistory.setMedia_path(gson.toJson(pictures));
-                chatHistory.setFrom(receiverId);
+                chatHistory.setFrom(senderId);
                 chatHistory.setChat_text(textMsg);
                 chatHistory.insert();
             }
@@ -637,10 +641,10 @@ public class ServiceThread extends Thread {
         Acknowledgement acknowledgement = new Acknowledgement();
 
 
-        this.socketResponse = new SocketResponse();
-        this.socketResponse.responseStat.tag = tag_ChatReceived;
+        SocketResponse socketResponse = new SocketResponse();
+        socketResponse.responseStat.tag = tag_ChatReceived;
 
-        this.socketResponse.responseStat.chatId = chatId;
+        socketResponse.responseStat.chatId = chatId;
 
         acknowledgement.id = id;
         acknowledgement.tmpChatId = tmpChatId;
@@ -649,14 +653,14 @@ public class ServiceThread extends Thread {
         acknowledgement.isOnline =isOline;
         acknowledgement.appCredential = this.appCredential;
 
-        this.socketResponse.responseData = acknowledgement;
+        socketResponse.responseData = acknowledgement;
 
-        this.sendData(this.gson.toJson(this.socketResponse));
+        this.sendData(this.gson.toJson(socketResponse));
 
 
         System.out.println("********************************************");
         System.out.println("Send text msg : to " + acknowledgement.appCredential.user.firstName);
-        System.out.println("Send text Object " + this.gson.toJson(this.socketResponse));
+        System.out.println("Send text Object " + this.gson.toJson(socketResponse));
         System.out.println(" Offline text msg and obj null");
         System.out.println("********************************************");
     }
