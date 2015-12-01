@@ -5,7 +5,7 @@ import model.datamodel.app.Places;
 /**
  * Created by mi on 11/30/15.
  */
-public class LocationShare extends ChatPhoto{
+public class LocationShare extends BaseChat{
     public Places places;
 
     public LocationShare() {

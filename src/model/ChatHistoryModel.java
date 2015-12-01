@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import model.datamodel.app.Chat;
 import model.datamodel.app.ChatHistory;
 import model.datamodel.app.Contact;
+import model.datamodel.app.Places;
+import model.datamodel.app.socket.chat.ContactShare;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -36,7 +38,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     public static final int type_txtChat =0 ;
     public static final int type_chatPic =1;
     public static final int type_chatVideo =2 ;
-    public static final int type_chatLocation =3 ;
+    public static final int type_chatLocationShare =3 ;
+    public static final int type_chatContactShare =4 ;
+    public static final int type_chatPrivatePhoto =5 ;
     public ChatHistoryModel() {
         this.tableName = "chat_history";
 
@@ -190,7 +194,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
-                " ORDER BY created_date DESC";
+                " AND is_deleted = 0 ORDER BY created_date DESC";
 
         if(this.limit>0)
         {
@@ -210,16 +214,21 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
                 chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
-                chat.extra = (this.resultSet.getObject("chat_history.extra")==null
-                        || this.resultSet.getString("chat_history.extra").equals("null"))? new Object() : this.resultSet.getString("chat_history.extra");
                 chat.type = this.resultSet.getInt("chat_history.type");
 
+                if(chat.type==3) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Places.class);
+                }else if(chat.type==4) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), ContactShare.class);
+                }
                 if(chat.type==1){
-
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                                       || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
                 }
+
+
                 try {
                     chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
                 }catch(Exception e) {
@@ -245,7 +254,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE `from` ="+ myId+" AND `to` ="+ receiver+" OR `from` = "+receiver+" AND `to` = "+myId+
-                " ORDER BY ID DESC LIMIT 1";
+                " AND is_deleted = 0  ORDER BY ID DESC LIMIT 1";
 
 
         System.out.println(query);
