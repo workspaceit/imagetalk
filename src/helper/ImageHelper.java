@@ -17,12 +17,12 @@ import java.util.logging.Level;
  */
 public class ImageHelper {
     //server settings for pictures and images
-    private final static String GLOBAL_PATH = "/home/wsit/Projects/j2ee/imagetalk_picture/";
-    private final static String STICKER_GLOBAL_PATH = "/home/wsit/Projects/j2ee/";
+   // private final static String GLOBAL_PATH = "/home/wsit/Projects/j2ee/imagetalk_picture/";
+   // private final static String STICKER_GLOBAL_PATH = "/home/wsit/Projects/j2ee/";
 
 //      Local settings for pictures and Images
-//    private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
-//    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
+    private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
+    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
 
     public static String getGlobalPath() {
         return GLOBAL_PATH;
@@ -225,6 +225,66 @@ public class ImageHelper {
             PictureDetails thumb2 = new PictureDetails();
             thumb2.type = "thumbnail";
             thumb2.path = createThumbnail(decodeToImage((String) imgObj), 200, 200, uId + "/chat/media/picture");
+            thumb2.size.width = 48;
+            thumb2.size.height = 48;
+
+            pictures.thumb.add(thumb2);
+
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return pictures;
+        }
+        return pictures;
+    }
+    public static Pictures saveChatPrivatePicture(Object imgObj, int uId) {
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+        try {
+            fileName = +System.nanoTime() + ".jpg";
+            path += uId;
+            createDirIfNotExist(path);
+            path += "/chat";
+            createDirIfNotExist(path);
+            path += "/media";
+            createDirIfNotExist(path);
+            path += "/picture";
+            createDirIfNotExist(path);
+            path += "/private";
+            createDirIfNotExist(path);
+            path += "/" + fileName;
+            System.out.println(path);
+            File file = new File(path);
+            BufferedImage img;
+
+            if (imgObj.getClass().equals(BufferedImage.class)) {
+                img = (BufferedImage) imgObj;
+            } else if (imgObj.getClass().equals(String.class)) {
+                img = decodeToImage((String) imgObj);
+            }else{
+                img = decodeToImage((String) imgObj);
+            }
+
+            ImageIO.write(img, "jpg", file);
+
+            fileName = uId + "/chat/media/picture/private/" + fileName;
+            pictures.original.size.height = img.getHeight();
+            pictures.original.size.width = img.getWidth();
+            pictures.original.path = fileName;
+
+
+            PictureDetails thumb1 = new PictureDetails();
+            thumb1.type = "thumbnail";
+            thumb1.path = createThumbnail(decodeToImage((String) imgObj), 100, 100, uId + "/chat/media/picture/private");
+
+            thumb1.size.width = 32;
+            thumb1.size.height = 32;
+
+            pictures.thumb.add(thumb1);
+
+            PictureDetails thumb2 = new PictureDetails();
+            thumb2.type = "thumbnail";
+            thumb2.path = createThumbnail(decodeToImage((String) imgObj), 200, 200, uId + "/chat/media/picture/private");
             thumb2.size.width = 48;
             thumb2.size.height = 48;
 

@@ -99,6 +99,7 @@ public class ChatController extends HttpServlet {
         baseController.serviceResponse.responseStat.status = true;
         baseController.serviceResponse.responseData = chatWithContactArrayList;
         //this.pw.print(this.baseController.getResponse());
+
         return baseController.getResponse();
 
     }
@@ -288,6 +289,8 @@ public class ChatController extends HttpServlet {
         baseController.serviceResponse.responseStat.status = true;
         baseController.serviceResponse.responseData = chatArrayList;
         //this.pw.print(this.baseController.getResponse());
+
+        System.out.println(baseController.getResponse());
         return baseController.getResponse();
 
     }

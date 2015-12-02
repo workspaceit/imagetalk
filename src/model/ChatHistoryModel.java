@@ -189,12 +189,27 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `read_status`= 1  WHERE `chat_id`="+this.chat_id;
         return this.updateData(query);
     }
+    public boolean updateIsDeleteTrueById()
+    {
+        String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `id`="+this.id;
+        return this.updateData(query);
+    }
+    public boolean updateMediaById()
+    {
+        String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `id`="+this.id;
+        return this.updateData(query);
+    }
+    public boolean deleteById()
+    {
+        String query = "DELETE FROM " + this.tableName + "  WHERE `id`="+this.id;
+        return this.updateData(query);
+    }
     public ArrayList<Chat> getChatHistory()
     {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
-                "WHERE `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+
-                " AND is_deleted = 0 ORDER BY created_date DESC";
+                "WHERE ( `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+" ) "+
+                " AND is_deleted = 0 ORDER BY id DESC";
 
         if(this.limit>0)
         {
@@ -221,9 +236,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                             || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Places.class);
                 }else if(chat.type==4) {
                     chat.extra = (this.resultSet.getObject("chat_history.extra") == null
-                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), ContactShare.class);
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Contact.class);
                 }
-                if(chat.type==1){
+                if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                                       || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
                 }
