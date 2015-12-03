@@ -60,6 +60,12 @@ public class PictureAndFileController extends HttpServlet {
             System.out.println(req.getParameter("p"));
             picRelativePath = URLDecoder.decode(req.getParameter("p"), "UTF-8");
             System.out.println(picRelativePath);
+            File file = new File(ImageHelper.getGlobalPath()+picRelativePath);
+            if (!file.exists()) {
+                return;
+            }
+
+
             in = new FileInputStream(ImageHelper.getGlobalPath()+picRelativePath);
             String mimeType = "image/jpeg";
             byte[] bytes = new byte[1024];

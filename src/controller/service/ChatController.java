@@ -35,11 +35,11 @@ public class ChatController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
        /* this.req = req;
         this.res = resp;*/
         res.setContentType("application/json");
-        baseController = new ImageTalkBaseController();
+        baseController = new ImageTalkBaseController(req);
         PrintWriter pw = res.getWriter();
 
         this.gson = new Gson();
@@ -72,6 +72,9 @@ public class ChatController extends HttpServlet {
                 break;
             case "/app/user/chat/showLatest":
                 pw.print(this.showLatest(req));
+                break;
+            case "/app/user/chat/private/photo/snapshot/confirm":
+                pw.print(this.confirmTakeSnapshot(req));
                 break;
             default:
                 break;
@@ -300,7 +303,7 @@ public class ChatController extends HttpServlet {
     }
 
     private String updateReadStatus(HttpServletRequest req) {
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         int read_status=0;
         int c_id;
@@ -356,7 +359,7 @@ public class ChatController extends HttpServlet {
 
 
     private String addchat(HttpServletRequest req) {
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         String chat_id;
         int to;
@@ -482,7 +485,31 @@ public class ChatController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "Chat added successfully";
         baseController.serviceResponse.responseStat.status = true;
         return baseController.getResponse();
+    }
+    private String confirmTakeSnapshot(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
 
+        int id;
+        if(!baseController.checkParam("id",req,true))
+        {
+            baseController.serviceResponse.responseStat.msg = "id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }else{
+            try{
+
+                id =  Integer.parseInt(req.getParameter("id"));
+            }catch (Exception ex){
+                ex.printStackTrace();
+                baseController.serviceResponse.responseStat.msg = "id Int required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+        ChatHistoryModel chatHistory = new  ChatHistoryModel();
+        chatHistory.setId(id);
+        chatHistory.updateIsTakeSnapShotStatusById();
+        return baseController.getResponse();
     }
 }

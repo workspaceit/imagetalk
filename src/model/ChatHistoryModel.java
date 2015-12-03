@@ -6,6 +6,7 @@ import model.datamodel.app.ChatHistory;
 import model.datamodel.app.Contact;
 import model.datamodel.app.Places;
 import model.datamodel.app.socket.chat.ContactShare;
+import model.datamodel.app.socket.chat.PrivateChatPhoto;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -194,6 +195,30 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `id`="+this.id;
         return this.updateData(query);
     }
+    public boolean updateIsTakeSnapShotStatusById()
+    {
+        Chat chat = this.getChatHistoryById();
+
+        PrivateChatPhoto privateChatPhoto =(PrivateChatPhoto)chat.extra;
+        privateChatPhoto.tookSnapShot = true;
+
+        this.setExtra(gson.toJson(privateChatPhoto));
+
+        String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `id`="+this.id;
+        return this.updateData(query);
+    }
+    public boolean updateIsTakeSnapShotStatusByChatId()
+    {
+        Chat chat = this.getChatHistoryById();
+
+        PrivateChatPhoto privateChatPhoto =(PrivateChatPhoto)chat.extra;
+        privateChatPhoto.tookSnapShot = true;
+
+        this.setExtra(gson.toJson(privateChatPhoto));
+
+        String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `chat_id`='"+this.chat_id+"'";
+        return this.updateData(query);
+    }
     public boolean updateMediaById()
     {
         String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `id`="+this.id;
@@ -263,6 +288,56 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
         Collections.reverse(chatList);
         return chatList;
+    }
+    public Chat getChatHistoryById()
+    {
+        Chat chat = new Chat();
+        String query = "SELECT chat_history.* FROM `chat_history` " +
+                "WHERE id = "+this.id;
+        this.setQuery(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+
+
+                chat.id = this.resultSet.getLong("chat_history.id");
+                chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chat.to = this.resultSet.getInt("chat_history.to");
+                chat.from = this.resultSet.getInt("chat_history.from");
+                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                chat.type = this.resultSet.getInt("chat_history.type");
+
+                if(chat.type==3) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Places.class);
+                }else if(chat.type==4) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Contact.class);
+                }else if(chat.type==5){
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                }
+                if(chat.type==1 || chat.type==5){
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }
+                try {
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
+                }catch(Exception e) {
+                    chat.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chat.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+
+        return chat;
     }
     public ArrayList<Chat> getChatHistory(int myId,int receiver)
     {

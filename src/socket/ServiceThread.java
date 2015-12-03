@@ -29,6 +29,7 @@ public class ServiceThread extends Thread {
     final static String tag_chatLocation = "chatlocation_share";
     final static String tag_ChatContactShare = "chatcontact_share";
     final static String tag_chatPrivatePhoto = "chatprivatephoto_transfer";
+    final static String tag_chatPrivatePhotoTookSnapshot = "chat_private_photo_took_snapshot";
     final static String tag_chatVideo = "chatvideo_transfer";
     final static String tag_ContactOnline = "contact_online";
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
@@ -116,6 +117,9 @@ public class ServiceThread extends Thread {
                             break;
                         case tag_chatPrivatePhoto:
                             this.processChatPrivatePhotoTransfer(this.socketResponse.responseData);
+                            break;
+                        case tag_chatPrivatePhotoTookSnapshot:
+                            this.processChatPrivateTookSnapShot(this.socketResponse.responseData);
                             break;
                         case tag_ChatAcknowledgement:
                             this.processChatAcknowledgement(this.socketResponse.responseData);
@@ -416,12 +420,73 @@ public class ServiceThread extends Thread {
                 sendChatAcknowledgement(0,privateChatPhoto.tmpChatId,chatId,false,false);
             }
             // Saving to database
-            savePrivatePhotoInChatHistory(chatId, senderId, receiverId, textMsg, privateChatPhoto,contactServiceThread);
+            savePrivatePhotoInChatHistory(chatId, senderId, receiverId, textMsg, privateChatPhoto, contactServiceThread);
         }catch (ClassCastException ex){
             sendError(chatId,"Can not cast the object");
             ex.printStackTrace();
         }
 
+    }
+    private void processChatPrivateTookSnapShot(Object dataObject){
+//        chatHistory.setId(id);
+//        chatHistory.updateIsTakeSnapShotStatusById();
+
+        if(!this.checkForAuthentication()){
+            return;
+        }
+        this.socketResponse = new SocketResponse();
+        String chatId = this.getMsgId();
+
+
+
+        try{
+            String jObjStr = this.gson.toJson(dataObject);
+            PrivateChatPhoto privateChatPhoto = this.gson.fromJson(jObjStr, PrivateChatPhoto.class);
+
+            // Sending the sender Received Acknowledgement
+            sendChatReceivedAcknowledgement(0, privateChatPhoto.tmpChatId, chatId, false, false);
+
+
+            ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(privateChatPhoto.appCredential.id);
+
+            this.socketResponse.responseStat.tag = tag_chatPrivatePhotoTookSnapshot;
+            this.socketResponse.responseStat.chatId = chatId;
+
+            int senderId = this.appCredential.id;
+            int receiverId = privateChatPhoto.appCredential.id;
+            privateChatPhoto.caption = validateChatTextMsg( privateChatPhoto.caption);
+            String textMsg = privateChatPhoto.caption;
+
+            privateChatPhoto.recevice = true;
+            privateChatPhoto.send = false;
+
+
+            this.socketResponse.responseData = privateChatPhoto;
+
+            if(contactServiceThread!=null){
+                if(contactServiceThread.isOnline()) {
+                    // Send text msg
+                    privateChatPhoto.appCredential = this.appCredential;
+                    contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
+
+                    System.out.println("================================");
+                    System.out.println("Send photo msg : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
+                    System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
+                    System.out.println("================================");
+
+                   // sendChatAcknowledgement(0, privateChatPhoto.tmpChatId, chatId, false, true);
+                }else{
+                   // sendChatAcknowledgement(0,privateChatPhoto.tmpChatId,chatId,false,false);
+                }
+            }else{
+               // sendChatAcknowledgement(0,privateChatPhoto.tmpChatId,chatId,false,false);
+            }
+            // Saving to database
+            updatePrivatePhotoTakeSnapShotStatusInChatHistory(chatId);
+        }catch (ClassCastException ex){
+            sendError(chatId,"Can not cast the object");
+            ex.printStackTrace();
+        }
     }
     private void processChatVideoTransfer(Object dataObject){
         if(!this.checkForAuthentication()){
@@ -714,6 +779,7 @@ public class ServiceThread extends Thread {
                 chatHistory.setChat_id(chatId);
                 chatHistory.setTo(receiverId);
                 chatHistory.setType(ChatHistoryModel.type_chatPrivatePhoto);
+                chatHistory.setExtra(gson.toJson(privateChatPhoto));
                 chatHistory.setMedia_path(gson.toJson(privateChatPhoto.pictures));
                 chatHistory.setFrom(senderId);
                 chatHistory.setChat_text(textMsg);
@@ -726,7 +792,7 @@ public class ServiceThread extends Thread {
                         this.sleep(privateChatPhoto.timer * 1000);
                         System.out.println("Executed after " + privateChatPhoto.timer * 1000 + "Mili Sec");
                         chatHistory.updateIsDeleteTrueById();
-                        sendChatPrivatePhotoAcknowledgement(0,chatId,privateChatPhoto.tmpChatId,false,false);
+                        sendChatPrivatePhotoAcknowledgement(0,privateChatPhoto.tmpChatId,chatId,false,false);
 
                         if(contactServiceThread!=null){
                             if(contactServiceThread.isOnline()){
@@ -739,6 +805,19 @@ public class ServiceThread extends Thread {
                 }
 
 
+            }
+        };
+        new DbOperationThread().start();
+    }
+    private void updatePrivatePhotoTakeSnapShotStatusInChatHistory(String chatId){
+
+        int uId = this.appCredential.id;
+        class DbOperationThread extends Thread{
+            @Override
+            public void run() {
+                ChatHistoryModel chatHistory = new ChatHistoryModel();
+                chatHistory.setChat_id(chatId);
+                chatHistory.updateIsTakeSnapShotStatusByChatId();
             }
         };
         new DbOperationThread().start();
