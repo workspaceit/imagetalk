@@ -9,6 +9,7 @@ public class Acknowledgement{
     public int id;
     public String chatId;
     public String tmpChatId;
+    public Object extra;
     public AppCredential appCredential;
     public boolean isRead;
     public boolean isOnline;
@@ -16,6 +17,7 @@ public class Acknowledgement{
     public Acknowledgement() {
         this.id = 0;
         this.chatId = "";
+        Object extra = new Object();
         this.appCredential = new AppCredential();
         this.isRead = false;
         this.isOnline = false;

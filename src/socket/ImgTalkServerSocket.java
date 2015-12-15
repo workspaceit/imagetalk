@@ -13,7 +13,7 @@ public class ImgTalkServerSocket {
     public void startServer(){
         System.out.println("OK");
 
-        int postNumber = 9091;
+        int postNumber = 9025;
         boolean runServer =true;
         int count = 1;
 

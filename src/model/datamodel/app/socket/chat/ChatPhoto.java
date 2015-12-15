@@ -15,7 +15,6 @@ public class ChatPhoto extends BaseChat{
 
     public ChatPhoto(){
         super();
-        this.appCredential = new AppCredential();
         this.caption = "";
         this.base64Img = "";
         this.type = 1;

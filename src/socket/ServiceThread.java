@@ -21,6 +21,7 @@ import java.net.Socket;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ServiceThread extends Thread {
     final static String tag_authentication = "authentication";
@@ -30,10 +31,12 @@ public class ServiceThread extends Thread {
     final static String tag_ChatContactShare = "chatcontact_share";
     final static String tag_chatPrivatePhoto = "chatprivatephoto_transfer";
     final static String tag_chatPrivatePhotoTookSnapshot = "chat_private_photo_took_snapshot";
+    final static String tag_chatPrivatePhotoTookSnapshotStartCountDown = "chat_private_photo_transfer_start_countdown";
     final static String tag_chatVideo = "chatvideo_transfer";
     final static String tag_ContactOnline = "contact_online";
     final static String tag_ChatAcknowledgement = "chat_acknowledgement";
     final static String tag_ChatPrivatePhotoAcknowledgement = "chat_private_photo_destroy_acknowledgement";
+    final static String tag_ChatPrivatePhotoCountDownAcknowledgement = "chat_private_photo_countdown_acknowledgement";
     final static String tag_ChatReceived = "chat_received";
     final static String tag_UserOnline = "user_online";
 
@@ -82,7 +85,9 @@ public class ServiceThread extends Thread {
                     String recvStr = input.readLine();
                     if(recvStr==null || recvStr==""){
                         this.closeConnection();
-
+                        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+                        appLoginCredentialModel.setId(appCredential.id);
+                        appLoginCredentialModel.updateLastLogout();
                         System.out.println("Connection closed");
 
                         continue;
@@ -121,6 +126,9 @@ public class ServiceThread extends Thread {
                         case tag_chatPrivatePhotoTookSnapshot:
                             this.processChatPrivateTookSnapShot(this.socketResponse.responseData);
                             break;
+                        case tag_chatPrivatePhotoTookSnapshotStartCountDown:
+                            this.processChatPrivatePhotoTransferStartCountDown(this.socketResponse.responseData);
+                            break;
                         case tag_ChatAcknowledgement:
                             this.processChatAcknowledgement(this.socketResponse.responseData);
                             break;
@@ -133,8 +141,6 @@ public class ServiceThread extends Thread {
                         default:
                             break;
                     }
-
-
                 } catch (IOException e) {
                     output.close();
                     input.close();
@@ -146,11 +152,12 @@ public class ServiceThread extends Thread {
                // this.sendData(this.gson.toJson(this.socketResponse));
             }
         } catch (IOException e) {
+
             e.printStackTrace();
         }
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setId(appCredential.id);
+        appLoginCredentialModel.updateLastLogout();
     }
     private void processAuthentication(Object dataObject){
 
@@ -427,6 +434,64 @@ public class ServiceThread extends Thread {
         }
 
     }
+    private void processChatPrivatePhotoTransferStartCountDown(Object dataObject){
+        if(!this.checkForAuthentication()){
+            return;
+        }
+        this.socketResponse = new SocketResponse();
+        String chatId = this.getMsgId();
+
+
+
+        try{
+            String jObjStr = this.gson.toJson(dataObject);
+            PrivateChatPhoto privateChatPhoto = this.gson.fromJson(jObjStr, PrivateChatPhoto.class);
+            // Sending the sender Received Acknowledgement
+            sendChatReceivedAcknowledgement(0, privateChatPhoto.tmpChatId, chatId, false, false);
+
+            System.out.println("Recepent :"+jObjStr);
+            System.out.println("chatPhoto.appCredential.id :" + jObjStr);
+            ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(privateChatPhoto.appCredential.id);
+
+            this.socketResponse.responseStat.tag = tag_chatPrivatePhotoTookSnapshotStartCountDown;
+            this.socketResponse.responseStat.chatId = chatId;
+
+            int senderId = this.appCredential.id;
+            int receiverId = privateChatPhoto.appCredential.id;
+            privateChatPhoto.caption = validateChatTextMsg( privateChatPhoto.caption);
+            String textMsg = privateChatPhoto.caption;
+
+            privateChatPhoto.recevice = true;
+            privateChatPhoto.send = false;
+            Pictures pictures = ImageHelper.saveChatPrivatePicture(privateChatPhoto.base64Img, senderId);
+            privateChatPhoto.base64Img = "";
+            privateChatPhoto.pictures = pictures;
+
+            privateChatPhoto.chatId = chatId;
+            this.socketResponse.responseData = privateChatPhoto;
+
+            if(contactServiceThread!=null) {
+                if (contactServiceThread.isOnline()) {
+
+                    // Send text msg
+                    privateChatPhoto.appCredential = this.appCredential;
+                    contactServiceThread.sendData(this.gson.toJson(this.socketResponse));
+
+
+                    System.out.println("================================");
+                    System.out.println("Send photo msg : to " + contactServiceThread.appCredential.user.firstName + " " + contactServiceThread.appCredential.user.lastName);
+                    System.out.println("Send text Object " + this.gson.toJson(this.socketResponse));
+                    System.out.println("================================");
+                }
+                destroyPrivatePhotoUsingTimer(privateChatPhoto, chatId, contactServiceThread);
+            }
+
+        }catch (ClassCastException ex){
+            sendError(chatId,"Can not cast the object");
+            ex.printStackTrace();
+        }
+
+    }
     private void processChatPrivateTookSnapShot(Object dataObject){
 //        chatHistory.setId(id);
 //        chatHistory.updateIsTakeSnapShotStatusById();
@@ -527,7 +592,7 @@ public class ServiceThread extends Thread {
                     System.out.println("Send video : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
                     //System.out.println("Send text Object "+this.gson.toJson(this.socketResponse));
                     System.out.println("================================");
-                    sendChatAcknowledgement(0,chatPhoto.tmpChatId, chatId, false, true);
+                    sendChatAcknowledgement(0, chatPhoto.tmpChatId, chatId, false, true);
 
                 }else{
                     //  saveOfflineMsg(textChat);
@@ -716,12 +781,24 @@ public class ServiceThread extends Thread {
                     if(contactServiceThread.isOnline()) {
                         acknowledgement.isOnline = true;
                     }else{
+                        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+                        HashMap<String,String> lastSeen = new HashMap();
+                        lastSeen.put("lastSeen", appLoginCredentialModel.getLastLogoutTime());
+
                         acknowledgement.isOnline = false;
+                        acknowledgement.extra = lastSeen;
+
                     }
                     acknowledgement.appCredential = contactServiceThread.appCredential;
                 }else{
                     acknowledgement.isOnline = false;
-                    System.out.println("Obj is null");
+                    AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+                    HashMap<String,String> lastSeen = new HashMap();
+                    lastSeen.put("lastSeen", appLoginCredentialModel.getLastLogoutTime());
+
+                    acknowledgement.isOnline = false;
+                    acknowledgement.extra = lastSeen;
+                    System.out.println("Contact is false");
                     acknowledgement.appCredential.id = appCredentialId;
                 }
 
@@ -769,7 +846,6 @@ public class ServiceThread extends Thread {
     }
     private void savePrivatePhotoInChatHistory(String chatId,int senderId,int receiverId,String textMsg,PrivateChatPhoto privateChatPhoto, ServiceThread contactServiceThread){
 
-        int uId = this.appCredential.id;
         class DbOperationThread extends Thread{
             @Override
             public void run() {
@@ -785,29 +861,43 @@ public class ServiceThread extends Thread {
                 chatHistory.setChat_text(textMsg);
                 chatHistory.insert();
 
-                try {
-                    System.out.println("Timer "+privateChatPhoto.timer);
-                    if(privateChatPhoto.timer!=0){
-
-                        this.sleep(privateChatPhoto.timer * 1000);
-                        System.out.println("Executed after " + privateChatPhoto.timer * 1000 + "Mili Sec");
-                        chatHistory.updateIsDeleteTrueById();
-                        sendChatPrivatePhotoAcknowledgement(0,privateChatPhoto.tmpChatId,chatId,false,false);
-
-                        if(contactServiceThread!=null){
-                            if(contactServiceThread.isOnline()){
-                                contactServiceThread.sendChatPrivatePhotoAcknowledgement(0,chatId,privateChatPhoto.tmpChatId,false,false);
-                            }
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-
             }
         };
         new DbOperationThread().start();
+    }
+    private void destroyPrivatePhotoUsingTimer(PrivateChatPhoto privateChatPhoto,String chatId,ServiceThread contactServiceThread)  {
+        class DestroyPrivatePhotoThread extends Thread {
+            @Override
+
+            public void run() {
+                System.out.println("Timer " + privateChatPhoto.timer);
+                if (privateChatPhoto.timer != 0) {
+
+                    try {
+                        this.sleep(privateChatPhoto.timer * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Executed after " + privateChatPhoto.timer * 1000 + "Mili Sec Chat Id" + chatId);
+                    ChatHistoryModel chatHistory = new ChatHistoryModel();
+                    chatHistory.setChat_id(chatId);
+                    chatHistory.updateIsDeleteTrueById();
+
+                    File file = new File(ImageHelper.getGlobalPath()+privateChatPhoto.pictures.original.path);
+                    if(file.exists()){
+                        file.delete();
+                    }
+                    sendChatPrivatePhotoAcknowledgement(0, privateChatPhoto.tmpChatId, chatId, false, false);
+
+                    if (contactServiceThread != null) {
+                        if (contactServiceThread.isOnline()) {
+                            contactServiceThread.sendChatPrivatePhotoAcknowledgement(0, chatId, privateChatPhoto.tmpChatId, false, false);
+                        }
+                    }
+                }
+            }
+        }
+        new DestroyPrivatePhotoThread().start();
     }
     private void updatePrivatePhotoTakeSnapShotStatusInChatHistory(String chatId){
 

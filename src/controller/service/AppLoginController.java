@@ -145,6 +145,9 @@ public class AppLoginController extends HttpServlet {
             countResponse.put("present",0);
             countResponse.put("wallPost",wallPostModel.getCountByOwnerId());
 
+            // Updating Last Login Time
+            appLoginCredentialModel.updateLastLogin();
+
             this.localResponseObj.extra = countResponse;
             this.baseController.serviceResponse.responseData =  this.localResponseObj;
             this.baseController.setAppSession(req, authCredential);

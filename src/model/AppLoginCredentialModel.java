@@ -254,7 +254,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
                        " left join location on location.id = user_inf.address_id " +
                        " left join job on job.app_login_credential_id = app_login_credential.id " +
                        " where app_login_credential.access_token = '" + this.access_token + "' limit 1";
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try {
@@ -508,8 +508,8 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
 
         String query = "INSERT INTO `app_login_credential` " +
-                       "(`u_id`, `phone_number`, `access_token`, `active`, `banned`)" +
-                       " VALUES (" + this.u_id + ",'" + this.phone_number + "',md5('" + this.access_token + "')," + this.active + "," + this.banned + ")";
+                       "(`u_id`, `phone_number`, `access_token`, `active`, `banned`,`created_date`,`last_logout`,`last_login`)" +
+                       " VALUES (" + this.u_id + ",'" + this.phone_number + "',md5('" + this.access_token + "')," + this.active + "," + this.banned + ",'"+this.getUtcDateTime()+"','"+this.getUtcDateTime()+"','"+this.getUtcDateTime()+"')";
 
         this.id = this.insertData(query);
         return this.id;
@@ -589,6 +589,36 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
         return "";
     }
+    public String getLastLoginTime() {
+        String sql = "SELECT last_login FROM " + this.tableName + " WHERE id = " + id;
+        this.setQuery(sql);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return this.getPrcessedTimeStamp(this.resultSet.getTimestamp("last_login"));
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return "";
+    }
+    public String getLastLogoutTime() {
+        String sql = "SELECT last_logout FROM " + this.tableName + " WHERE id = " + id;
+        this.setQuery(sql);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                return this.getPrcessedTimeStamp(this.resultSet.getTimestamp("last_logout"));
+            }
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+
+        return "";
+    }
     public int getUserStatusById(int id) {
         String sql = "SELECT * FROM " + this.tableName + " WHERE u_id = " + id;
         this.setQuery(sql);
@@ -638,7 +668,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
             query += " and app_login_credential.id not in ("+contactIdStr +")";
         }
 
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
 
@@ -698,7 +728,15 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         return appCredentialList;
     }
     public boolean updateUserStatus() {
-        String sql = "UPDATE " + this.tableName + " SET banned = '" + this.banned + "' WHERE  id =" + this.id;
+        String sql = "UPDATE " + this.tableName + " SET banned = " + this.banned + " WHERE  id =" + this.id;
+        return this.updateData(sql);
+    }
+    public boolean updateLastLogin() {
+        String sql = "UPDATE " + this.tableName + " SET last_login = '" + this.getUtcDateTime()+ "' WHERE   id =" + this.id;
+        return this.updateData(sql);
+    }
+    public boolean updateLastLogout() {
+        String sql = "UPDATE " + this.tableName + " SET last_logout = '" + this.getUtcDateTime()+ "' WHERE   id =" + this.id;
         return this.updateData(sql);
     }
     public boolean updateUserTextStatus() {

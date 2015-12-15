@@ -97,3 +97,9 @@ ALTER TABLE  `chat_history` CHANGE  `type`  `type` INT( 11 ) NOT NULL DEFAULT  '
  # Date of change 3rd Dec 2015
 
  ALTER TABLE  `chat_history` CHANGE  `type`  `type` INT( 11 ) NOT NULL DEFAULT  '0' COMMENT  'textChat = 0 , PhotoChat = 1,  VideoFile = 2 , Location = 3, Contact = 4 , Private photo = 5';
+
+ # Date of change 11th Dec 2015
+ ALTER TABLE  `app_login_credential` ADD  `last_login` TIMESTAMP NOT NULL AFTER  `created_date` ,
+ ADD  `last_logout` TIMESTAMP NOT NULL AFTER  `last_login` ;
+ ALTER TABLE  `app_login_credential` CHANGE  `created_date`  `created_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ;
+ UPDATE `app_login_credential` SET `last_login`=CURRENT_TIMESTAMP,`last_logout`=CURRENT_TIMESTAMP WHERE 1
