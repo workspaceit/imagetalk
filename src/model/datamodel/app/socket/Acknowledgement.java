@@ -13,7 +13,7 @@ public class Acknowledgement{
     public AppCredential appCredential;
     public boolean isRead;
     public boolean isOnline;
-
+    public String lastSeen;
     public Acknowledgement() {
         this.id = 0;
         this.chatId = "";
@@ -21,5 +21,6 @@ public class Acknowledgement{
         this.appCredential = new AppCredential();
         this.isRead = false;
         this.isOnline = false;
+        this.lastSeen = "";
     }
 }

@@ -35,11 +35,12 @@ public class ChatController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
        /* this.req = req;
         this.res = resp;*/
         res.setContentType("application/json");
-        baseController = new ImageTalkBaseController(req);
+        res.setCharacterEncoding("utf8");
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         PrintWriter pw = res.getWriter();
 
         this.gson = new Gson();
@@ -291,6 +292,7 @@ public class ChatController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
         baseController.serviceResponse.responseStat.status = true;
         baseController.serviceResponse.responseData = chatArrayList;
+
         //this.pw.print(this.baseController.getResponse());
 
         System.out.println(baseController.getResponse());

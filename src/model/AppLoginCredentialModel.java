@@ -608,10 +608,10 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         String sql = "SELECT last_logout FROM " + this.tableName + " WHERE id = " + id;
         this.setQuery(sql);
         this.getData();
-
+        System.out.println(sql);
         try {
             while (this.resultSet.next()) {
-                return this.getPrcessedTimeStamp(this.resultSet.getTimestamp("last_logout"));
+                return this.getUTCTimeStamp(this.resultSet.getString("last_logout"));
             }
         } catch (Exception ex) {
             System.out.println(ex);

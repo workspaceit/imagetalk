@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
+import helper.ImageHelper;
 import model.datamodel.app.Chat;
 import model.datamodel.app.ChatHistory;
 import model.datamodel.app.Contact;
@@ -8,8 +9,10 @@ import model.datamodel.app.Places;
 import model.datamodel.app.socket.chat.ContactShare;
 import model.datamodel.app.socket.chat.PrivateChatPhoto;
 import model.datamodel.photo.Pictures;
-import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,7 +96,19 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     }
 
     public boolean setChat_text(String chat_text) {
-        this.chat_text = StringEscapeUtils.escapeEcmaScript(chat_text.trim());
+
+        byte bytes[] = new byte[0];
+        try {
+            bytes = chat_text.getBytes("UTF-8");
+            this.chat_text = new String(bytes, "UTF-8");
+            System.out.println("this.chat_text 01" + this.chat_text);
+            this.chat_text.replace("\'", "\\\'");
+            //this.chat_text = StringEscapeUtils.escapeEcmaScript( this.chat_text.trim());
+            System.out.println("\\\'");
+            System.out.println("this.chat_text 02" + this.chat_text);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -174,9 +189,33 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     public long insert()
     {
         String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
-                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"\""+this.chat_text+"\",'"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
-        System.out.print(query);
-        this.id = this.insertData(query);
+                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
+       // System.out.print(query);
+      //  this.id = this.insertData(query);
+        final String query1 = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
+                "VALUES (?,?,?,?,?,?,?,?,?)";
+
+        //this.closeConnection();
+        try {
+            PreparedStatement ps = null;
+            ps = this.con.prepareStatement(query1,ps.RETURN_GENERATED_KEYS);
+
+            ps.setString((int) 1, this.chat_id);
+            ps.setInt((int) 2, this.to);
+            ps.setInt((int) 3, this.from);
+            ps.setString((int) 4, this.chat_text);
+            ps.setString((int) 5, this.extra);
+            ps.setString((int) 6, this.media_path);
+            ps.setInt((int) 7, this.type);
+            ps.setString((int) 8, this.getUtcDateTime());
+            ps.setInt((int) 9, 0);
+     //       this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+"
+           System.out.println("Query "+ps.toString());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
         return this.id;
     }
 
@@ -185,14 +224,21 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `read_status`='" + this.read_status + "' WHERE `id`="+this.id;
         return this.updateData(query);
     }
-    public boolean updateReadStatusBychatId()
+    public boolean updateReadStatusByChatId()
     {
         String query = "UPDATE " + this.tableName + " SET `read_status`= 1  WHERE `chat_id`="+this.chat_id;
+        System.out.println("Query "+query);
         return this.updateData(query);
     }
     public boolean updateIsDeleteTrueById()
     {
         String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `id`="+this.id;
+        return this.updateData(query);
+    }
+    public boolean updateIsDeleteTrueByChat_id()
+    {
+        String query = "UPDATE " + this.tableName + " SET `is_deleted`= 1  WHERE `chat_id`='"+this.chat_id+"'";
+        System.out.println("Query "+query);
         return this.updateData(query);
     }
     public boolean updateIsTakeSnapShotStatusById()
@@ -241,7 +287,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             this.offset = this.offset * this.limit;
             query += " LIMIT " + this.offset + " ," + this.limit + " ";
         }
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try{
@@ -253,7 +299,11 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
-                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                System.out.println("chat_history.chat_text");
+                System.out.println(tmpString);
+                chat.chatText = new String(tmpString.getBytes("UTF-8"),"UTF-8");
+                //chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
                 chat.type = this.resultSet.getInt("chat_history.type");
 
                 if(chat.type==3) {
@@ -287,7 +337,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
             this.closeConnection();
         }
 
@@ -310,7 +362,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
-                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+
+                chat.chatText = new String(tmpString.getBytes("UTF-8"),"UTF-8");
                 chat.type = this.resultSet.getInt("chat_history.type");
 
                 if(chat.type==3) {
@@ -337,7 +391,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
             this.closeConnection();
         }
 
@@ -364,7 +420,12 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
-                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+
+
+                String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+
+                chat.chatText = new String(tmpString.getBytes("UTF-8"),"UTF-8");
+
                 chat.extra = (this.resultSet.getObject("chat_history.extra")==null
                         || this.resultSet.getString("chat_history.extra").toString().equals("null"))? new Object() : this.resultSet.getString("chat_history.extra");
                 chat.type = this.resultSet.getInt("chat_history.type");
@@ -399,7 +460,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
             this.closeConnection();
         }
         return chatList;
@@ -454,7 +517,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
-                chat.chatText = (this.resultSet.getString("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+                String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+
+                chat.chatText = new String(tmpString.getBytes("UTF-8"),"UTF-8");
                 chat.extra = (this.resultSet.getObject("chat_history.extra")==null)? "" : this.resultSet.getString("chat_history.extra");
                 chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
                 chat.type = this.resultSet.getInt("chat_history.type");
@@ -471,7 +536,9 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
             this.closeConnection();
         }
         return previousChatList;

@@ -11,7 +11,7 @@ class ImageTalkBaseModel {
     static final private String DBPort = "3306";
     static final private String DBName = "imagetalk";
     static final private String Url_Prefix = "jdbc:mysql:";
-    static final private String timeZoneParam = "?useLegacyDatetimeCode=false";
+    static final private String timeZoneParam = "?characterEncoding=UTF-8";
     static final private String DBUrl = Url_Prefix + "//" + DBHost + "/" + DBName + timeZoneParam; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
     static final private String DBUser = "root";
     static final private String DBPassword = "";
@@ -147,6 +147,33 @@ class ImageTalkBaseModel {
 
     protected int insertData(String query) {
         this.dbConnectionRecheck();
+        this.query = query;
+        int id = 0;
+        try {
+            stmt.executeUpdate(this.query, Statement.RETURN_GENERATED_KEYS);
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                id = rs.getInt(1);
+            }
+            return id;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (autoCommit) {
+                this.closeConnection();
+            } else {
+                System.out.println("Auto Commit False Connection is open");
+            }
+
+        }
+
+
+        return id;
+    }
+    protected int insertDataDemo(String query) {
+
         this.query = query;
         int id = 0;
         try {
