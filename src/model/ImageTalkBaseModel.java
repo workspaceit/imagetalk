@@ -101,6 +101,8 @@ class ImageTalkBaseModel {
         this.query = query;
     }
 
+
+
     protected void getData() {
         this.dbConnectionRecheck();
         try {

@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,8 +37,11 @@ public class WallPostController extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
+
         res.setContentType("application/json");
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        res.setCharacterEncoding("utf8");
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         PrintWriter pw = res.getWriter();
 
@@ -56,6 +61,10 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/create":
                 pw.print(this.create(req));
                 break;
+            case "/app/wallpost/delete":
+                pw.print(this.deleteWallPost(req));
+                break;
+
             case "/app/wallpost/get/own":
                 pw.print(this.getOwnPost(req));
                 break;
@@ -212,7 +221,14 @@ public class WallPostController extends HttpServlet {
         wallPostModel.setOwner_id(baseController.appCredential.id);
 
         if(baseController.checkParam("description", req, true)){
-            wallPostModel.setDescrption(req.getParameter("description"));
+            try {
+                wallPostModel.setDescrption(URLDecoder.decode(new String(req.getParameter("description").getBytes("UTF-8"),"UTF-8"), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                baseController.serviceResponse.responseStat.msg = "Unable to handel Description text";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
         }
 
         try{
@@ -936,6 +952,61 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseData = respObj;
         //this.pw.print(this.baseController.getResponse());
         return baseController.getResponse();
+    }
+    private String deleteWallPost(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!baseController.checkParam("wall_post_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        int wallPostId = 0;
+        try{
+            wallPostId = Integer.parseInt(req.getParameter("wall_post_id"));
+        }catch(Exception ex){
 
+        }
+
+        WallPostModel wallPostModel  = new WallPostModel();
+
+        wallPostModel.setId(wallPostId);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
+
+        if(!wallPostModel.delete()) {
+            baseController.serviceResponse.responseStat.msg = wallPostModel.errorObj.msg;
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg ="Wall Post deleted";
+        return baseController.getResponse();
+    }
+    private String deleteWallPostTemp(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!baseController.checkParam("wall_post_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        int wallPostId = 0;
+        try{
+            wallPostId = Integer.parseInt(req.getParameter("wall_post_id"));
+        }catch(Exception ex){
+
+        }
+
+        WallPostModel wallPostModel  = new WallPostModel();
+
+        wallPostModel.setId(wallPostId);
+        wallPostModel.setOwner_id(baseController.appCredential.id);
+
+        if(!wallPostModel.delete()) {
+            baseController.serviceResponse.responseStat.msg = wallPostModel.errorObj.msg;
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg ="Wall Post deleted";
+        return baseController.getResponse();
     }
 }

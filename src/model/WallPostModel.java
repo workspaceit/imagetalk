@@ -5,8 +5,12 @@ import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.security.Timestamp;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -32,7 +36,7 @@ public class WallPostModel extends ImageTalkBaseModel{
 
         this.id =0;
         this.owner_id=0;
-        this.description=null;
+        this.description="";
         this.picture_path=null;
         this.location_id=0;
         this.created_date="";
@@ -66,8 +70,16 @@ public class WallPostModel extends ImageTalkBaseModel{
 
     public boolean setDescrption(String description) {
 
+        System.out.println("description " + description);
+        description = description.trim();
+        System.out.println("description.trim()" + description.trim());
 
-        this.description = StringEscapeUtils.escapeEcmaScript( description.trim());
+        try {
+            this.description = new String(description.getBytes("UTF-8"),"UTF-8"); //StringEscapeUtils.escapeEcmaScript( description.trim());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(" this.description" +  this.description);
         return true;
     }
 
@@ -631,11 +643,44 @@ public class WallPostModel extends ImageTalkBaseModel{
     public int insert() {
 
         String query = "INSERT INTO `wall_post`(`owner_id`, `description`,`type`, `picture_path`, `location_id`,`created_date`) " +
-                " VALUES (" + this.owner_id + ",'" + this.description +"',"+ this.type + ",'" + this.picture_path + "'," + this.location_id +",'"+ this.getUtcDateTime() + "')";
+                " VALUES (?,?,?,?,?,?)";
 
-        this.id = this.insertData(query);
-        System.out.println(query);
+        try {
+            PreparedStatement ps = this.con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt((int)1, this.owner_id);
+            ps.setString((int) 2, this.description);
+            ps.setInt((int)3, this.type);
+            ps.setString((int)4, this.picture_path);
+            ps.setInt((int)5, this.location_id);
+            ps.setString((int)6, this.getUtcDateTime());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next())
+            {
+                this.id = rs.getInt(1);
+            }
+            rs.close();
+            ps.close();
+            this.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+        }
         return this.id;
+    }
+    public boolean delete(){
+        String query = "DELETE FROM `wall_post` WHERE id = "+this.id;
+        if(this.isWallPostOwner()){
+            if(this.deleteData(query)==1){
+                return true;
+            }
+            this.errorObj.errStatus = false;
+            this.errorObj.msg = "You don't have privilege to delete this wall post";
+            return false;
+        }
+        this.errorObj.errStatus = false;
+        this.errorObj.msg = "You don't have privilege to delete this wall post";
+        return false;
     }
 }
 
