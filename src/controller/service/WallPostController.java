@@ -115,10 +115,6 @@ public class WallPostController extends HttpServlet {
 
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
-        System.out.println("description :'"+req.getParameter("description")+"'");
-        System.out.println("appCredential.id  :'"+baseController.appCredential.id+"'");
-
-        System.out.println("01");
         String imgBase64 = "";
         String fileRelativePath = "";
         ArrayList<Integer> taggedList = new ArrayList<Integer>();
@@ -214,7 +210,7 @@ public class WallPostController extends HttpServlet {
         /*======================================================*/
 
 
-        System.out.println("fileName :" + fileRelativePath);
+
 
         WallPostModel wallPostModel = new WallPostModel();
 
@@ -479,7 +475,14 @@ public class WallPostController extends HttpServlet {
         }
 
         PostCommentModel postCommentModel = new PostCommentModel();
-        postCommentModel.setComment(req.getParameter("comment"));
+        try {
+            postCommentModel.setComment(URLDecoder.decode(new String(req.getParameter("comment").getBytes("UTF-8"), "UTF-8"), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            baseController.serviceResponse.responseStat.msg = "Unable to encode comment";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
         postCommentModel.setCommenter_id(baseController.appCredential.id);
 
         try{

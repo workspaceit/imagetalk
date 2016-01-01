@@ -8,6 +8,7 @@ import model.datamodel.app.Contact;
 import model.datamodel.app.Places;
 import model.datamodel.app.socket.chat.ContactShare;
 import model.datamodel.app.socket.chat.PrivateChatPhoto;
+import model.datamodel.app.socket.chat.TextChat;
 import model.datamodel.photo.Pictures;
 
 import java.io.IOException;
@@ -188,17 +189,17 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     }
     public long insert()
     {
-        String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
-                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
-       // System.out.print(query);
+//        String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
+//                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
+//       // System.out.print(query);
       //  this.id = this.insertData(query);
-        final String query1 = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
+        final String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
                 "VALUES (?,?,?,?,?,?,?,?,?)";
 
         //this.closeConnection();
         try {
             PreparedStatement ps = null;
-            ps = this.con.prepareStatement(query1,ps.RETURN_GENERATED_KEYS);
+            ps = this.con.prepareStatement(query,ps.RETURN_GENERATED_KEYS);
 
             ps.setString((int) 1, this.chat_id);
             ps.setInt((int) 2, this.to);
@@ -253,16 +254,53 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `id`="+this.id;
         return this.updateData(query);
     }
-    public boolean updateIsTakeSnapShotStatusByChatId()
+    public boolean updateIsTakeSnapShotStatusByChatId(String msg,TextChat textChat)
     {
-        Chat chat = this.getChatHistoryById();
+        Chat chat = this.getChatHistoryByChatId();
 
         PrivateChatPhoto privateChatPhoto =(PrivateChatPhoto)chat.extra;
         privateChatPhoto.tookSnapShot = true;
+        privateChatPhoto.extra = msg;
+        this.setExtra(gson.toJson(privateChatPhoto));
 
+        String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `id`='"+chat.id+"'";
+
+        textChat.extra = privateChatPhoto;
+
+        this.chat_id = textChat.chatId;
+        this.to = privateChatPhoto.to;
+        this.from =privateChatPhoto.from;
+        this.extra = this.gson.toJson(textChat.extra);
+        this.chat_text = textChat.text;
+        this.type = 6;
+        this.dbConnectionRecheck();
+        this.insert();
+
+
+        return this.updateData(query);
+    }
+    public boolean insertTakeSnapShotStatusByChatId(String msg)
+    {
+        Chat chat = this.getChatHistoryById();
+
+
+        PrivateChatPhoto privateChatPhoto =(PrivateChatPhoto)chat.extra;
+        privateChatPhoto.tookSnapShot = true;
+        privateChatPhoto.extra = msg;
         this.setExtra(gson.toJson(privateChatPhoto));
 
         String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `chat_id`='"+this.chat_id+"'";
+        return this.updateData(query);
+    }
+    public boolean updateCountDownByChatId(int timer)
+    {
+        Chat chat = this.getChatHistoryByChatId();
+        PrivateChatPhoto privateChatPhoto =(PrivateChatPhoto)chat.extra;
+        privateChatPhoto.timer = timer;
+
+        this.setExtra(gson.toJson(privateChatPhoto));
+
+        String query = "UPDATE " + this.tableName + " SET `extra`= '"+this.extra+"'  WHERE `id`='"+chat.id+"'";
         return this.updateData(query);
     }
     public boolean updateMediaById()
@@ -352,6 +390,62 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE id = "+this.id;
         this.setQuery(query);
+        System.out.println(query);
+        this.getData();
+        try{
+            while (this.resultSet.next())
+            {
+
+
+                chat.id = this.resultSet.getLong("chat_history.id");
+                chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
+                chat.to = this.resultSet.getInt("chat_history.to");
+                chat.from = this.resultSet.getInt("chat_history.from");
+                String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
+
+                chat.chatText = new String(tmpString.getBytes("UTF-8"),"UTF-8");
+                chat.type = this.resultSet.getInt("chat_history.type");
+
+                if(chat.type==3) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Places.class);
+                }else if(chat.type==4) {
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), Contact.class);
+                }else if(chat.type==5){
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                }
+                if(chat.type==1 || chat.type==5){
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }
+                try {
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
+                }catch(Exception e) {
+                    chat.createdDate = "";
+                    System.out.println(e.getMessage());
+                }
+                chat.readStatus = (this.resultSet.getInt("chat_history.read_status")==0)?false:true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+
+
+        return chat;
+    }
+    public Chat getChatHistoryByChatId()
+    {
+        Chat chat = new Chat();
+        String query = "SELECT chat_history.* FROM `chat_history` " +
+                "WHERE chat_id = "+this.chat_id;
+        this.setQuery(query);
+        System.out.println(query);
         this.getData();
         try{
             while (this.resultSet.next())

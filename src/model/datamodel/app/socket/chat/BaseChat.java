@@ -7,6 +7,8 @@ import model.datamodel.app.AppCredential;
  */
 public class BaseChat {
     public int id;
+    public int from;
+    public int to;
     public String chatId;
     public String tmpChatId;
     public AppCredential appCredential;

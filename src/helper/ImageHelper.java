@@ -17,12 +17,12 @@ import java.util.logging.Level;
  */
 public class ImageHelper {
     //server settings for pictures and images
-    private final static String GLOBAL_PATH = "/home/wsit/Projects/j2ee/imagetalk_picture/";
-    private final static String STICKER_GLOBAL_PATH = "/home/wsit/Projects/j2ee/";
+//    private final static String GLOBAL_PATH = "/home/wsit/Projects/j2ee/imagetalk_picture/";
+//    private final static String STICKER_GLOBAL_PATH = "/home/wsit/Projects/j2ee/";
 
 //      Local settings for pictures and Images
- //   private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
-//    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
+    private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
+    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
 
     public static String getGlobalPath() {
         return GLOBAL_PATH;

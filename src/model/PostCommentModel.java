@@ -8,7 +8,11 @@ import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.UnsupportedEncodingException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 /**
@@ -53,7 +57,11 @@ public class PostCommentModel extends ImageTalkBaseModel {
     }
 
     public boolean setComment(String comment) {
-        this.comment = StringEscapeUtils.escapeEcmaScript(comment);
+        try {
+            this.comment =   new String(comment.getBytes("UTF-8"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
@@ -97,7 +105,33 @@ public class PostCommentModel extends ImageTalkBaseModel {
         String query = "INSERT INTO "+this.tableName+" (comment,pic_path, post_id, commenter_id,created_date)";
         query +="VALUES ('"+this.comment+"','"+this.pic_path+"',"+this.post_id+","+this.commenter_id+",'"+this.getUtcDateTime()+"')";
 
-        this.id = this.insertData(query);
+
+        String query1 = "INSERT INTO "+this.tableName+" (`comment`, `pic_path`,`post_id`, `commenter_id`, `created_date`) " +
+                " VALUES (?,?,?,?,?)";
+
+        PreparedStatement ps = null;
+        try {
+            ps = this.con.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
+            ps.setString((int) 1, this.comment);
+            ps.setString((int) 2, this.pic_path);
+            ps.setInt((int) 3, this.post_id);
+            ps.setInt((int) 4, this.commenter_id);
+            ps.setString((int)5, this.getUtcDateTime());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next())
+            {
+                this.id = rs.getInt(1);
+            }
+            rs.close();
+            ps.close();
+            this.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        //this.id = this.insertData(query);
         return this.id;
     }
     public  ArrayList<PostComment> getByPostId(){

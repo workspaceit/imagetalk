@@ -232,7 +232,7 @@ public class ContactModel extends ImageTalkBaseModel {
 
         return contactsId;
     }
-    public ArrayList<AppCredential> getContactByOwnerId() {
+   /* public ArrayList<AppCredential> getContactByOwnerId() {
         ArrayList<AppCredential> appCredentialList = new ArrayList<AppCredential>();
         String query = "select user_inf.id as user_inf_id," +
                 " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
@@ -310,7 +310,7 @@ public class ContactModel extends ImageTalkBaseModel {
         }
 
         return appCredentialList;
-    }
+    }*/
 
     public Contact getContactByOwnerId(int owner,int recipient)
     {
@@ -584,7 +584,101 @@ public class ContactModel extends ImageTalkBaseModel {
 
         return contactList;
     }
+    public ArrayList<Contact> getContactByOwnerId() {
+        ArrayList<Contact> contactList = new ArrayList<Contact>();
+        String query = "select " +super.tableName+".*,"+
+                " user_inf.id as user_inf_id," +
+                " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
+                " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
+                " app_login_credential.created_date as app_login_credential_c_date,job.*" +
+                "  from " + super.tableName + " " +
+                " join app_login_credential on  app_login_credential.id  = " + super.tableName + ".contact_id  "+
+                " join user_inf on user_inf.id = app_login_credential.u_id  " +
+                " left join location on location.id = user_inf.address_id " +
+                " left join job on job.app_login_credential_id = app_login_credential.id " +
+                " where  " + super.tableName + ".owner_id="+ this.owner_id;
 
+        if (keyword != null && keyword != "") {
+            query += " and ( user_inf.f_name like '%" + keyword + "%' or user_inf.l_name like '%" + keyword + "%' )";
+        }
+
+        if (this.limit > 0) {
+            this.offset = this.offset * this.limit;
+            query += " LIMIT " + this.offset + " ," + this.limit + " ";
+        }
+        System.out.println(query);
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+
+                Byte tempFavorites = this.resultSet.getByte(super.tableName + ".favorites");
+                Byte tempIsBlock =this.resultSet.getByte(super.tableName + ".is_block");
+
+                Contact contact = new Contact();
+
+                contact.contactId = this.resultSet.getInt(super.tableName + ".id");
+                contact.nickName = this.resultSet.getString(super.tableName + ".nickname");
+                contact.favorites = (tempFavorites.intValue()>0);
+                contact.isBlock = (tempIsBlock.intValue()>0);
+                contact.rating = this.resultSet.getInt(super.tableName + ".rating");
+
+                contact.id = this.resultSet.getInt("app_login_credential_id");
+                contact.textStatus = (this.resultSet.getString("text_status") == null) ? "" : this.resultSet.getString("text_status");
+                contact.phoneNumber = this.resultSet.getString("phone_number");
+                contact.user.id = this.resultSet.getInt("user_inf_id");
+                contact.user.firstName = this.resultSet.getString("f_name");
+                contact.user.lastName = this.resultSet.getString("l_name");
+
+                try {
+                    contact.user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
+                } catch (Exception ex) {
+                    System.out.println("Parse error on picture appCid " + contact.id);
+                    contact.user.picPath.original.path = (this.resultSet.getObject("pic_path") == null) ? "" : this.resultSet.getString("pic_path");
+                    ex.printStackTrace();
+                }
+                contact.user.createdDate = this.resultSet.getString("app_login_credential_c_date");
+
+                contact.user.address.id = (this.resultSet.getObject("location_id") == null) ? 0 : this.resultSet.getInt("location_id");
+                contact.user.address.lat = (this.resultSet.getObject("lat") == null) ? 0 : this.resultSet.getDouble("lat");
+                contact.user.address.lng = (this.resultSet.getObject("lng") == null) ? 0 : this.resultSet.getDouble("lng");
+                contact.user.address.formattedAddress = (this.resultSet.getObject("formatted_address") == null) ? "" : this.resultSet.getString("formatted_address");
+                contact.user.address.countryName = (this.resultSet.getObject("country") == null) ? "" : this.resultSet.getString("country");
+                contact.user.address.createdDate = (this.resultSet.getObject("location_c_date") == null) ? "" : this.resultSet.getString("location_c_date");
+
+                //job details
+                contact.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                contact.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                contact.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                contact.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    contact.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
+                try {
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    contact.job.createdDate = "";
+                }
+                //end job details
+
+                contactList.add(contact);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            this.closeConnection();
+        }
+
+        return contactList;
+    }
     public ArrayList<Contact> getWhoHasMyContactByOwnerId() {
         ArrayList<Contact> contacts = new ArrayList<Contact>();
         String query = "select " + super.tableName + ".*, " +

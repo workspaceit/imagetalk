@@ -10,6 +10,7 @@ import model.ContactModel;
 import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
+import model.datamodel.app.Contact;
 import model.datamodel.app.Login;
 
 import javax.mail.Message;
@@ -35,7 +36,7 @@ public class AppLoginController extends HttpServlet {
     LocalResponseClass localResponseObj;
     class LocalResponseClass{
         AuthCredential authCredential;
-        ArrayList<AppCredential> contacts;
+        ArrayList<Contact> contacts;
         Object extra;
 
         public LocalResponseClass() {
