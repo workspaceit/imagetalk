@@ -6,6 +6,7 @@ import model.AppLoginCredentialModel;
 import model.ChatHistoryModel;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.socket.SocketResponse;
+import model.datamodel.app.socket.chat.ChatPhoto;
 import model.datamodel.app.socket.chat.ChatVideo;
 import model.datamodel.app.video.Videos;
 import org.apache.thrift.TException;
@@ -45,14 +46,16 @@ public class ChatTransportHandler implements ChatTransport.Iface {
             bufferedByte.get(b);
 
             SocketResponse socketResp= this.gson.fromJson(socketResponse, SocketResponse.class);
+
             String dataObjStr = this.gson.toJson(socketResp.responseData);
 
-            ChatVideo chatVideo =  this.gson.fromJson(dataObjStr,ChatVideo.class);
+            ChatVideo chatVideo =  this.gson.fromJson(dataObjStr, ChatVideo.class);
             chatVideo.video = ImageHelper.saveChatVideo(b,chatVideo.appCredential.id,fileName);
 
             socketResp.responseData = chatVideo;
 
             ServiceThread st = BaseSocketController.getServiceThread(appCredentialId);
+            socketResp.responseStat.tag = ServiceThread.tag_chatVideo;
             st.processPushBack(this.gson.toJson(socketResp));
         }else{
             responseObj.status = false;
@@ -63,11 +66,42 @@ public class ChatTransportHandler implements ChatTransport.Iface {
 
     @Override
     public ResponseObj sendPicture(int appCredentialId, String token, String socketResponse, ByteBuffer bufferedByte, String fileName) throws TException {
+        ResponseObj responseObj = new ResponseObj();
+
+        if(BaseSocketController.isThriftToken(appCredentialId,token)){
+            byte[] b = new byte[bufferedByte.remaining()];
+            bufferedByte.get(b);
+
+            SocketResponse socketResp= this.gson.fromJson(socketResponse, SocketResponse.class);
+            String dataObjStr = this.gson.toJson(socketResp.responseData);
+
+            ChatPhoto chatPhoto =  this.gson.fromJson(dataObjStr,ChatPhoto.class);
+            chatPhoto.pictures = ImageHelper.saveByteToChatPrivatePicture(b, chatPhoto.appCredential.id, fileName);
+
+            socketResp.responseData = chatPhoto;
+
+            ServiceThread st = BaseSocketController.getServiceThread(appCredentialId);
+            socketResp.responseStat.tag = ServiceThread.tag_chatPrivatePhoto;
+            st.processPushBack(this.gson.toJson(socketResp));
+        }else{
+            responseObj.status = false;
+            responseObj.msg = "Token miss matched";
+        }
+        return responseObj;
+    }
+
+    @Override
+    public ResponseObj sendPrivatePhoto(int appCredentialId, String token, String socketResponse, ByteBuffer bufferedByte, String fileName) throws TException {
         return null;
     }
 
     @Override
     public ResponseObj sendVoice(int appCredentialId, String token, String socketResponse, ByteBuffer bufferedByte, String fileName) throws TException {
+        return null;
+    }
+
+    @Override
+    public ByteBuffer getVideo(int appCredentialId, String token, int id) throws TException {
         return null;
     }
 

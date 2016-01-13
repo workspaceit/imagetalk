@@ -16,8 +16,10 @@ service ChatTransport {
    string getToken(1:string accessToken),
    ResponseObj sendVideo(1:i32 appCredentialId,2:string token,3:string socketResponse,4:binary bufferedByte,5:string fileName),
    ResponseObj sendPicture(1:i32 appCredentialId,2:string token,3:string socketResponse,4:binary bufferedByte,5:string fileName),
+   ResponseObj sendPrivatePhoto(1:i32 appCredentialId,2:string token,3:string socketResponse,4:binary bufferedByte,5:string fileName),
    ResponseObj sendVoice(1:i32 appCredentialId,2:string token,3:string socketResponse,4:binary bufferedByte,5:string fileName),
-   ResponseObj expireMyToken(1:i32 appCredentialId,2:string token)
+   ResponseObj expireMyToken(1:i32 appCredentialId,2:string token),
+   binary getVideo(1:i32 appCredentialId,2:string token,3:i32 id),
 
 
 }

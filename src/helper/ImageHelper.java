@@ -179,6 +179,106 @@ public class ImageHelper {
         }
         return videos;
     }
+    public static Pictures saveByteToChatPicture(byte[] b,int uId,String tmpFileName) {
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+        try {
+            fileName = +System.nanoTime() + "."+getExtension(tmpFileName);
+            path += uId;
+            createDirIfNotExist(path);
+            path += "/chat";
+            createDirIfNotExist(path);
+            path += "/media";
+            createDirIfNotExist(path);
+            path += "/picture";
+            createDirIfNotExist(path);
+            path += "/" + fileName;
+            System.out.println(path);
+            File outputfile = new File(path);
+
+
+
+
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(b));
+            ImageIO.write(bufferedImage,getExtension(tmpFileName), outputfile);
+
+            fileName = uId + "/chat/media/picture/" + fileName;
+            pictures.original.size.height = bufferedImage.getHeight();
+            pictures.original.size.width = bufferedImage.getWidth();
+            pictures.original.path = fileName;
+
+
+            PictureDetails thumb1 = new PictureDetails();
+            thumb1.type = "thumbnail";
+            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture");
+            thumb1.size.width = 32;
+            thumb1.size.height = 32;
+            pictures.thumb.add(thumb1);
+
+            PictureDetails thumb2 = new PictureDetails();
+            thumb2.type = "thumbnail";
+            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture");
+            thumb2.size.width = 48;
+            thumb2.size.height = 48;
+            pictures.thumb.add(thumb2);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return pictures;
+    }
+    public static Pictures saveByteToChatPrivatePicture(byte[] b,int uId,String tmpFileName) {
+        Pictures pictures = new Pictures();
+        String   path     = GLOBAL_PATH;
+        String   fileName = "";
+        try {
+            fileName = +System.nanoTime() + "."+getExtension(tmpFileName);
+            path += uId;
+            createDirIfNotExist(path);
+            path += "/chat";
+            createDirIfNotExist(path);
+            path += "/media";
+            createDirIfNotExist(path);
+            path += "/picture";
+            createDirIfNotExist(path);
+            path += "/private";
+            createDirIfNotExist(path);
+            path += "/" + fileName;
+            System.out.println(path);
+            File outputfile = new File(path);
+
+
+
+
+            BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(b));
+            ImageIO.write(bufferedImage,getExtension(tmpFileName), outputfile);
+
+            fileName = uId + "/chat/media/picture/" + fileName;
+            pictures.original.size.height = bufferedImage.getHeight();
+            pictures.original.size.width = bufferedImage.getWidth();
+            pictures.original.path = fileName;
+
+
+            PictureDetails thumb1 = new PictureDetails();
+            thumb1.type = "thumbnail";
+            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture");
+            thumb1.size.width = 32;
+            thumb1.size.height = 32;
+            pictures.thumb.add(thumb1);
+
+            PictureDetails thumb2 = new PictureDetails();
+            thumb2.type = "thumbnail";
+            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture");
+            thumb2.size.width = 48;
+            thumb2.size.height = 48;
+            pictures.thumb.add(thumb2);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return pictures;
+    }
     public static Pictures saveChatPicture(Object imgObj, int uId) {
         Pictures pictures = new Pictures();
         String   path     = GLOBAL_PATH;
@@ -192,6 +292,8 @@ public class ImageHelper {
             path += "/media";
             createDirIfNotExist(path);
             path += "/picture";
+            createDirIfNotExist(path);
+            path += "/regular";
             createDirIfNotExist(path);
             path += "/" + fileName;
             System.out.println(path);
@@ -208,7 +310,7 @@ public class ImageHelper {
 
             ImageIO.write(img, "jpg", file);
 
-            fileName = uId + "/chat/media/picture/" + fileName;
+            fileName = uId + "/chat/media/picture/regular/" + fileName;
             pictures.original.size.height = img.getHeight();
             pictures.original.size.width = img.getWidth();
             pictures.original.path = fileName;
@@ -216,7 +318,7 @@ public class ImageHelper {
 
             PictureDetails thumb1 = new PictureDetails();
             thumb1.type = "thumbnail";
-            thumb1.path = createThumbnail(decodeToImage((String) imgObj), 100, 100, uId + "/chat/media/picture");
+            thumb1.path = createThumbnail(decodeToImage((String) imgObj), 100, 100, uId + "/chat/media/picture/regular");
 
             thumb1.size.width = 32;
             thumb1.size.height = 32;
@@ -225,7 +327,7 @@ public class ImageHelper {
 
             PictureDetails thumb2 = new PictureDetails();
             thumb2.type = "thumbnail";
-            thumb2.path = createThumbnail(decodeToImage((String) imgObj), 200, 200, uId + "/chat/media/picture");
+            thumb2.path = createThumbnail(decodeToImage((String) imgObj), 200, 200, uId + "/chat/media/picture/regular");
             thumb2.size.width = 48;
             thumb2.size.height = 48;
 

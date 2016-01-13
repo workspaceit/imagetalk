@@ -25,23 +25,23 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class ServiceThread extends Thread {
-    final static String tag_authentication = "authentication";
-    final static String tag_textChat = "textchat";
-    final static String tag_chatPhoto = "chatphoto_transfer";
-    final static String tag_chatLocation = "chatlocation_share";
-    final static String tag_ChatContactShare = "chatcontact_share";
-    final static String tag_chatPrivatePhoto = "chatprivatephoto_transfer";
-    final static String tag_chatPrivatePhotoTookSnapshot = "chat_private_photo_took_snapshot";
-    final static String tag_chatPrivatePhotoUpdateCountDown = "chat_private_photo_update_count_down";
-    final static String tag_chatPrivatePhotoTookSnapshotStartCountDown = "chat_private_photo_destroy";
-    final static String tag_chatVideo = "chat_video_transfer";
-    final static String tag_ContactOnlineOffline = "broad_cast_contact_online_offline";
-    final static String tag_ChatAcknowledgement = "chat_acknowledgement";
-    final static String tag_ChatPrivatePhotoAcknowledgement = "chat_private_photo_destroy_acknowledgement";
-    final static String tag_ChatPrivatePhotoCountDownAcknowledgement = "chat_private_photo_countdown_acknowledgement";
-    final static String tag_SyncContact = "sync_contact";
-    final static String tag_ChatReceived = "chat_received";
-    final static String tag_UserOnline = "user_online";
+    public final static String tag_authentication = "authentication";
+    public final static String tag_textChat = "textchat";
+    public final static String tag_chatPhoto = "chatphoto_transfer";
+    public final static String tag_chatLocation = "chatlocation_share";
+    public final static String tag_ChatContactShare = "chatcontact_share";
+    public final static String tag_chatPrivatePhoto = "chatprivatephoto_transfer";
+    public final static String tag_chatPrivatePhotoTookSnapshot = "chat_private_photo_took_snapshot";
+    public final static String tag_chatPrivatePhotoUpdateCountDown = "chat_private_photo_update_count_down";
+    public final static String tag_chatPrivatePhotoTookSnapshotStartCountDown = "chat_private_photo_destroy";
+    public final static String tag_chatVideo = "chat_video_transfer";
+    public final static String tag_ContactOnlineOffline = "broad_cast_contact_online_offline";
+    public final static String tag_ChatAcknowledgement = "chat_acknowledgement";
+    public final static String tag_ChatPrivatePhotoAcknowledgement = "chat_private_photo_destroy_acknowledgement";
+    public final static String tag_ChatPrivatePhotoCountDownAcknowledgement = "chat_private_photo_countdown_acknowledgement";
+    public final static String tag_SyncContact = "sync_contact";
+    public final static String tag_ChatReceived = "chat_received";
+    public final static String tag_UserOnline = "user_online";
 
     private Socket serviceSocket;
     private boolean authintic;
@@ -656,6 +656,10 @@ public class ServiceThread extends Thread {
             chatVideo.recevice = true;
             chatVideo.send = false;
             ChatVideo originalChatVideo = this.gson.fromJson(this.gson.toJson(chatVideo), ChatVideo.class);
+
+            // Saving to database before send
+            chatVideo.id =  saveVideoInChatHistory(originalChatVideo);
+
             if(contactServiceThread!=null){
 
                 if(contactServiceThread.isOnline()) {
@@ -681,8 +685,7 @@ public class ServiceThread extends Thread {
                 //   saveOfflineMsg(textChat);
                 sendChatAcknowledgement(0,originalChatVideo.tmpChatId,chatId,false,false);
             }
-            // Saving to database
-            saveVideoInChatHistory(originalChatVideo);
+
         }catch (ClassCastException ex){
             sendError(chatId,"Unable to cast the object");
             ex.printStackTrace();
@@ -1070,7 +1073,7 @@ public class ServiceThread extends Thread {
         };
         new DbOperationThread().start();
     }
-    private void saveVideoInChatHistory(ChatVideo chatVideo){
+    private long saveVideoInChatHistory(ChatVideo chatVideo){
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         chatHistoryModel.setChat_id(chatVideo.chatId);
@@ -1079,7 +1082,7 @@ public class ServiceThread extends Thread {
         chatHistoryModel.setMedia_path(gson.toJson(chatVideo.video));
         chatHistoryModel.setFrom(chatVideo.from);
         chatHistoryModel.setChat_text("");
-        chatHistoryModel.insert();
+        return chatHistoryModel.insert();
     }
     private void saveOfflineMsg(TextChat textChat){
         ChatTransferStatus chatTransferStatus = new ChatTransferStatus();

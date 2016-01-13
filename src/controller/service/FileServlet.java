@@ -112,19 +112,19 @@ public class FileServlet extends HttpServlet {
         // Validate the requested file ------------------------------------------------------------
         System.out.println("I came here");
         // Get requested file by path info.
-        String requestedFile = request.getPathInfo();
-
+        String requestedFileRelativePath = request.getParameter("v");
+        System.out.println("requestedFileRelativePath : "+requestedFileRelativePath);
         // Check if file is actually supplied to the request URL.
-//        if (requestedFile == null) {
-//            // Do your thing if the file is not supplied to the request URL.
-//            // Throw an exception, or send 404, or show default/warning page, or just ignore it.
-//            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-//            return;
-//        }
+        if (requestedFileRelativePath == null || requestedFileRelativePath =="") {
+            // Do your thing if the file is not supplied to the request URL.
+            // Throw an exception, or send 404, or show default/warning page, or just ignore it.
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
         // URL-decode the file name (might contain spaces and on) and prepare file object.
        // File file = new File(basePath, URLDecoder.decode(requestedFile, "UTF-8"));
-        File file = new File(ImageHelper.getGlobalPath()+"SampleVideo_1080x720_5mb.mp4");
+        File file = new File(ImageHelper.getGlobalPath()+requestedFileRelativePath);
 
         // Check if file actually exists in filesystem.
         if (!file.exists()) {

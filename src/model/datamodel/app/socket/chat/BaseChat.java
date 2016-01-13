@@ -6,7 +6,7 @@ import model.datamodel.app.AppCredential;
  * Created by mi on 11/4/15.
  */
 public class BaseChat {
-    public int id;
+    public long id;
     public int from;
     public int to;
     public String chatId;

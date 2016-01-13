@@ -14,6 +14,7 @@ import model.datamodel.photo.Pictures;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -213,6 +214,11 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
      //       this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+"
            System.out.println("Query "+ps.toString());
             ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next())
+            {
+                this.id = rs.getInt(1);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
