@@ -25,7 +25,7 @@ class ImageTalkBaseModel {
     public ResultSet resultSet = null;
     public BaseErrorManager errorObj;
     public BaseOperationManager operationStatus;
-
+    private int currentUserId;
     public int limit;
     public int offset;
 
@@ -61,8 +61,15 @@ class ImageTalkBaseModel {
         this.operationStatus = new BaseOperationManager();
         this.limit = -1;
         this.offset = -1;
-    }
 
+        this.currentUserId = 0;
+    }
+    public void setCurrentUserId(int currentUserId){
+        this.currentUserId = currentUserId;
+    }
+    public int getCurrentUserId(){
+        return this.currentUserId;
+    }
     public void startTransaction() {
         this.dbConnectionRecheck();
         try {

@@ -13,25 +13,23 @@ public class ImgTalkFileTransferSocket {
     public void startServer(){
 
 
-        int postNumber = 9025;
+        int postNumber = 9027;
         boolean runServer =true;
         int count = 1;
 
         try {
 
             ServerSocket fileTransferSocket = new ServerSocket(postNumber);
-            while(true){
 
-                System.out.println("Waiting For request");
-                Socket serviceSocket = fileTransferSocket.accept();
+            System.out.println("Waiting For request");
+            Socket serviceSocket = fileTransferSocket.accept();
 
-                System.out.println("Request arrived");
-                FileTransferThread fileTransferThread = new FileTransferThread(serviceSocket);
+            System.out.println("Request arrived");
+            FileTransferThread fileTransferThread = new FileTransferThread(serviceSocket);
 
-                System.out.println("count :"+count);
-                count++;
-                fileTransferThread.start();
-            }
+            System.out.println("count :"+count);
+            count++;
+            fileTransferThread.start();
 
         } catch (IOException e) {
             e.printStackTrace();

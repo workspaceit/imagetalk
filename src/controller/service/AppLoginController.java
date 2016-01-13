@@ -118,7 +118,7 @@ public class AppLoginController extends HttpServlet {
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         appLoginCredentialModel.setAccess_token(accessToken);
         AuthCredential authCredential = appLoginCredentialModel.getAuthincatedByAccessToken();
-        if(authCredential.id>0){
+        if(authCredential.id>0 && authCredential.accessToken!=null && authCredential.accessToken!=""){
 
             if(!appLoginCredentialModel.isActive()){
                 this.baseController.serviceResponse.responseStat.status = false;

@@ -26,8 +26,6 @@ public class WallPostModel extends ImageTalkBaseModel{
     private String picture_path;
     private int location_id;
     private String created_date;
-    private int currentUserId;
-
     private Gson gson;
     public WallPostModel(){
         super();
@@ -41,7 +39,6 @@ public class WallPostModel extends ImageTalkBaseModel{
         this.location_id=0;
         this.created_date="";
 
-        this.currentUserId = 0;
         this.gson = new Gson();
 
     }
@@ -118,14 +115,7 @@ public class WallPostModel extends ImageTalkBaseModel{
         return true;
     }
 
-    public int getCurrentUserId() {
-        return currentUserId;
-    }
 
-    public boolean setCurrentUserId(int currentUserId) {
-        this.currentUserId = currentUserId;
-        return true;
-    }
     public boolean isWallPostOwner(){
         String query = "SELECT id from wall_post where owner_id="+this.owner_id+" and id = "+this.id;
 
@@ -149,8 +139,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
-                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
-                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.currentUserId+" limit 1 ) as isFavorite," +
+                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.getCurrentUserId()+" limit 1 ) as isLiked," +
+                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.getCurrentUserId()+" limit 1 ) as isFavorite," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate," +
@@ -262,8 +252,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
-                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
-                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.currentUserId+" limit 1 ) as isFavorite," +
+                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.getCurrentUserId()+" limit 1 ) as isLiked," +
+                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.getCurrentUserId()+" limit 1 ) as isFavorite," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate," +
@@ -372,8 +362,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
-                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
-                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.currentUserId+" limit 1 ) as isFavorite," +
+                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.getCurrentUserId()+" limit 1 ) as isLiked," +
+                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.getCurrentUserId()+" limit 1 ) as isFavorite," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate," +
@@ -497,8 +487,8 @@ public class WallPostModel extends ImageTalkBaseModel{
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
-                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.currentUserId+" limit 1 ) as isLiked," +
-                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.currentUserId+" limit 1 ) as isFavorite," +
+                " (select count(id) from post_like where post_like.post_id =  wall_post.id  and liker_id = "+this.getCurrentUserId()+" limit 1 ) as isLiked," +
+                " (select count(id) from wall_post_favorite where wall_post_favorite.wall_post_id = wall_post.id and owner_id = "+this.getCurrentUserId()+" limit 1 ) as isFavorite," +
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate," +

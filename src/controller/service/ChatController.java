@@ -280,6 +280,8 @@ public class ChatController extends HttpServlet {
 
         chatHistoryModel.setFrom(baseController.appCredential.id);
         chatHistoryModel.setTo(to);
+        chatHistoryModel.setCurrentUserId(baseController.appCredential.id);
+
         ArrayList<Chat> chatArrayList = chatHistoryModel.getChatHistory();
         if(chatArrayList.size()==0)
         {

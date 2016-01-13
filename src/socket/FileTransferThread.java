@@ -98,38 +98,16 @@ public class FileTransferThread extends Thread {
 
             System.out.println("available "+dIn.available());
             byte[] message = new byte[dIn.available()]; // dIn.available()
-
-
-            while(dIn.available() > 0){
-                System.out.println("at 01");
-                dIn.readFully(message); // read the message , 0, message.length
-                System.out.println("at 02");
-
-                byte[] one = new byte[]{-84,-19,0,5,115,114,0};
-
-                byte[] concatBytes = ArrayUtils.addAll(one, message);
-                ByteArrayInputStream b = new ByteArrayInputStream(concatBytes);
-                System.out.println("at 03");
-                System.out.println("Binary Array Start");
-//                for(int i=0;i<concatBytes.length;i++){
-//                    System.out.println(concatBytes[i]);
-//                }
-                System.out.println("Before ObjectInputStream");
-
-
-                ObjectInputStream o = new ObjectInputStream(b);
-
-                System.out.println("After ObjectInputStream");
-                try {
-                    System.out.println("Before Obj");
-                    respObj = o.readObject();
-                    System.out.println("After Obj");
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+            try {
+                FileOutputStream fileOuputStream;
+                fileOuputStream = new FileOutputStream("testVideo.mp4");
+                fileOuputStream.write(message);
+                fileOuputStream.close();
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }catch (IOException ex) {
+                ex.printStackTrace();
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }

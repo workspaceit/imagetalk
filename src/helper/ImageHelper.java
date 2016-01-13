@@ -1,5 +1,6 @@
 package helper;
 
+import model.datamodel.app.video.VideoDetails;
 import model.datamodel.app.video.Videos;
 import model.datamodel.photo.PictureDetails;
 import model.datamodel.photo.Pictures;
@@ -451,7 +452,38 @@ public class ImageHelper {
         }
         return pictures;
     }
+    public static VideoDetails saveChatVideo(byte[] videoByte, int uId,String SourceFileName) {
+        VideoDetails videoDetails = new VideoDetails();
 
+        String   path     = GLOBAL_PATH;
+        String fileName = +System.nanoTime() + "."+getExtension(SourceFileName);
+
+        path += uId;
+        createDirIfNotExist(path);
+        path += "/chat";
+        createDirIfNotExist(path);
+        path += "/media";
+        createDirIfNotExist(path);
+        path += "/video";
+        createDirIfNotExist(path);
+        path += "/" + fileName;
+        System.out.println(path);
+
+
+
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(path);
+            fileOutputStream.write(videoByte);
+            fileOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return videoDetails;
+        }
+
+
+        videoDetails.path = path;
+        return videoDetails;
+    }
     public static BufferedImage decodeToImage(String imageString) {
         BufferedImage image = null;
         byte[]        imageByte;
@@ -504,6 +536,16 @@ public class ImageHelper {
         }
 
         return path;
+    }
+    public static String getExtension(String fileName){
+        String extension ="";
+        String name = fileName;
+        try {
+            extension =  name.substring(name.lastIndexOf(".") + 1);
+        } catch (Exception e) {
+            return "";
+        }
+        return extension;
     }
 
 }

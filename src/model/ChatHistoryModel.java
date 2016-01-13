@@ -353,6 +353,20 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 }else if(chat.type==5){
                     chat.extra = (this.resultSet.getObject("chat_history.extra") == null
                             || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    PrivateChatPhoto privateChatPhoto = (PrivateChatPhoto )chat.extra;
+                    System.out.println("APPC ID " + privateChatPhoto.appCredential.id);
+                    System.out.println("CURRENT ID " + this.getCurrentUserId());
+                    if(privateChatPhoto.appCredential.id == this.getCurrentUserId()){
+                        privateChatPhoto.recevice = true;
+                        privateChatPhoto.send = false;
+                    }else{
+                        privateChatPhoto.recevice = false;
+                        privateChatPhoto.send = true;
+                    }
+                    chat.extra = privateChatPhoto;
+
+                    System.out.println("Private Photo");
+                    System.out.println(this.gson.toJson(chat.extra));
                 }
 
 
@@ -415,6 +429,18 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 }else if(chat.type==5){
                     chat.extra = (this.resultSet.getObject("chat_history.extra") == null
                             || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    PrivateChatPhoto privateChatPhoto = (PrivateChatPhoto )chat.extra;
+                    if(privateChatPhoto.appCredential.id == this.getCurrentUserId()){
+                        privateChatPhoto.recevice = true;
+                        privateChatPhoto.send = false;
+                    }else{
+                        privateChatPhoto.recevice = false;
+                        privateChatPhoto.send = true;
+                    }
+                    chat.extra = privateChatPhoto;
                 }
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
@@ -470,6 +496,17 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 }else if(chat.type==5){
                     chat.extra = (this.resultSet.getObject("chat_history.extra") == null
                             || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    PrivateChatPhoto privateChatPhoto = (PrivateChatPhoto )chat.extra;
+                    if(privateChatPhoto.appCredential.id == this.getCurrentUserId()){
+                        privateChatPhoto.recevice = true;
+                        privateChatPhoto.send = false;
+                    }else{
+                        privateChatPhoto.recevice = false;
+                        privateChatPhoto.send = true;
+                    }
+                    chat.extra = privateChatPhoto;
                 }
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
@@ -533,6 +570,17 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 }else if(chat.type==5){
                     chat.extra = (this.resultSet.getObject("chat_history.extra") == null
                             || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    chat.extra = (this.resultSet.getObject("chat_history.extra") == null
+                            || this.resultSet.getString("chat_history.extra").equals("null")) ? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.extra"), PrivateChatPhoto.class);
+                    PrivateChatPhoto privateChatPhoto = (PrivateChatPhoto )chat.extra;
+                    if(privateChatPhoto.appCredential.id == this.getCurrentUserId()){
+                        privateChatPhoto.recevice = true;
+                        privateChatPhoto.send = false;
+                    }else{
+                        privateChatPhoto.recevice = false;
+                        privateChatPhoto.send = true;
+                    }
+                    chat.extra = privateChatPhoto;
                 }
 
 

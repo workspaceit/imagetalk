@@ -5,6 +5,16 @@
          version="3.1">
 
     <servlet>
+        <servlet-name>VideoStreaming</servlet-name>
+        <servlet-class>controller.service.FileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VideoStreaming</servlet-name>
+        <url-pattern>/transfer/file</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
         <servlet-name>Registration</servlet-name>
         <servlet-class>controller.service.UserRegistrationController</servlet-class>
     </servlet>
