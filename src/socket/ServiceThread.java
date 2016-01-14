@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class ServiceThread extends Thread {
+    public static HashMap<Integer,String> currentUsers = new HashMap<>();
     public final static String tag_authentication = "authentication";
     public final static String tag_textChat = "textchat";
     public final static String tag_chatPhoto = "chatphoto_transfer";
@@ -92,6 +93,9 @@ public class ServiceThread extends Thread {
             switch ( socketResponse.responseStat.tag) {
                 case tag_chatVideo:
                     this.processChatVideoTransfer(socketResponse.responseData);
+                    break;
+                case tag_chatPhoto:
+                    this.processChatPhotoPushBackTransfer(socketResponse.responseData);
                     break;
                 default:
                     break;
@@ -203,7 +207,7 @@ public class ServiceThread extends Thread {
                 this.currentUnknownChatPersons.add(contactServiceThread.appCredential);
             }
         }
-        contactServiceThread.sendData(this.appCredential,(String) obj);
+        contactServiceThread.sendData(this.appCredential, (String) obj);
     }
     private void processAuthentication(Object dataObject){
 
@@ -223,6 +227,8 @@ public class ServiceThread extends Thread {
                 ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
                 chatHistoryModel.setFrom(this.appCredential.id);
 
+
+                ServiceThread.currentUsers.put(authCredential.id, "HOGA");
                 // Fetching contacts
 
                 this.syncContactsWithDb();
@@ -238,7 +244,7 @@ public class ServiceThread extends Thread {
 
             ex.printStackTrace();
         }
-        this.sendData(null,this.gson.toJson(socketResponse));
+        this.sendData(null, this.gson.toJson(socketResponse));
 
         if(!this.authintic){
             this.closeConnection();
@@ -420,7 +426,69 @@ public class ServiceThread extends Thread {
         }
 
     }
+    private void processChatPhotoPushBackTransfer(Object dataObject){
+        if(!this.checkForAuthentication()){
+            return;
+        }
+        SocketResponse socketResponse = new SocketResponse();
+        String chatId = this.getMsgId();
 
+
+
+        try{
+            String jObjStr = this.gson.toJson(dataObject);
+            ChatPhoto chatPhoto = this.gson.fromJson(jObjStr, ChatPhoto.class);
+            sendChatReceivedAcknowledgement(0, chatPhoto.tmpChatId,chatId, false,false);
+
+            System.out.println("Recepent :"+jObjStr);
+            System.out.println("chatPhoto.appCredential.id :" + jObjStr);
+            ServiceThread contactServiceThread =  BaseSocketController.getServiceThread(chatPhoto.appCredential.id);
+
+            socketResponse.responseStat.tag = tag_chatPhoto;
+            socketResponse.responseStat.chatId = chatId;
+
+            int senderId = this.appCredential.id;
+            int receiverId = chatPhoto.appCredential.id;
+            chatPhoto.caption = validateChatTextMsg( chatPhoto.caption);
+            String textMsg = chatPhoto.caption;
+
+            chatPhoto.recevice = true;
+            chatPhoto.send = false;
+
+            chatPhoto.base64Img = "";
+
+            chatPhoto.chatId = chatId;
+            socketResponse.responseData = chatPhoto;
+
+            // Received ackonwledgement
+
+            if(contactServiceThread!=null){
+                if(contactServiceThread.isOnline()) {
+
+                    // Send text msg
+                    chatPhoto.appCredential = this.appCredential;
+
+                    this.flushDataToOthers(contactServiceThread, this.gson.toJson(socketResponse));
+
+                    System.out.println("================================");
+                    System.out.println("Send photo msg : to " + contactServiceThread.appCredential.user.firstName+" " + contactServiceThread.appCredential.user.lastName);
+                    System.out.println("Send text Object "+this.gson.toJson(socketResponse));
+                    System.out.println("================================");
+
+                    sendChatAcknowledgement(0, chatPhoto.tmpChatId, chatId, false, true);
+                }else{
+                    sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
+                }
+            }else{
+                sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatId,false,false);
+            }
+
+        }catch (ClassCastException ex){
+            sendError(chatId,"Can not cast the object");
+            ex.printStackTrace();
+        }
+
+    }
     private void processChatPrivatePhotoTransfer(Object dataObject){
         if(!this.checkForAuthentication()){
             return;
@@ -656,9 +724,6 @@ public class ServiceThread extends Thread {
             chatVideo.recevice = true;
             chatVideo.send = false;
             ChatVideo originalChatVideo = this.gson.fromJson(this.gson.toJson(chatVideo), ChatVideo.class);
-
-            // Saving to database before send
-            chatVideo.id =  saveVideoInChatHistory(originalChatVideo);
 
             if(contactServiceThread!=null){
 
@@ -943,11 +1008,10 @@ public class ServiceThread extends Thread {
         socketResponse.responseData = acknowledgement;
 
 
-        this.sendData(null,this.gson.toJson(socketResponse));
+        this.sendData(null, this.gson.toJson(socketResponse));
     }
     private void savePhotoInChatHistory(String chatId,int senderId,int receiverId,String textMsg,Pictures pictures){
 
-        int uId = this.appCredential.id;
         class DbOperationThread extends Thread{
             @Override
             public void run() {
@@ -1359,6 +1423,9 @@ public class ServiceThread extends Thread {
             socketResponse.responseStat.status = false;
             socketResponse.responseStat.msg = "Can not cast AuthCredential";
             this.sendData(null,this.gson.toJson(socketResponse));
+            System.out.println("----------------------------------------------------------------------------------------------");
+            System.out.println("checkForAuthentication : False : this.authintic : False : For " + this.appCredential.user.firstName+" "+this.appCredential.user.lastName);
+            System.out.println("----------------------------------------------------------------------------------------------");
             this.closeConnection();
             return false;
         }

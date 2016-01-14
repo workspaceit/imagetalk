@@ -65,8 +65,6 @@
                     </li>
                 </ul>
             </li>
-            <%}%>
-
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-gears"></i>
@@ -74,9 +72,12 @@
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i>Upload logo</a></li>
+                    <li><a href="<%=baseUrl%>admin/chat_server"><i class="fa fa-circle-o"></i>Server</a></li>
                 </ul>
             </li>
+            <%}%>
+
+
 
             <li class="treeview">
                 <a href="#">

@@ -9,7 +9,6 @@ import java.net.Socket;
  */
 public class ImgTalkServerSocket {
 
-    BaseSocketController baseSocketController;
     public void startServer(){
         System.out.println("OK");
 
@@ -34,6 +33,7 @@ public class ImgTalkServerSocket {
             chatImgTalkServerSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+
         }finally {
 
         }

@@ -4,6 +4,8 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+
+
     <servlet>
         <servlet-name>VideoStreaming</servlet-name>
         <servlet-class>controller.service.FileServlet</servlet-class>
@@ -13,6 +15,17 @@
         <url-pattern>/transfer/file</url-pattern>
     </servlet-mapping>
 
+
+
+
+    <servlet>
+        <servlet-name>DEVELOPER_ACCESS</servlet-name>
+        <servlet-class>controller.admin.AdminChatServerController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DEVELOPER_ACCESS</servlet-name>
+        <url-pattern>/developer/server/access/*</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>Registration</servlet-name>
@@ -316,6 +329,15 @@
     <servlet-mapping>
         <servlet-name>Upload Sticker</servlet-name>
         <url-pattern>/admin/sticker/upload</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SERVER_STATUS</servlet-name>
+        <jsp-file>/admin/serverStatus.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SERVER_STATUS</servlet-name>
+        <url-pattern>/admin/chat_server</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

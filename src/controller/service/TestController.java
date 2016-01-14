@@ -3,7 +3,13 @@ package controller.service;
 import model.*;
 
 import model.datamodel.app.Stickers;
+import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TServerTransport;
 import socket.ImgTalkServerSocket;
+import socket.thrift_service.ChatTransport;
+import socket.thrift_service.handler.ChatTransportHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -48,6 +54,39 @@ public class TestController extends  HttpServlet{
         };
         new testRead().start();
 
+        try {
+            ChatTransportHandler handler;
+
+            ChatTransport.Processor processor;
+            handler = new ChatTransportHandler();
+            processor = new ChatTransport.Processor(handler);
+
+            Runnable simple = new Runnable() {
+                public void run() {
+                    simple(processor);
+                }
+            };
+
+            new Thread(simple).start();
+        } catch (Exception x) {
+            x.printStackTrace();
+        }
+
+    }
+    public static void simple(ChatTransport.Processor processor) {
+        try {
+            TServerTransport serverTransport = new TServerSocket(9028);
+            TServer server = new TSimpleServer(new TServer.Args(serverTransport).processor(processor));
+//
+//         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
+//        TServer server = new TNonblockingServer(new TNonblockingServer.Args(serverTransport).processor(processor));
+
+
+            System.out.println("Starting the simple server...");
+            server.serve();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)

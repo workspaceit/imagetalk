@@ -7,6 +7,13 @@ import model.datamodel.app.Login;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TServerTransport;
+import socket.ImgTalkServerSocket;
+import socket.thrift_service.ChatTransport;
+import socket.thrift_service.handler.ChatTransportHandler;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -26,8 +33,9 @@ import java.util.regex.Pattern;
  */
 public class AdminController extends HttpServlet {
     Login                   login;
-    ImageTalkBaseController baseController;
-    PrintWriter             pw;
+    private static int thriftServerPort = 9028;
+    private boolean isThriftServerRunning = false;
+    private boolean isChatServerRunning = false;
 
     @Override
     public void init() throws ServletException {
@@ -39,19 +47,19 @@ public class AdminController extends HttpServlet {
         resp.setContentType("application/json");
 
         String url = req.getRequestURI().toString();
-        this.baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         this.login = new Login();
-        this.pw = resp.getWriter();
+        PrintWriter pw = resp.getWriter();
 
-        if (!this.baseController.isSessionValid(req)) {
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if (!baseController.isSessionValid(req)) {
+            pw.print(baseController.getResponse());
+             
         }
-        if (!this.baseController.isAdmin(req)) {
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if (!baseController.isAdmin(req)) {
+            pw.print(baseController.getResponse());
+
         }
-        login = this.baseController.getUserLoginFromSession(req);
+        login = baseController.getUserLoginFromSession(req);
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -60,65 +68,75 @@ public class AdminController extends HttpServlet {
         switch (url) {
 
             case "/admin/operation/user/add":
-                this.addUser(req, resp);
+                pw.print(this.addUser(req, resp));
                 break;
             case "/admin/operation/admin/add":
-                this.addAdminUser(req, resp);
+                pw.print(this.addAdminUser(req, resp));
                 break;
 
             case "/admin/operation/admin_user/delete":
-                this.deleteAdminUser(req);
+                pw.print(this.deleteAdminUser(req));
                 break;
 
             case "/admin/operation/change/user/status":
-                this.changeUserStatus(req);
+                pw.print(this.changeUserStatus(req));
                 break;
-
             case "/admin/operation/upload/image/ajax":
-                this.uploadImageByAjax(req);
+                pw.print(this.uploadImageByAjax(req));
                 break;
-
+            case "/admin/operation/start/chatserver":
+                pw.print(this.startChatPushBackServer(req));
+                break;
+            case "/admin/operation/start/thriftserver":
+                pw.print(this.startThriftServer(req));
+                break;
+            case "/admin/operation/chatserver/running":
+                pw.print(this.isChatServerRunning(req));
+                break;
+            case "/admin/operation/thriftserver/running":
+                pw.print(this.isThriftServerRunning(req));
+                break;
             default:
                 break;
         }
-        this.pw.close();
+        pw.close();
     }
 
-    public void addUser(HttpServletRequest req, HttpServletResponse resp) {
-        resp.setContentType("application/json");
-
-        this.baseController = new ImageTalkBaseController();
+    public String addUser(HttpServletRequest req, HttpServletResponse resp) {
+       
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        
         AdminLoginModel adminLoginModel = new AdminLoginModel();
         UserInfModel    userInfModel    = new UserInfModel();
 
-        if (this.baseController.checkParam("f_name", req, true)) {
+        if (baseController.checkParam("f_name", req, true)) {
             userInfModel.setF_name(req.getParameter("f_name"));
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "First name empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "First name empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+            
         }
 
-        if (this.baseController.checkParam("l_name", req, true)) {
+        if (baseController.checkParam("l_name", req, true)) {
             userInfModel.setL_name(req.getParameter("l_name"));
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Last name empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Last name empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("address", req, true)) {
+        if (baseController.checkParam("address", req, true)) {
             userInfModel.setAddress(req.getParameter("address"));
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Address empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Address empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("email", req, true)) {
+        if (baseController.checkParam("email", req, true)) {
             // String email_regex = "[A-Z]+[a-zA-Z_]+@\b([a-zA-Z]+.){2}\b?.[a-zA-Z]+";
             String testString = req.getParameter("email").trim();
 
@@ -129,44 +147,44 @@ public class AdminController extends HttpServlet {
             if (matcher.matches()) {
                 adminLoginModel.email = req.getParameter("email");
             } else {
-                this.baseController.serviceResponse.responseStat.msg = "Email is not valid";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Email is not valid";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
 
 
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Email empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Email empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("password", req, true)) {
+        if (baseController.checkParam("password", req, true)) {
             adminLoginModel.password = req.getParameter("password");
             if (adminLoginModel.password.length() < 6) {
-                this.baseController.serviceResponse.responseStat.msg = "Password at least 6 digit required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Password at least 6 digit required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Password empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Password empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
 
         if (adminLoginModel.isEmailExist(adminLoginModel.email)) {
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Email already used";
-            this.pw.println(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Email already used";
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("type", req, true)) {
+        if (baseController.checkParam("type", req, true)) {
             String type = req.getParameter("type").trim();
             System.out.println("type = " + type);
             if (type.equals("ADMIN")) {
@@ -187,8 +205,7 @@ public class AdminController extends HttpServlet {
         int userId = userInfModel.insertData();
         if (userId <= 0) {
             userInfModel.deleteData(userId);
-            this.pw.println(this.baseController.getResponse());
-            return;
+            return baseController.getResponse();
         }
 
         adminLoginModel.u_id = userId;
@@ -196,52 +213,51 @@ public class AdminController extends HttpServlet {
 
         if (loginId <= 0) {
             userInfModel.deleteData(userId);
-            this.pw.println(this.baseController.getResponse());
-            return;
+            return baseController.getResponse();
         }
 
 
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseStat.msg = "Registration Successfully";
-        this.pw.println(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseStat.msg = "Registration Successfully";
+        return baseController.getResponse();
+         
     }
 
-    public void addAdminUser(HttpServletRequest req, HttpServletResponse resp) {
+    public String addAdminUser(HttpServletRequest req, HttpServletResponse resp) {
         resp.setContentType("application/json");
-
-        this.baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        baseController = new ImageTalkBaseController();
         AdminLoginModel adminLoginModel = new AdminLoginModel();
         UserInfModel    userInfModel    = new UserInfModel();
 
-        if (this.baseController.checkParam("f_name", req, true)) {
+        if (baseController.checkParam("f_name", req, true)) {
             userInfModel.setF_name(req.getParameter("f_name"));
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "First name empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "First name empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("l_name", req, true)) {
+        if (baseController.checkParam("l_name", req, true)) {
             userInfModel.setL_name(req.getParameter("l_name"));
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Last name empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Last name empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
         //        if (this.baseController.checkParam("address",req,true)) {
         //            userInfModel.address = req.getParameter("address");
         //        } else {
-        //            this.baseController.serviceResponse.responseStat.msg = "Address empty";
-        //            this.baseController.serviceResponse.responseStat.status = false;
-        //            this.pw.print(this.baseController.getResponse());
-        //            return;
+        //            baseController.serviceResponse.responseStat.msg = "Address empty";
+        //            baseController.serviceResponse.responseStat.status = false;
+        //            return baseController.getResponse());
+        //             
         //        }
 
-        if (this.baseController.checkParam("email", req, true)) {
+        if (baseController.checkParam("email", req, true)) {
             // String email_regex = "[A-Z]+[a-zA-Z_]+@\b([a-zA-Z]+.){2}\b?.[a-zA-Z]+";
             String testString = req.getParameter("email").trim();
 
@@ -252,41 +268,41 @@ public class AdminController extends HttpServlet {
             if (matcher.matches()) {
                 adminLoginModel.email = req.getParameter("email");
             } else {
-                this.baseController.serviceResponse.responseStat.msg = "Email is not valid";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Email is not valid";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
 
 
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Email empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Email empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        if (this.baseController.checkParam("password", req, true)) {
+        if (baseController.checkParam("password", req, true)) {
             adminLoginModel.password = req.getParameter("password");
             if (adminLoginModel.password.length() < 6) {
-                this.baseController.serviceResponse.responseStat.msg = "Password at least 6 digit required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "Password at least 6 digit required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "Password empty";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Password empty";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
 
         if (adminLoginModel.isEmailExist(adminLoginModel.email)) {
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Email already used";
-            this.pw.println(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Email already used";
+            return baseController.getResponse();
+             
         }
         // Setting type is Admin
         adminLoginModel.type = 1;
@@ -295,8 +311,7 @@ public class AdminController extends HttpServlet {
         int userId = userInfModel.insertData();
         if (userId <= 0) {
             userInfModel.deleteData(userId);
-            this.pw.println(this.baseController.getResponse());
-            return;
+            return baseController.getResponse();
         }
 
         adminLoginModel.u_id = userId;
@@ -304,49 +319,49 @@ public class AdminController extends HttpServlet {
 
         if (loginId <= 0) {
             userInfModel.deleteData(userId);
-            this.pw.println(this.baseController.getResponse());
-            return;
+            return baseController.getResponse();
         }
 
 
-        this.baseController.serviceResponse.responseStat.status = true;
-        this.baseController.serviceResponse.responseStat.msg = "Registration Successfully";
-        this.pw.println(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseStat.msg = "Registration Successfully";
+        return baseController.getResponse();
+         
     }
 
-    private void deleteAdminUser(HttpServletRequest req) {
+    private String deleteAdminUser(HttpServletRequest req) {
         int u_id     = 0;
         int login_id = 0;
-        if (!this.baseController.checkParam("u_id", req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "User id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if (!baseController.checkParam("u_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "User id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         } else {
             try {
                 u_id = Integer.parseInt(req.getParameter("u_id").trim());
             } catch (NumberFormatException e) {
-                this.baseController.serviceResponse.responseStat.msg = "User id not valid format, int required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "User id not valid format, int required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
         }
 
-        if (!this.baseController.checkParam("login_id", req, true)) {
-            this.baseController.serviceResponse.responseStat.msg = "User id required";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+        if (!baseController.checkParam("login_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "User id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         } else {
             try {
                 login_id = Integer.parseInt(req.getParameter("login_id").trim());
             } catch (NumberFormatException e) {
-                this.baseController.serviceResponse.responseStat.msg = "login id not valid format, int required";
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                baseController.serviceResponse.responseStat.msg = "login id not valid format, int required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+                 
             }
         }
 
@@ -359,26 +374,28 @@ public class AdminController extends HttpServlet {
 
 
         if (adminLoginModel.deleteById() <= 0) {
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error at login model";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error at login model";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
         if (userInfModel.deleteById() <= 0) {
-            this.baseController.serviceResponse.responseStat.msg = "Internal server error at userinf model";
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "Internal server error at userinf model";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
-        this.baseController.serviceResponse.responseStat.msg = "User successfully deleted";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        baseController.serviceResponse.responseStat.msg = "User successfully deleted";
+        return baseController.getResponse();
+         
 
     }
 
-    private void changeUserStatus(HttpServletRequest req) {
+    private String changeUserStatus(HttpServletRequest req) {
         AppLoginCredentialModel appModel = new AppLoginCredentialModel();
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         int userId        = Integer.parseInt(req.getParameter("user_id"));
         int status        = Integer.parseInt(req.getParameter("user_status"));
@@ -391,10 +408,10 @@ public class AdminController extends HttpServlet {
                 statusName = "Permitted";
             }
 
-            this.baseController.serviceResponse.responseStat.msg = "This user already " + statusName;
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            baseController.serviceResponse.responseStat.msg = "This user already " + statusName;
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+             
         }
 
         appModel.setId(userId);
@@ -403,23 +420,23 @@ public class AdminController extends HttpServlet {
         boolean changeStatus = appModel.updateUserStatus();
 
         if (changeStatus) {
-            this.baseController.serviceResponse.responseStat.msg = "User Status Changed Successfully";
-            this.baseController.serviceResponse.responseStat.status = true;
+            baseController.serviceResponse.responseStat.msg = "User Status Changed Successfully";
+            baseController.serviceResponse.responseStat.status = true;
         } else {
-            this.baseController.serviceResponse.responseStat.msg = "User Status Changed Failed";
-            this.baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "User Status Changed Failed";
+            baseController.serviceResponse.responseStat.status = false;
         }
 
-        this.pw.print(this.baseController.getResponse());
-        return;
+        return baseController.getResponse();
+         
     }
 
-    private void uploadImageByAjax(HttpServletRequest req) {
+    private String uploadImageByAjax(HttpServletRequest req) {
         boolean isMultipart;
         String  saveDir     = "ImageTalk_sticker/";
 //        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
         String  filePath    = "/home/wsit/Projects/j2ee/" + saveDir;
-
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         int     maxFileSize = 250 * 1024 * 1024;
         int     maxMemSize  = 10 * 1024 * 1024;
@@ -428,8 +445,8 @@ public class AdminController extends HttpServlet {
         isMultipart = ServletFileUpload.isMultipartContent(req);
 
         if (!isMultipart) {
-            this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
-            return;
+            return "{\"isComplete\":false, \"isSuccess\":false}";
+             
         }
 
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -472,9 +489,9 @@ public class AdminController extends HttpServlet {
                     long sizeInBytes = fi.getSize();
 
                     if (sizeInBytes > maxFileSize || contentType == "image/gif") {
-                        this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
                         fi.delete();
-                        return;
+                        return "{\"isComplete\":false, \"isSuccess\":false}";
+
                     }
 
                     if (fileName.lastIndexOf("\\") >= 0) {
@@ -486,9 +503,8 @@ public class AdminController extends HttpServlet {
                     }
 
                     fi.write(file);
-                    this.pw.print("{\"path\":\"" + saveDir + tempName + "\",\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
-                    System.out.println("{\"path\":\"" + saveDir + tempName + "\",\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}");
-                    return;
+                    return "{\"path\":\"" + saveDir + tempName + "\",\"isComplete\":true, \"isSuccess\":true, \"hasErrors\":false, \"hasWarnings\":false}";
+                     
                 } else {
                     String fieldName = fi.getFieldName();
                     String fieldValue = fi.getString();
@@ -496,7 +512,93 @@ public class AdminController extends HttpServlet {
             }
         } catch (Exception ex) {
             System.out.println(ex);
-            this.pw.print("{\"isComplete\":false, \"isSuccess\":false}");
+            return "{\"isComplete\":false, \"isSuccess\":false}";
+        }
+        return "{\"isComplete\":false, \"isSuccess\":false}";
+    }
+
+    private String startChatPushBackServer(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!isChatServerRunning){
+            class testRead extends Thread{
+
+                @Override
+                public void run() {
+
+                    ImgTalkServerSocket imgTalkServerSocket = new ImgTalkServerSocket();
+                    imgTalkServerSocket.startServer();
+                }
+            };
+            new testRead().start();
+        }else{
+
+        }
+        return baseController.getResponse();
+    }
+    private String startThriftServer(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(!isThriftServerRunning){
+
+            try {
+                ChatTransportHandler handler;
+
+                ChatTransport.Processor processor;
+                handler = new ChatTransportHandler();
+                processor = new ChatTransport.Processor(handler);
+
+                Runnable simple = new Runnable() {
+                    public void run() {
+                        simple(processor);
+                    }
+                };
+
+                new Thread(simple).start();
+            } catch (Exception x) {
+                x.printStackTrace();
+            }
+        }
+
+
+        return baseController.getResponse();
+    }
+    private String isThriftServerRunning(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(isThriftServerRunning){
+            baseController.serviceResponse.responseStat.status = true;
+            baseController.serviceResponse.responseStat.msg = "Server is running";
+        }else{
+            baseController.serviceResponse.responseStat.status = true;
+            baseController.serviceResponse.responseStat.msg = "Server is not running";
+        }
+        return baseController.getResponse();
+    }
+    private String isChatServerRunning(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if(isChatServerRunning){
+            baseController.serviceResponse.responseStat.status = true;
+            baseController.serviceResponse.responseStat.msg = "Server is running";
+        }else{
+            baseController.serviceResponse.responseStat.status = true;
+            baseController.serviceResponse.responseStat.msg = "Server is not running";
+        }
+        return baseController.getResponse();
+    }
+
+
+
+    public static void simple(ChatTransport.Processor processor) {
+        try {
+            TServerTransport serverTransport = new TServerSocket(thriftServerPort);
+            TServer server = new TSimpleServer(new TServer.Args(serverTransport).processor(processor));
+//
+//         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
+//        TServer server = new TNonblockingServer(new TNonblockingServer.Args(serverTransport).processor(processor));
+
+
+            System.out.println("Starting the simple server...");
+            server.serve();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

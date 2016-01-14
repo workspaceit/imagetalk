@@ -145,44 +145,12 @@ public class ImageHelper {
         }
         return pictures;
     }
-    public static Videos saveByteToChatVideo(byte[] b,int uId) throws IOException{
-        FileOutputStream fos;
-        Videos videos = new Videos();
-        String   path     = GLOBAL_PATH;
-        String   fileName = "";
 
-        fileName = +System.nanoTime() + ".mp4";
-        path += uId;
-        createDirIfNotExist(path);
-        path += "/chat";
-        createDirIfNotExist(path);
-        path += "/media";
-        createDirIfNotExist(path);
-        path += "/video";
-        createDirIfNotExist(path);
-
-
-
-
-        try {
-            fos = new FileOutputStream(path+"/"+fileName);
-            fos.write(b);
-            fos.close();
-
-            fileName = uId + "/chat/media/video/" + fileName;
-            videos.original.size = "";
-            videos.original.resolution = "";
-            videos.original.path = fileName;
-
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        }
-        return videos;
-    }
     public static Pictures saveByteToChatPicture(byte[] b,int uId,String tmpFileName) {
         Pictures pictures = new Pictures();
         String   path     = GLOBAL_PATH;
         String   fileName = "";
+        System.out.println("tmpFileName :" + tmpFileName);
         try {
             fileName = +System.nanoTime() + "."+getExtension(tmpFileName);
             path += uId;
@@ -192,6 +160,8 @@ public class ImageHelper {
             path += "/media";
             createDirIfNotExist(path);
             path += "/picture";
+            createDirIfNotExist(path);
+            path += "/regular";
             createDirIfNotExist(path);
             path += "/" + fileName;
             System.out.println(path);
@@ -211,14 +181,14 @@ public class ImageHelper {
 
             PictureDetails thumb1 = new PictureDetails();
             thumb1.type = "thumbnail";
-            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture");
+            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture/regular",tmpFileName);
             thumb1.size.width = 32;
             thumb1.size.height = 32;
             pictures.thumb.add(thumb1);
 
             PictureDetails thumb2 = new PictureDetails();
             thumb2.type = "thumbnail";
-            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture");
+            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture/regular",tmpFileName);
             thumb2.size.width = 48;
             thumb2.size.height = 48;
             pictures.thumb.add(thumb2);
@@ -262,17 +232,19 @@ public class ImageHelper {
 
             PictureDetails thumb1 = new PictureDetails();
             thumb1.type = "thumbnail";
-            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture");
+            thumb1.path = createThumbnail(bufferedImage, 100, 100, uId + "/chat/media/picture/private",tmpFileName);
             thumb1.size.width = 32;
             thumb1.size.height = 32;
             pictures.thumb.add(thumb1);
 
             PictureDetails thumb2 = new PictureDetails();
             thumb2.type = "thumbnail";
-            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture");
+            thumb2.path = createThumbnail(bufferedImage, 200, 200, uId + "/chat/media/picture/private",tmpFileName);
             thumb2.size.width = 48;
             thumb2.size.height = 48;
             pictures.thumb.add(thumb2);
+
+            System.out.println("Path  : " + path);
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -554,7 +526,7 @@ public class ImageHelper {
         }
         return pictures;
     }
-    public static VideoDetails saveChatVideo(byte[] videoByte, int uId,String SourceFileName) {
+    public static VideoDetails saveByteToChatVideo(byte[] videoByte, int uId,String SourceFileName) {
         VideoDetails videoDetails = new VideoDetails();
 
         String   path     = GLOBAL_PATH;
@@ -583,7 +555,7 @@ public class ImageHelper {
         }
 
 
-        videoDetails.path = path;
+        videoDetails.path =  uId + "/chat/media/video/" + fileName;
         return videoDetails;
     }
     public static BufferedImage decodeToImage(String imageString) {
@@ -639,6 +611,27 @@ public class ImageHelper {
 
         return path;
     }
+    public static String createThumbnail(BufferedImage img, int width, int height, String path,String tmpFileName) {
+
+
+        Image         scaledImg = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage thumbnail = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        thumbnail.createGraphics().drawImage(scaledImg, 0, 0, null);
+
+        String fileName = System.nanoTime() + "."+getExtension(tmpFileName);
+
+        path += "/thumbnail";
+        createDirIfNotExist(GLOBAL_PATH + path);
+        path += "/" + fileName;
+
+        try {
+            ImageIO.write(thumbnail, getExtension(tmpFileName), new File(GLOBAL_PATH + path));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return path;
+    }
     public static String getExtension(String fileName){
         String extension ="";
         String name = fileName;
@@ -647,6 +640,7 @@ public class ImageHelper {
         } catch (Exception e) {
             return "";
         }
+        System.out.println("Extension "+extension);
         return extension;
     }
 
