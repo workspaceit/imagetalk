@@ -69,6 +69,12 @@ public class ChatTransportHandler implements ChatTransport.Iface {
                 if(st!=null){
                     socketResp.responseStat.tag = ServiceThread.tag_chatVideo;
                     st.processPushBack(this.gson.toJson(socketResp));
+                }else{
+                    ServiceThread selfSt = BaseSocketController.getServiceThread(appCredentialId);
+                    if(selfSt!=null){
+                        selfSt.sendChatAcknowledgement(0,chatVideo.tmpChatId,chatVideo.chatId,false,false);
+                    }
+                    System.out.println("ST Socket Null d");
                 }
             }else{
                 responseObj.status = false;
@@ -77,6 +83,8 @@ public class ChatTransportHandler implements ChatTransport.Iface {
         }catch (Exception ex){
             ex.printStackTrace();
         }
+
+
 
         return responseObj;
     }
@@ -114,11 +122,12 @@ public class ChatTransportHandler implements ChatTransport.Iface {
                     socketResp.responseStat.tag = ServiceThread.tag_chatPhoto;
                     st.processPushBack(this.gson.toJson(socketResp));
                 }else{
-                    System.out.println("Socket Null miss matched");
+                    ServiceThread selfSt = BaseSocketController.getServiceThread(appCredentialId);
+                    if(selfSt!=null){
+                        selfSt.sendChatAcknowledgement(0,chatPhoto.tmpChatId,chatPhoto.chatId,false,false);
+                    }
+                    System.out.println("ST Socket Null d");
                 }
-                getServiceObj();
-
-
             }else{
                 responseObj.status = false;
                 responseObj.msg = "Token miss matched";
@@ -127,6 +136,11 @@ public class ChatTransportHandler implements ChatTransport.Iface {
         }catch (Exception ex){
             ex.printStackTrace();
         }
+
+
+
+
+
         return responseObj;
     }
 
@@ -160,6 +174,12 @@ public class ChatTransportHandler implements ChatTransport.Iface {
                 if(st!=null){
                     socketResp.responseStat.tag = ServiceThread.tag_chatPhoto;
                     st.processPushBack(this.gson.toJson(socketResp));
+                }else{
+                    ServiceThread selfSt = BaseSocketController.getServiceThread(appCredentialId);
+                    if(selfSt!=null){
+                        selfSt.sendChatAcknowledgement(0,privateChatPhoto.tmpChatId,privateChatPhoto.chatId,false,false);
+                    }
+                    System.out.println("ST Socket Null d");
                 }
 
 

@@ -9,6 +9,7 @@ import model.datamodel.app.Places;
 import model.datamodel.app.socket.chat.ContactShare;
 import model.datamodel.app.socket.chat.PrivateChatPhoto;
 import model.datamodel.app.socket.chat.TextChat;
+import model.datamodel.app.video.VideoDetails;
 import model.datamodel.photo.Pictures;
 
 import java.io.IOException;
@@ -379,6 +380,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                             || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }else if(chat.type==2) {
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), VideoDetails.class);
+
                 }
 
 
@@ -451,6 +456,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                             || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }else if(chat.type==2) {
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), VideoDetails.class);
+
                 }
                 try {
                     chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
@@ -517,6 +526,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                             || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }else if(chat.type==2) {
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), VideoDetails.class);
+
                 }
                 try {
                     chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null) ? "" : this.getUTCTimeStamp(this.resultSet.getString("chat_history.created_date"));
@@ -593,6 +606,10 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 if(chat.type==1 || chat.type==5){
                     chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
                             || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), Pictures.class);
+                }else if(chat.type==2) {
+                    chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null
+                            || this.resultSet.getString("chat_history.media_path").equals("null"))? new Object() : this.gson.fromJson(this.resultSet.getString("chat_history.media_path"), VideoDetails.class);
+
                 }
 
                 try {

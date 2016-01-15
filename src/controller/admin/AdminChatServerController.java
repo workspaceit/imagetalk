@@ -4,6 +4,9 @@ import controller.service.ImageTalkBaseController;
 import model.datamodel.app.Login;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
+import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import socket.ImgTalkServerSocket;
@@ -30,6 +33,7 @@ public class AdminChatServerController extends HttpServlet{
     private static ServerSocket serverSocket = null;
     private static TServer ts = null;
     private static TServerTransport tsTransport = null;
+    private static TNonblockingServerTransport nonblockingTs=null;
     private static int thriftServerPort = 9028;
     private static boolean isThriftServerRunning = false;
     private static boolean isChatServerRunning = false;
@@ -226,9 +230,15 @@ public class AdminChatServerController extends HttpServlet{
     public static void simple(ChatTransport.Processor processor) {
         try {
             tsTransport = new TServerSocket(thriftServerPort);
-            ts = new TSimpleServer(new TServer.Args(tsTransport).processor(processor));
+          //  ts = new TSimpleServer(new TServer.Args(tsTransport).processor(processor));
+            ts = new TThreadPoolServer(new TThreadPoolServer.Args(tsTransport).processor(processor));
+
+
+//            TNonblockingServerSocket tServerSocket=new TNonblockingServerSocket(thriftServerPort);
+      //      ts=getServer(processor,tServerSocket,protoFactory);
+//            nonblockingTs = new TNonblockingServerSocket(thriftServerPort);
+//            ts = new TSimpleServer(new TServer.Args(nonblockingTs).processor(processor));
 //
-//         TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
 //        TServer server = new TNonblockingServer(new TNonblockingServer.Args(serverTransport).processor(processor));
 
 

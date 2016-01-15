@@ -288,16 +288,16 @@ public class ChatController extends HttpServlet {
             baseController.serviceResponse.responseStat.msg = "No record found!";
             baseController.serviceResponse.responseStat.status = false;
             //this.pw.print(this.baseController.getResponse());
+
             return baseController.getResponse();
         }
 
         baseController.serviceResponse.responseStat.msg = "Records are in arraylist";
         baseController.serviceResponse.responseStat.status = true;
         baseController.serviceResponse.responseData = chatArrayList;
-
+        System.out.println(baseController.getResponse());
         //this.pw.print(this.baseController.getResponse());
 
-        System.out.println(baseController.getResponse());
         return baseController.getResponse();
 
     }

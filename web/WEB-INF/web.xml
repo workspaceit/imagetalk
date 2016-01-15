@@ -12,7 +12,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>VideoStreaming</servlet-name>
-        <url-pattern>/transfer/file</url-pattern>
+        <url-pattern>/app/transfer/file</url-pattern>
     </servlet-mapping>
 
 

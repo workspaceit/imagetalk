@@ -1231,7 +1231,7 @@ public class ServiceThread extends Thread {
         return tempMsg;
     }
 
-    private void sendChatAcknowledgement(int id,String tmpChatId,String chatId,boolean isRead,boolean isOline){
+    public void sendChatAcknowledgement(int id,String tmpChatId,String chatId,boolean isRead,boolean isOline){
         Acknowledgement acknowledgement = new Acknowledgement();
 
 

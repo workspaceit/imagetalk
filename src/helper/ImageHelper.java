@@ -173,7 +173,7 @@ public class ImageHelper {
             BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(b));
             ImageIO.write(bufferedImage,getExtension(tmpFileName), outputfile);
 
-            fileName = uId + "/chat/media/picture/" + fileName;
+            fileName = uId + "/chat/media/picture/regular/" + fileName;
             pictures.original.size.height = bufferedImage.getHeight();
             pictures.original.size.width = bufferedImage.getWidth();
             pictures.original.path = fileName;

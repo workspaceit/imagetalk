@@ -38,10 +38,14 @@ public class BaseSocketController {
         boolean status = false;
         token = token.trim();
         System.out.println("AppCId From isThriftToken : " + appCredential);
+        System.out.println("Token : " + token);
         if(thriftToken.containsKey(appCredential)){
             String tempToken = thriftToken.get(appCredential);
+            System.out.println("Token tempToken: " + tempToken);
             if(tempToken!=null && tempToken!=""){
+                System.out.println("01");
                 if(tempToken.equals(token)){
+                    System.out.println("02");
                     status = true;
                 }
             }

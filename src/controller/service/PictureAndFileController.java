@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.*;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 
 /**
@@ -39,7 +40,7 @@ public class PictureAndFileController extends HttpServlet {
 
         switch (url) {
             default:
-                this.readPicture(req,res);
+                readPicture(req, res);
                 break;
         }
 
@@ -67,6 +68,7 @@ public class PictureAndFileController extends HttpServlet {
 
 
             in = new FileInputStream(ImageHelper.getGlobalPath()+picRelativePath);
+            System.out.println(URLConnection.guessContentTypeFromStream(in));
             String mimeType = "image/jpeg";
             byte[] bytes = new byte[1024];
             int bytesRead;
@@ -76,20 +78,15 @@ public class PictureAndFileController extends HttpServlet {
             while ((bytesRead = in.read(bytes)) != -1) {
                 out.write(bytes, 0, bytesRead);
             }
-
+            in.close();
+            out.flush();
+            out.close();
 
         } catch (IOException e) {
+            System.out.println("Exception picRelativePath : '"+picRelativePath+"'");
             e.printStackTrace();
         }finally {
-            try {
 
-                in.close();
-                out.flush();
-                out.close();
-            } catch (IOException e) {
-                System.out.println("Exception picRelativePath : '"+picRelativePath+"'");
-                e.printStackTrace();
-            }
         }
 
     }
