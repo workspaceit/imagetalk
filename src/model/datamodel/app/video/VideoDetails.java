@@ -9,11 +9,13 @@ public class VideoDetails {
     public String type;
     public String size;
     public String resolution;
+    public String coverPic;
 
     public VideoDetails() {
         this.path = "";
         this.type = "";
         this.size = "";
         this.resolution = "";
+        this.coverPic = "";
     }
 }

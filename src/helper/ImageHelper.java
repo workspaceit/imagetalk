@@ -1,5 +1,7 @@
 package helper;
 
+import com.googlecode.javacv.FFmpegFrameGrabber;
+import com.googlecode.javacv.FrameGrabber;
 import model.datamodel.app.video.VideoDetails;
 import model.datamodel.app.video.Videos;
 import model.datamodel.photo.PictureDetails;
@@ -11,7 +13,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.logging.Level;
 
 /**
  * Created by mi on 10/1/15.
@@ -556,6 +557,7 @@ public class ImageHelper {
 
 
         videoDetails.path =  uId + "/chat/media/video/" + fileName;
+       // videoDetails.coverPic = createCoverPictureFromVideo(GLOBAL_PATH+videoDetails.path,GLOBAL_PATH+uId + "/chat/media/video/"+System.nanoTime()+".png");
         return videoDetails;
     }
     public static BufferedImage decodeToImage(String imageString) {
@@ -631,6 +633,24 @@ public class ImageHelper {
         }
 
         return path;
+    }
+    public static String createCoverPictureFromVideo(String videoPath,String imgSavePath){
+        FFmpegFrameGrabber g = new FFmpegFrameGrabber(videoPath);
+        try {
+            g.start();
+            ImageIO.write(g.grab().getBufferedImage(), "png", new File(imgSavePath));
+            g.stop();
+        } catch (FrameGrabber.Exception e) {
+            e.printStackTrace();
+            return "";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+
+
+
+        return imgSavePath;
     }
     public static String getExtension(String fileName){
         String extension ="";

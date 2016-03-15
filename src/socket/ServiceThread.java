@@ -200,7 +200,7 @@ public class ServiceThread extends Thread {
         this.broadCastOnlineOfflineToUnknownChatPerson(false);
 
     }
-    private void flushDataToOthers(ServiceThread contactServiceThread,Object obj){
+    private synchronized void flushDataToOthers(ServiceThread contactServiceThread,Object obj){
 
         if(!this.isInContactList( contactServiceThread.appCredential)){
             if(!this.currentUnknownChatPersons.contains(contactServiceThread.appCredential)){
@@ -918,7 +918,7 @@ public class ServiceThread extends Thread {
         }
 
     }
-    private void broadCastOnlineOfflineToContact(boolean online) {
+    private synchronized  void broadCastOnlineOfflineToContact(boolean online) {
 
 
         try {
@@ -957,7 +957,7 @@ public class ServiceThread extends Thread {
         }
 
     }
-    private void broadCastOnlineOfflineToUnknownChatPerson(boolean online){
+    private synchronized  void  broadCastOnlineOfflineToUnknownChatPerson(boolean online){
         try {
             for(AppCredential appCredential : this.currentUnknownChatPersons){
 
@@ -993,7 +993,7 @@ public class ServiceThread extends Thread {
             ex.printStackTrace();
         }
     }
-    private void syncContactsWithDb(){
+    private synchronized  void syncContactsWithDb(){
         ContactModel contactModel = new ContactModel();
         contactModel.setOwner_id(this.appCredential.id);
         this.contacts = contactModel.getContactByOwnerId();
