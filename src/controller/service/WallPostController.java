@@ -104,6 +104,9 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/add/remove/favourite":
                 pw.print(this.favourWallPost(req));
                 break;
+            case "/app/wallpost/hide":
+                pw.print(this.hidePost(req));
+                break;
 
             default:
                 break;
@@ -177,6 +180,7 @@ public class WallPostController extends HttpServlet {
 
         /*===============  Insert location here ==============*/
         LocationModel locationModel = new LocationModel();
+
         if(baseController.checkParam("places", req, true)){
             System.out.println("At location  ");
             String locationStr = req.getParameter("places");
@@ -222,6 +226,17 @@ public class WallPostController extends HttpServlet {
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
                 baseController.serviceResponse.responseStat.msg = "Unable to handel Description text";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+        if(baseController.checkParam("wall_post_mood", req, true)){
+            try {
+                wallPostModel.setWallPostMood(URLDecoder.decode(new String(req.getParameter("wall_post_mood").getBytes("UTF-8"),"UTF-8"), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+                baseController.serviceResponse.responseStat.msg = "Unable to handel Wall Post Mood text";
                 baseController.serviceResponse.responseStat.status = false;
                 return baseController.getResponse();
             }
@@ -1010,6 +1025,44 @@ public class WallPostController extends HttpServlet {
         }
 
         baseController.serviceResponse.responseStat.msg ="Wall Post deleted";
+        return baseController.getResponse();
+    }
+
+    private String hidePost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        if(!baseController.checkParam("wall_post_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        /*if(!baseController.checkParam("owner_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }*/
+
+        int wallPostId = 0;
+        //int ownerId = 0;
+        try{
+            wallPostId = Integer.parseInt(req.getParameter("wall_post_id"));
+        }catch(Exception ex){
+
+        }
+
+        WallPostStatusModel wallPostStatusModel  = new WallPostStatusModel();
+
+        wallPostStatusModel.setOwner_id(baseController.appCredential.id);
+        wallPostStatusModel.setWall_post_id(wallPostId);
+
+        if(wallPostStatusModel.hide() <= 0) {
+            baseController.serviceResponse.responseStat.msg = wallPostStatusModel.errorObj.msg;
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg ="Successfully Hidden Wall Post";
         return baseController.getResponse();
     }
 }

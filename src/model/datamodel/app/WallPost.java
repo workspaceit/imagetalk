@@ -10,6 +10,7 @@ public class WallPost {
 
     public int id;
     public  String description;
+    public String wallPostMood;
     public AppCredential owner;
     public  String picPath;
     public ArrayList<AppCredential> tagList;
@@ -27,6 +28,7 @@ public class WallPost {
    public WallPost() {
         this.id = 0;
         this.description = "";
+        this.wallPostMood = "";
         this.owner = new AppCredential();
         this.picPath = "";
         this.tagList = new ArrayList<AppCredential>();
