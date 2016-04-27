@@ -196,6 +196,15 @@
         <url-pattern>/admin/user/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Review_User</servlet-name>
+        <servlet-class>controller.service.UserReviewController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Review_User</servlet-name>
+        <url-pattern>/user/review/*</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>ADMIN_OPERATION</servlet-name>

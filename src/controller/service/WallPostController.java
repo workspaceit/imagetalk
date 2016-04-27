@@ -1047,7 +1047,6 @@ public class WallPostController extends HttpServlet {
         }*/
 
         int wallPostId = 0;
-        //int ownerId = 0;
         try{
             wallPostId = Integer.parseInt(req.getParameter("wall_post_id"));
         }catch(Exception ex){

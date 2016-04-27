@@ -285,7 +285,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id "+
-                " where wall_post.id NOT IN (SELECT wall_post_status.wall_post_id FROM wall_post_status, wall_post WHERE wall_post.owner_id = wall_post_status.owner_id AND wall_post.id = wall_post_status.wall_post_id)";
+                " where wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
 
         query += " order by  wall_post.id  DESC ";
         if(this.limit >0){
