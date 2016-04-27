@@ -699,5 +699,23 @@ public class WallPostModel extends ImageTalkBaseModel{
         this.errorObj.msg = "You don't have privilege to delete this wall post";
         return false;
     }
+
+    /*public int wallpostCountByOwnerId()
+    {
+        String query = "SELECT count(wall_post.id) FROM `wall_post` WHERE owner_id = "+this.owner_id;
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return false;
+    }*/
 }
 

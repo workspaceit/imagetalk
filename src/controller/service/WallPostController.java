@@ -107,6 +107,9 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/hide":
                 pw.print(this.hidePost(req));
                 break;
+            case "/app/wallpost/count/byownerid":
+                pw.print(this.wallpostCountByOwnerId(req));
+                break;
 
             default:
                 break;
@@ -965,7 +968,7 @@ public class WallPostController extends HttpServlet {
         }
         HashMap<String,Object> respObj = new HashMap<>();
 
-        respObj.put("isFavorite",wallPostFavoriteModel.isFavorite);
+        respObj.put("isFavorite", wallPostFavoriteModel.isFavorite);
         baseController.serviceResponse.responseStat.msg = wallPostFavoriteModel.operationStatus.msg;
         baseController.serviceResponse.responseData = respObj;
         //this.pw.print(this.baseController.getResponse());
@@ -1063,6 +1066,36 @@ public class WallPostController extends HttpServlet {
         }
 
         baseController.serviceResponse.responseStat.msg ="Successfully Hidden Wall Post";
+        return baseController.getResponse();
+    }
+
+    private String wallpostCountByOwnerId(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        if(!baseController.checkParam("owner_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "owner_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        int ownerId = 0;
+        try{
+            ownerId = Integer.parseInt(req.getParameter("owner_id"));
+        }catch(Exception ex){
+
+        }
+
+        WallPostModel wallPostModel  = new WallPostModel();
+
+
+        wallPostModel.setOwner_id(ownerId);
+        int wallPostCount = wallPostModel.getCountByOwnerId();
+
+
+        baseController.serviceResponse.responseStat.status=true;
+        baseController.serviceResponse.responseStat.msg ="Data Found";
+        baseController.serviceResponse.responseData= wallPostCount;
         return baseController.getResponse();
     }
 }
