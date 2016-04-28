@@ -12,12 +12,14 @@ public class UserReview {
     public int    id;
     public User from;
     public User to;
+    public String review;
     public String createdDate;
 
     public UserReview() {
         this.id = 0;
         this.from = new User();
         this.to = new User();
+        this.review = "";
         this.createdDate = "";
     }
 }

@@ -288,7 +288,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " where wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
 
         query += " order by  wall_post.id  DESC ";
-        //System.out.println(query);
+        System.out.println(query);
         //System.out.println("app cred id in wallpost: "+ this.getCurrentUserId());
         if(this.limit >0){
             this.offset = this.offset * this.limit;
@@ -306,8 +306,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.type = this.resultSet.getInt("postType");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
-                wallPost.isLiked = (this.resultSet.getInt("likeCount")==1)?true:false;
-                wallPost.isFavorite = (this.resultSet.getInt("commentCount")==1)?true:false;
+                wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
+                wallPost.isFavorite = (this.resultSet.getInt("isFavorite")==1)?true:false;
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
                 wallPost.commentCount = this.resultSet.getInt("commentCount");
 

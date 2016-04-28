@@ -291,7 +291,8 @@ public class WallPostController extends HttpServlet {
 
         wallPostModel.setCurrentUserId(baseController.appCredential.id);
 
-        //System.out.print("App cred id in wall post controller: "+ wallPostModel.getCurrentUserId());
+       // System.out.print("App cred id in wall post controller: "+ wallPostModel.getCurrentUserId());
+
         if(baseController.checkParam("limit", req, true)) {
             try{
                 wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
