@@ -291,8 +291,7 @@ public class WallPostController extends HttpServlet {
 
         wallPostModel.setCurrentUserId(baseController.appCredential.id);
 
-
-        //System.out.print("wallpost model owner : "+ baseController.appCredential.id);
+        //System.out.print("App cred id in wall post controller: "+ wallPostModel.getCurrentUserId());
         if(baseController.checkParam("limit", req, true)) {
             try{
                 wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
@@ -321,7 +320,7 @@ public class WallPostController extends HttpServlet {
                 return baseController.getResponse();
             }
         }
-        wallPostModel.setCurrentUserId(baseController.appCredential.user.id);
+        wallPostModel.setCurrentUserId(baseController.appCredential.id);
         //System.out.println("Recent post controller current user :"+ wallPostModel.getCurrentUserId());
         ArrayList<WallPost> wallPostList =  wallPostModel.getAllRecent();
 
@@ -1056,8 +1055,8 @@ public class WallPostController extends HttpServlet {
 
         WallPostStatusModel wallPostStatusModel  = new WallPostStatusModel();
 
-        wallPostStatusModel.setCurrentUserId(baseController.appCredential.user.id);
-        //System.out.println("hide post status current user :" + wallPostStatusModel.getCurrentUserId());
+        wallPostStatusModel.setCurrentUserId(baseController.appCredential.id);
+        System.out.println("hide post status current user :" + wallPostStatusModel.getCurrentUserId());
         wallPostStatusModel.setWall_post_id(wallPostId);
 
         if(wallPostStatusModel.hide() <= 0) {

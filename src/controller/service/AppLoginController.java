@@ -143,6 +143,8 @@ public class AppLoginController extends HttpServlet {
             WallPostModel wallPostModel = new WallPostModel();
             wallPostModel.setOwner_id(authCredential.id);
 
+            System.out.println("Auth cred id :"+authCredential.id);
+
             countResponse.put("present",0);
             countResponse.put("wallPost",wallPostModel.getCountByOwnerId());
 
