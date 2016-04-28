@@ -288,6 +288,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " where wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
 
         query += " order by  wall_post.id  DESC ";
+        //System.out.println(query);
+        //System.out.println("app cred id in wallpost: "+ this.getCurrentUserId());
         if(this.limit >0){
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";

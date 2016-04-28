@@ -40,7 +40,7 @@ public class WallPostStatusModel extends  ImageTalkBaseModel{
 
     public int hide(){
         String query = "INSERT INTO " + super.tableName+" (`owner_id`, `wall_post_id`) " +
-                       " VALUES ("+this.owner_id+","+this.wall_post_id+")";
+                       " VALUES ("+this.getCurrentUserId()+","+this.wall_post_id+")";
         return insertData(query);
     }
 

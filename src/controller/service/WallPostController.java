@@ -285,9 +285,14 @@ public class WallPostController extends HttpServlet {
     }
     private String getRecentPost(HttpServletRequest req){
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
         WallPostModel wallPostModel = new WallPostModel();
 
+        wallPostModel.setCurrentUserId(baseController.appCredential.id);
+
+
+        //System.out.print("wallpost model owner : "+ baseController.appCredential.id);
         if(baseController.checkParam("limit", req, true)) {
             try{
                 wallPostModel.limit = Integer.parseInt(req.getParameter("limit").trim());
@@ -316,7 +321,8 @@ public class WallPostController extends HttpServlet {
                 return baseController.getResponse();
             }
         }
-        wallPostModel.setCurrentUserId(baseController.appCredential.id);
+        wallPostModel.setCurrentUserId(baseController.appCredential.user.id);
+        //System.out.println("Recent post controller current user :"+ wallPostModel.getCurrentUserId());
         ArrayList<WallPost> wallPostList =  wallPostModel.getAllRecent();
 
         baseController.serviceResponse.responseStat.msg =(wallPostList.size()<=0)?"No record found":"";
@@ -1040,11 +1046,6 @@ public class WallPostController extends HttpServlet {
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        /*if(!baseController.checkParam("owner_id", req, true)) {
-            baseController.serviceResponse.responseStat.msg = "wall_post_id required";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }*/
 
         int wallPostId = 0;
         try{
@@ -1055,7 +1056,8 @@ public class WallPostController extends HttpServlet {
 
         WallPostStatusModel wallPostStatusModel  = new WallPostStatusModel();
 
-        wallPostStatusModel.setOwner_id(baseController.appCredential.id);
+        wallPostStatusModel.setCurrentUserId(baseController.appCredential.user.id);
+        //System.out.println("hide post status current user :" + wallPostStatusModel.getCurrentUserId());
         wallPostStatusModel.setWall_post_id(wallPostId);
 
         if(wallPostStatusModel.hide() <= 0) {
