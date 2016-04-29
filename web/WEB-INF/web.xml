@@ -205,6 +205,15 @@
         <url-pattern>/user/review/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>Report_issue</servlet-name>
+        <servlet-class>controller.service.ReportAppIssueController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Report_issue</servlet-name>
+        <url-pattern>/report/*</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>ADMIN_OPERATION</servlet-name>

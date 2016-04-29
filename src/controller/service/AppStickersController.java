@@ -143,7 +143,7 @@ public class AppStickersController extends HttpServlet {
     }
 
     private String addStickerUsability(HttpServletRequest req) {
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         int sticker_category_id;
 
@@ -179,7 +179,6 @@ public class AppStickersController extends HttpServlet {
         }
 
         baseController.serviceResponse.responseStat.msg = "sticker usability inserted successfully";
-        baseController.serviceResponse.responseStat.status = false;
         return baseController.getResponse();
 
     }
