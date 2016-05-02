@@ -74,6 +74,10 @@ public class ChatController extends HttpServlet {
             case "/app/user/chat/showLatest":
                 pw.print(this.showLatest(req));
                 break;
+
+            case "/app/user/chat/delete":
+                pw.print(this.deleteChatMessage(req));
+                break;
             case "/app/user/chat/private/photo/snapshot/confirm":
                 pw.print(this.confirmTakeSnapshot(req));
                 break;
@@ -515,5 +519,40 @@ public class ChatController extends HttpServlet {
         chatHistory.setId(id);
         chatHistory.updateIsTakeSnapShotStatusById();
         return baseController.getResponse();
+    }
+
+    private String deleteChatMessage(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+
+        chatHistoryModel.setCurrentUserId(baseController.appCredential.id);
+
+        if(!baseController.checkParam("chat_id",req,true))
+        {
+            baseController.serviceResponse.responseStat.msg = "chat_id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        String chatId = req.getParameter("chat_id");
+
+        chatHistoryModel.setChat_id(chatId);
+
+        if(chatHistoryModel.updateDelete()){
+            baseController.serviceResponse.responseStat.msg = "Successfully deleted";
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.status=false;
+        baseController.serviceResponse.responseStat.msg = "Problem with app credential";
+        return baseController.getResponse();
+
+
+
+
+
+
+        //return baseController.getResponse();
     }
 }

@@ -117,7 +117,7 @@ public class ReportAppIssueController extends HttpServlet {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("rafsanhasin@gmail.com"));
             message.setSubject("User Report");
             message.setText("Dear Mr, ,"
-                            + "\n\n This is a report!");
+                            + "\n\n"+req.getParameter("report_text"));
 
             Transport.send(message);
 

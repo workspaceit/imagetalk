@@ -37,6 +37,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     private String extra;
     private String media_path;
     private int type;
+    private int deleted_to;
+    private int deleted_from;
     private String created_date;
     private int read_status;
 
@@ -59,6 +61,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         extra = null;
         media_path = null;
         type = 0;
+        deleted_to=0;
+        deleted_from=0;
         created_date = "";
         read_status = 0;
 
@@ -140,6 +144,25 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
     public boolean setType(int type) {
         this.type = type;
         return true;
+    }
+    public boolean setDeletedTo(int deleted_to)
+    {
+        this.deleted_to=deleted_to;
+        return true;
+    }
+
+    public int getDeletedTo(){
+        return deleted_to;
+    }
+
+    public boolean setDeletedFrom(int deleted_from)
+    {
+        this.deleted_from=deleted_from;
+        return true;
+    }
+
+    public int getDeletedFrom(){
+        return deleted_from;
     }
 
     public String getCreated_date() {
@@ -766,6 +789,43 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
 
     return chatWithContactArrayList;
+    }
+
+    public boolean updateDelete(){
+
+        String query = "Select chat_history.to,chat_history.from from chat_history where chat_id="+this.getChat_id();
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                this.from = Integer.parseInt(this.resultSet.getString("from")) ;
+                this.to = Integer.parseInt(this.resultSet.getString("to")) ;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+        if(this.from == getCurrentUserId()){
+            String updateQuery = "Update chat_history set deleted_from=1";
+            this.setQuery(updateQuery);
+            if(this.updateData(updateQuery))
+            {
+                return true;
+            }
+        }
+
+        if(this.to == getCurrentUserId()){
+            String updateQuery = "Update chat_history set deleted_to=1";
+            this.setQuery(updateQuery);
+            if(this.updateData(updateQuery))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
