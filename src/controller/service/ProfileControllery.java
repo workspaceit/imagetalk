@@ -3,6 +3,7 @@ package controller.service;
 import com.google.gson.Gson;
 import helper.ImageHelper;
 import model.AppLoginCredentialModel;
+import model.ProfileSettingsModel;
 import model.UserInfModel;
 import model.WallPostModel;
 import model.datamodel.app.AppCredential;
@@ -63,6 +64,15 @@ public class ProfileControllery extends HttpServlet {
             case "/app/profile/get/entities/count":
                 pw.print(this.getCounts(req));
                 break;
+
+            case "/app/profile/get/notification/status":
+                pw.print(this.getNotification(req));
+                break;
+
+            case "/app/profile/set/notification/status":
+                pw.print(this.setNotificationStatus(req));
+                break;
+
             default:
                 break;
         }
@@ -89,7 +99,7 @@ public class ProfileControllery extends HttpServlet {
         if(!appLoginCredentialModel.updateUserTextStatus()){
             baseController.serviceResponse.responseStat.msg = "Internal server error on text status update";
             baseController.serviceResponse.responseStat.status = false;
-            textStatusResponse.put("textStatus",appLoginCredentialModel.getUserTextStatusById());
+            textStatusResponse.put("textStatus", appLoginCredentialModel.getUserTextStatusById());
             baseController.serviceResponse.responseData = textStatusResponse;
             return baseController.getResponse();
         }
@@ -230,4 +240,65 @@ public class ProfileControllery extends HttpServlet {
         return baseController.getResponse();
 
     }
+
+    private String getNotification(HttpServletRequest req) {
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        ProfileSettingsModel profileSettingsModel = new ProfileSettingsModel();
+        profileSettingsModel.setCurrentUserId(baseController.appCredential.id);
+
+        if(profileSettingsModel.getNotificationStatus()==0){
+            baseController.serviceResponse.responseStat.status=false;
+            baseController.serviceResponse.responseStat.msg = "no status found !";
+            baseController.serviceResponse.responseData = 0;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg = "Found !";
+        baseController.serviceResponse.responseData = profileSettingsModel.getNotificationStatus();
+
+        return baseController.getResponse();
+    }
+
+    public String setNotificationStatus(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        ProfileSettingsModel profileSettingsModel = new ProfileSettingsModel();
+        profileSettingsModel.setCurrentUserId(baseController.appCredential.id);
+
+        if(!baseController.checkParam("notification",req,true)) {
+            baseController.serviceResponse.responseStat.msg = "notification is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        int notification = Integer.parseInt(req.getParameter("notification"));
+        profileSettingsModel.setNotification(notification);
+
+        if(!profileSettingsModel.isExist()){
+            if(profileSettingsModel.insert()==0)
+            {
+                baseController.serviceResponse.responseStat.msg = "Internal server error";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+            else{
+                baseController.serviceResponse.responseStat.msg = "Notification successfully set ";
+                return baseController.getResponse();
+            }
+        }else{
+
+            if(profileSettingsModel.updateNotificationStatus()){
+                baseController.serviceResponse.responseStat.msg = "successfully updated notification ";
+                return baseController.getResponse();
+            }
+            baseController.serviceResponse.responseStat.msg = "notification change unsuccessful ";
+            return baseController.getResponse();
+
+        }
+
+
+    }
+
 }

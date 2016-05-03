@@ -25,6 +25,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
     private String pic_path;
     private int post_id;
     private int  commenter_id;
+    private int parent_id;
     private String created_date;
 
     private Gson gson;
@@ -38,6 +39,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
         this.pic_path = "";
         this.post_id = 0;
         this.commenter_id=0;
+        this.parent_id = 0;
         this.created_date = "";
 
         this.gson = new Gson();
@@ -93,6 +95,16 @@ public class PostCommentModel extends ImageTalkBaseModel {
         return true;
     }
 
+    public int getParentId() {
+        return parent_id;
+
+    }
+
+    public boolean setParentId(int parent_id) {
+        this.parent_id = parent_id;
+        return true;
+    }
+
     public String getCreated_date() {
         return created_date;
     }
@@ -134,6 +146,41 @@ public class PostCommentModel extends ImageTalkBaseModel {
         //this.id = this.insertData(query);
         return this.id;
     }
+    public int insertCommentReply(){
+        String query = "INSERT INTO "+this.tableName+" (comment,pic_path, post_id, commenter_id,parent_id,created_date)";
+        query +="VALUES ('"+this.comment+"','"+this.pic_path+"',"+this.post_id+","+this.commenter_id+",'"+this.getUtcDateTime()+"')";
+
+
+        String query1 = "INSERT INTO "+this.tableName+" (`comment`, `pic_path`,`post_id`, `commenter_id`,`parent_id`, `created_date`) " +
+                        " VALUES (?,?,?,?,?,?)";
+
+        PreparedStatement ps = null;
+        try {
+            ps = this.con.prepareStatement(query1, Statement.RETURN_GENERATED_KEYS);
+            ps.setString((int) 1, this.comment);
+            ps.setString((int) 2, this.pic_path);
+            ps.setInt((int) 3, this.post_id);
+            ps.setInt((int) 4, this.commenter_id);
+            ps.setInt((int) 5, this.parent_id);
+            ps.setString((int)6, this.getUtcDateTime());
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next())
+            {
+                this.id = rs.getInt(1);
+            }
+            rs.close();
+            ps.close();
+            this.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+        //this.id = this.insertData(query);
+        return this.id;
+    }
+
     public  ArrayList<PostComment> getByPostId(){
         ArrayList<PostComment> postCommentList = new ArrayList<PostComment>();
         String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+

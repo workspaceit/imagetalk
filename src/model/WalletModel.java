@@ -23,7 +23,7 @@ public class WalletModel extends ImageTalkBaseModel {
 
     public WalletModel() {
         super();
-        super.tableName = "report_app_issue";
+        super.tableName = "wallet";
 
 
         this.id = 0;
@@ -70,7 +70,7 @@ public class WalletModel extends ImageTalkBaseModel {
 
     public double getTotalCreditByAppCredential(){
 
-        String query = "Select total_credit from wallet where user_id="+this.getUserId();
+        String query = "Select total_credit from"+this.tableName+" where user_id="+this.getUserId();
         this.setQuery(query);
         this.getData();
         try {

@@ -111,6 +111,10 @@ public class WallPostController extends HttpServlet {
                 pw.print(this.wallpostCountByOwnerId(req));
                 break;
 
+            case "/app/wallpost/comment/reply":
+                pw.print(this.wallPostCommentReply(req));
+                break;
+
             default:
                 break;
         }
@@ -1099,4 +1103,86 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseData= wallPostCount;
         return baseController.getResponse();
     }
+
+    private String wallPostCommentReply(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        if(!baseController.checkParam("post_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "post_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        if(!baseController.checkParam("comment_reply", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "comment_reply required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+
+        if(!baseController.checkParam("parent_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "parent_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+
+        PostCommentModel postCommentModel = new PostCommentModel();
+        try {
+            postCommentModel.setComment(URLDecoder.decode(new String(req.getParameter("comment_reply").getBytes("UTF-8"), "UTF-8"), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            baseController.serviceResponse.responseStat.msg = "Unable to encode comment";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+        postCommentModel.setCommenter_id(baseController.appCredential.id);
+
+        try{
+            postCommentModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
+        }catch(Exception ex){
+            baseController.serviceResponse.responseStat.msg = "post_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+
+        try{
+            postCommentModel.setParentId(Integer.parseInt(req.getParameter("parent_id")));
+        }catch(Exception ex){
+            baseController.serviceResponse.responseStat.msg = "parent_id int format required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+
+
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(postCommentModel.getPost_id());
+
+        if(!wallPostModel.isIdExist()){
+            baseController.serviceResponse.responseStat.msg = "Post id does not exist";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+        if(postCommentModel.insertCommentReply()==0){
+            baseController.serviceResponse.responseStat.msg = "Unable to comment on the post,database error";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+
+
+
+        baseController.serviceResponse.responseStat.msg = "Comment Reply posted";
+        baseController.serviceResponse.responseData = postCommentModel.getByPostId();
+        //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
+    }
+
 }
