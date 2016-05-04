@@ -1,6 +1,12 @@
 package model;
 
+import model.datamodel.app.Location;
+import model.datamodel.app.WallPost;
+import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Created by mi on 10/7/15.
@@ -132,5 +138,35 @@ public class LocationModel extends ImageTalkBaseModel {
         query += "VALUES ('"+this.place_id+"','"+this.icon+"','"+this.name+"','"+this.place_id+"',,"+this.lat+","+this.lng+",'"+this.formatted_address+"','"+this.country+"')";
         this.id = this.insertData(query);
         return  this.id;
+    }
+
+    public ArrayList<Integer> getLocationIdOfNearByWallpost(){
+
+        ArrayList<Integer> locationIdList = new ArrayList<Integer>();
+
+
+        String query = "SELECT id, SQRT(POW(69.1 * (lat - "+ this.lat+"), 2) +" +
+                       "POW(69.1 * ("+this.lng+" - lng) * COS(lat / 57.3), 2)) AS distance " +
+                       "FROM location HAVING distance < 0.5 ORDER BY distance";
+
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                Location location = new Location();
+                location.id = this.resultSet.getInt("location.id");
+
+                locationIdList.add(location.id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return locationIdList;
+
+
+
     }
 }

@@ -115,6 +115,10 @@ public class WallPostController extends HttpServlet {
                 pw.print(this.wallPostCommentReply(req));
                 break;
 
+            case "/app/wallpost/get/nearby":
+                pw.print(this.getNearbyWallpost(req));
+                break;
+
             default:
                 break;
         }
@@ -1182,6 +1186,89 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "Comment Reply posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();
         //this.pw.print(this.baseController.getResponse());
+        return baseController.getResponse();
+    }
+
+    private String getNearbyWallpost(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        WallPostModel wallPostModel = new WallPostModel();
+        LocationModel locationModel = new LocationModel();
+
+        if(!baseController.checkParam("lat", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "lat required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }else {
+            try{
+                locationModel.setLat(Double.parseDouble(req.getParameter("lat")));
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "lat is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+
+        if(!baseController.checkParam("lng", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "lng required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }else {
+            try{
+                locationModel.setLng(Double.parseDouble(req.getParameter("lng")));
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "lng is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+
+        ArrayList<Integer> locationIdList;
+
+        locationIdList = locationModel.getLocationIdOfNearByWallpost();
+
+
+        String locationIdToString = "";
+
+        for(int i=0;i<locationIdList.size();i++){
+            if(i==0)
+                locationIdToString+=locationIdList.get(i);
+            else{
+                locationIdToString+=","+locationIdList.get(i);
+            }
+
+
+        }
+
+        ArrayList<Integer> wallPostIdList;
+
+        wallPostIdList = wallPostModel.getWallpostIdByLocationId(locationIdToString);
+
+        ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
+
+        for(int i=0;i<wallPostIdList.size();i++){
+            wallPostModel.setId(wallPostIdList.get(i));
+            wallPostList.add(i,wallPostModel.getById());
+        }
+
+        if(wallPostList.size()==0)
+        {
+            baseController.serviceResponse.responseStat.status=false;
+            baseController.serviceResponse.responseStat.msg="No Nearby Location found";
+            baseController.serviceResponse.responseData = wallPostList;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg="Nearby Location Found";
+        baseController.serviceResponse.responseData = wallPostList;
+
         return baseController.getResponse();
     }
 

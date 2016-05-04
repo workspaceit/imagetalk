@@ -1,6 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
+import model.datamodel.app.Location;
 import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -719,5 +720,33 @@ public class WallPostModel extends ImageTalkBaseModel{
         }
         return false;
     }*/
+
+    public ArrayList<Integer> getWallpostIdByLocationId(String locationIdList) {
+
+        ArrayList<Integer> wallpostIdList = new ArrayList<Integer>();
+
+
+        String query = "SELECT id FROM wall_post WHERE wall_post.location_id IN ("+locationIdList+")";
+
+        this.setQuery(query);
+        this.getData();
+
+        try {
+            while (this.resultSet.next()) {
+                WallPost wallPost = new WallPost();
+                wallPost.id = this.resultSet.getInt("wall_post.id");
+
+                wallpostIdList.add(wallPost.id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return wallpostIdList;
+
+
+
+    }
 }
 
