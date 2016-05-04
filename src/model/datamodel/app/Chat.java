@@ -15,6 +15,8 @@ public class Chat {
     public int type;
     public String createdDate;
     public boolean readStatus;
+    public boolean deletedTo;
+    public boolean deletedFrom;
 
     public Chat() {
         this.id = 0;
@@ -27,5 +29,7 @@ public class Chat {
         this.type = 0;
         this.createdDate = "";
         this.readStatus = false;
+        this.deletedTo=false;
+        this.deletedFrom=false;
     }
 }

@@ -367,6 +367,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.chatId =(this.resultSet.getString("chat_history.chat_id")==null)?"":this.resultSet.getString("chat_history.chat_id");
                 chat.to = this.resultSet.getInt("chat_history.to");
                 chat.from = this.resultSet.getInt("chat_history.from");
+                chat.deletedTo = this.resultSet.getBoolean("chat_history.deleted_to");
+                chat.deletedFrom = this.resultSet.getBoolean("chat_history.deleted_from");
                 String tmpString = (this.resultSet.getObject("chat_history.chat_text")==null) ? "" : this.resultSet.getString("chat_history.chat_text");
                 System.out.println("chat_history.chat_text");
                 System.out.println(tmpString);
@@ -798,8 +800,8 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         this.getData();
         try {
             while (this.resultSet.next()) {
-                this.from = Integer.parseInt(this.resultSet.getString("from")) ;
-                this.to = Integer.parseInt(this.resultSet.getString("to")) ;
+                this.from = Integer.parseInt(this.resultSet.getString("chat_history.from")) ;
+                this.to = Integer.parseInt(this.resultSet.getString("chat_history.to")) ;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -807,8 +809,11 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
 
+        /*System.out.println("From id :"+this.from+" To Id:"+this.to);
+        System.out.println("Current user : " + this.getCurrentUserId());*/
+
         if(this.from == getCurrentUserId()){
-            String updateQuery = "Update chat_history set deleted_from=1";
+            String updateQuery = "Update chat_history set deleted_from=1 where chat_history.from="+this.from;
             this.setQuery(updateQuery);
             if(this.updateData(updateQuery))
             {
@@ -817,7 +822,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         }
 
         if(this.to == getCurrentUserId()){
-            String updateQuery = "Update chat_history set deleted_to=1";
+            String updateQuery = "Update chat_history set deleted_to=1 where chat_history.to="+this.to;
             this.setQuery(updateQuery);
             if(this.updateData(updateQuery))
             {

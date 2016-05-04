@@ -522,6 +522,7 @@ public class ChatController extends HttpServlet {
     }
 
     private String deleteChatMessage(HttpServletRequest req) {
+
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
@@ -535,9 +536,7 @@ public class ChatController extends HttpServlet {
             return baseController.getResponse();
         }
 
-        String chatId = req.getParameter("chat_id");
-
-        chatHistoryModel.setChat_id(chatId);
+        chatHistoryModel.setChat_id(req.getParameter("chat_id"));
 
         if(chatHistoryModel.updateDelete()){
             baseController.serviceResponse.responseStat.msg = "Successfully deleted";
@@ -548,11 +547,5 @@ public class ChatController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "Problem with app credential";
         return baseController.getResponse();
 
-
-
-
-
-
-        //return baseController.getResponse();
     }
 }

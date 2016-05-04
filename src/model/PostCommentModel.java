@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import model.ImageTalkBaseModel;
 import model.TagListModel;
 import model.datamodel.app.PostComment;
+import model.datamodel.app.PostCommentReply;
 import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -396,5 +397,88 @@ public class PostCommentModel extends ImageTalkBaseModel {
 
         return this.deleteData(query);
     }
+
+    public PostCommentReply getPostCommentReplyById(){
+
+        PostCommentReply postCommentReply = new PostCommentReply();
+        String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
+                       " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
+                       " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
+                       " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate,job.*" +
+                       " FROM " +this.tableName+
+                       " join app_login_credential on app_login_credential.id =  " +this.tableName+".commenter_id "+
+                       " join user_inf on user_inf.id = app_login_credential.u_id " +
+                       " left join location on location.id = user_inf.address_id " +
+                       " left join job on job.app_login_credential_id = app_login_credential.id " +
+                       " where "+this.tableName+".parent_id = "+this.getParentId()+" limit 1";
+
+
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+
+                postCommentReply.id = this.resultSet.getInt("postCommentId");
+                postCommentReply.comment = this.resultSet.getString("comment");
+                postCommentReply.picPath = this.resultSet.getString("commentPicPath");
+                postCommentReply.createdDate = this.resultSet.getString("postCommentCDate");
+
+                postCommentReply.commenter.id = this.resultSet.getInt("app_login_credentialId");
+                postCommentReply.commenter.textStatus = this.resultSet.getString("text_status");
+                postCommentReply.commenter.phoneNumber = this.resultSet.getString("phone_number");
+                postCommentReply.commenter.createdDate = this.resultSet.getString("app_lCdate");
+
+                postCommentReply.commenter.user.id = this.resultSet.getInt("user_infId");
+                postCommentReply.commenter.user.firstName = this.resultSet.getString("f_name");
+                postCommentReply.commenter.user.lastName = this.resultSet.getString("l_name");
+                postCommentReply.commenter.user.createdDate = this.resultSet.getString("user_infCdate");
+
+                try{
+                    postCommentReply.commenter.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
+                }catch (Exception ex){
+                    postCommentReply.commenter.user.picPath.original.path  = this.resultSet.getString("proPic");
+
+                    ex.printStackTrace();
+                }
+                postCommentReply.commenter.user.address.id = (this.resultSet.getObject("locationId")==null)?0:this.resultSet.getInt("locationId");
+                postCommentReply.commenter.user.address.lat = (this.resultSet.getObject("lat")==null)?0:this.resultSet.getDouble("lat");
+                postCommentReply.commenter.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
+                postCommentReply.commenter.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
+                postCommentReply.commenter.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
+                postCommentReply.commenter.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.resultSet.getString("locationCDate");
+
+                //job details
+                postCommentReply.commenter.job.id =(this.resultSet.getObject("job.id")==null)?0:this.resultSet.getInt("job.id");
+                postCommentReply.commenter.job.appCredentialId = (this.resultSet.getObject("job.app_login_credential_id")==null)?0:this.resultSet.getInt("job.app_login_credential_id");
+                postCommentReply.commenter.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
+                postCommentReply.commenter.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
+                try{
+                    postCommentReply.commenter.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
+
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                postCommentReply.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
+                postCommentReply.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
+                try {
+                    postCommentReply.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                }catch(Exception e) {
+                    System.out.println(e.getMessage());
+                    postCommentReply.commenter.job.createdDate = "";
+                }
+                //end job details
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+        return postCommentReply;
+    }
+
+
 
 }

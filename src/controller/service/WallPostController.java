@@ -111,7 +111,7 @@ public class WallPostController extends HttpServlet {
                 pw.print(this.wallpostCountByOwnerId(req));
                 break;
 
-            case "/app/wallpost/comment/reply":
+            case "/app/wallpost/comment/create/reply":
                 pw.print(this.wallPostCommentReply(req));
                 break;
 
@@ -765,7 +765,6 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseStat.status = (postComments.size()>0);
         baseController.serviceResponse.responseStat.msg = (postComments.size()>0)?"":"No comment found";
         baseController.serviceResponse.responseData = postComments;
-        //this.pw.print(this.baseController.getResponse());
         return baseController.getResponse();
 
     }
@@ -1163,7 +1162,7 @@ public class WallPostController extends HttpServlet {
             return baseController.getResponse();
         }
 
-
+        postCommentModel.setParentId(Integer.parseInt(req.getParameter("parent_id")));
 
         WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setId(postCommentModel.getPost_id());
