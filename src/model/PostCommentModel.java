@@ -27,6 +27,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
     private int post_id;
     private int  commenter_id;
     private int parent_id;
+    private int last_reply_id;
     private String created_date;
 
     private Gson gson;
@@ -39,6 +40,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
         this.comment = "";
         this.pic_path = "";
         this.post_id = 0;
+        this.last_reply_id = 0;
         this.commenter_id=0;
         this.parent_id = 0;
         this.created_date = "";
@@ -50,10 +52,19 @@ public class PostCommentModel extends ImageTalkBaseModel {
         return id;
     }
 
+    public boolean setLastReplyId(int last_reply_id) {
+        this.last_reply_id = last_reply_id;
+        return true;
+    }
+    public int getLastReplyId() {
+        return last_reply_id;
+    }
+
     public boolean setId(int id) {
         this.id = id;
         return true;
     }
+
 
     public String getComment() {
         return comment;
@@ -198,6 +209,9 @@ public class PostCommentModel extends ImageTalkBaseModel {
             this.offset = this.offset * this.limit;
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         }
+
+        //System.out.println("query of post comment ::" + query);
+
         this.setQuery(query);
         this.getData();
         try {
@@ -251,8 +265,12 @@ public class PostCommentModel extends ImageTalkBaseModel {
                     postComment.commenter.job.createdDate = "";
                 }
                 //end job details
+                PostCommentModel postCommentModel = new PostCommentModel();
+                postCommentModel.setParentId(postComment.id);
+                postComment = this.getOtherDependency(postComment);
 
                 postCommentList.add(postComment);
+
 
             }
         } catch (SQLException e) {
@@ -317,7 +335,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.job.title = (this.resultSet.getObject("job.title") == null) ? "" : this.resultSet.getString("job.title");
                 postComment.commenter.job.description = (this.resultSet.getObject("job.description") == null)? "" : this.resultSet.getString("job.description");
                 try{
-                    postComment.commenter.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"),Pictures.class);
+                    postComment.commenter.job.icons = (this.resultSet.getObject("job.icon")==null || !this.resultSet.getString("job.icon").trim().startsWith("{"))?new Pictures():this.gson.fromJson(this.resultSet.getString("job.icon"), Pictures.class);
 
                 }catch (Exception ex){
                     ex.printStackTrace();
@@ -398,10 +416,10 @@ public class PostCommentModel extends ImageTalkBaseModel {
         return this.deleteData(query);
     }
 
-    public PostCommentReply getPostCommentReplyById(){
+    public ArrayList<PostCommentReply> getPostCommentReplyByParentId(){
 
-        PostCommentReply postCommentReply = new PostCommentReply();
-        String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
+        ArrayList<PostCommentReply> postCommentRepliesList = new ArrayList<PostCommentReply>();
+        String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".parent_id as parentId,"+this.tableName+".created_date as postCommentCDate,"+
                        " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                        " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                        " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate,job.*" +
@@ -410,19 +428,24 @@ public class PostCommentModel extends ImageTalkBaseModel {
                        " join user_inf on user_inf.id = app_login_credential.u_id " +
                        " left join location on location.id = user_inf.address_id " +
                        " left join job on job.app_login_credential_id = app_login_credential.id " +
-                       " where "+this.tableName+".parent_id = "+this.getParentId()+" limit 1";
+                       " where "+this.tableName+".parent_id = "+this.parent_id+" AND "+this.tableName+".id >"+this.last_reply_id;
+        //System.out.println("parent id in comment reply :" + this.parent_id);
+        //if(this.limit >0){
+            this.offset = this.offset * this.limit;
+            query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+        //}
 
-
-
+        System.out.println("Comment Reply query ::"+query);
         this.setQuery(query);
         this.getData();
         try {
             while (this.resultSet.next()) {
-
+                PostCommentReply postCommentReply = new PostCommentReply();
                 postCommentReply.id = this.resultSet.getInt("postCommentId");
                 postCommentReply.comment = this.resultSet.getString("comment");
                 postCommentReply.picPath = this.resultSet.getString("commentPicPath");
-                postCommentReply.createdDate = this.resultSet.getString("postCommentCDate");
+                postCommentReply.parentId = this.resultSet.getInt("parentId");
+                postCommentReply.createdDate = Long.toString(this.resultSet.getTimestamp("postCommentCDate").getTime());
 
                 postCommentReply.commenter.id = this.resultSet.getInt("app_login_credentialId");
                 postCommentReply.commenter.textStatus = this.resultSet.getString("text_status");
@@ -432,7 +455,6 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postCommentReply.commenter.user.id = this.resultSet.getInt("user_infId");
                 postCommentReply.commenter.user.firstName = this.resultSet.getString("f_name");
                 postCommentReply.commenter.user.lastName = this.resultSet.getString("l_name");
-                postCommentReply.commenter.user.createdDate = this.resultSet.getString("user_infCdate");
 
                 try{
                     postCommentReply.commenter.user.picPath  = this.gson.fromJson(this.resultSet.getString("proPic"), Pictures.class);
@@ -468,17 +490,28 @@ public class PostCommentModel extends ImageTalkBaseModel {
                     postCommentReply.commenter.job.createdDate = "";
                 }
                 //end job details
-
+                postCommentRepliesList.add(postCommentReply);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
             this.closeConnection();
         }
-
-        return postCommentReply;
+        return postCommentRepliesList;
     }
 
+    public PostComment getOtherDependency(PostComment postComment){
 
+        PostCommentModel postCommentModel = new PostCommentModel();
+        postCommentModel.setParentId(postComment.id);
+        postCommentModel.offset = 0;
+        postCommentModel.limit = 3;
+
+        //System.out.println("other dependency :" + postCommentModel.offset);
+
+        postComment.commentReplies = postCommentModel.getPostCommentReplyByParentId();
+        return postComment;
+
+    }
 
 }

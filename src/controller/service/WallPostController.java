@@ -18,6 +18,7 @@ import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.zip.DeflaterInputStream;
 
 /**
  * Created by mi on 10/2/15.
@@ -85,6 +86,9 @@ public class WallPostController extends HttpServlet {
                 break;
             case "/app/wallpost/get/comment":
                 pw.print(this.getComments(req, true));
+                break;
+            case "/app/wallpost/get/commentreplies/byparentid":
+                pw.print(this.getCommentRepliesByParentId(req));
                 break;
             case "/app/wallpost/get/comment/all":
                 pw.print(this.getComments(req, false));
@@ -491,6 +495,7 @@ public class WallPostController extends HttpServlet {
 
     public String creatComment(HttpServletRequest req){
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        PostCommentModel postCommentModel = new PostCommentModel();
 
         if(!baseController.checkParam("post_id", req, true)){
 
@@ -498,6 +503,9 @@ public class WallPostController extends HttpServlet {
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
+
+        postCommentModel.setPost_id(Integer.parseInt(req.getParameter("post_id")));
+
         if(!baseController.checkParam("comment", req, true)){
 
             baseController.serviceResponse.responseStat.msg = "comment required";
@@ -506,7 +514,6 @@ public class WallPostController extends HttpServlet {
             return baseController.getResponse();
         }
 
-        PostCommentModel postCommentModel = new PostCommentModel();
         try {
             postCommentModel.setComment(URLDecoder.decode(new String(req.getParameter("comment").getBytes("UTF-8"), "UTF-8"), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -543,6 +550,16 @@ public class WallPostController extends HttpServlet {
         }
 
 
+
+        if(!wallPostModel.updateCommentCount())
+        {
+            baseController.serviceResponse.responseStat.msg = "Unable to update";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        //wallPostModel.setCommentCount(postCommentModel.getCountByPostId());
+
+        //System.out.println("comment count :"+wallPostModel.getCommentCount());
 
         baseController.serviceResponse.responseStat.msg = "Comment posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();
@@ -696,6 +713,7 @@ public class WallPostController extends HttpServlet {
     public String getComments(HttpServletRequest req, boolean pagination){
 
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        WallPostModel wallPostModel = new WallPostModel();
 
         if(!baseController.checkParam("post_id", req, true)){
 
@@ -740,6 +758,8 @@ public class WallPostController extends HttpServlet {
             }else {
                 try{
                     postCommentModel.offset = Integer.parseInt(req.getParameter("offset").trim());
+                    //wallPostModel.offset = Integer.parseInt(req.getParameter("offset").trim());
+
                 }catch (Exception ex){
                     System.out.println(ex);
                     baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
@@ -748,10 +768,10 @@ public class WallPostController extends HttpServlet {
                     return baseController.getResponse();
                 }
             }
+
         }
 
 
-        WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setId(postCommentModel.getPost_id());
 
         if(!wallPostModel.isIdExist()){
@@ -1268,6 +1288,83 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg="Nearby Location Found";
         baseController.serviceResponse.responseData = wallPostList;
 
+        return baseController.getResponse();
+    }
+
+    private String getCommentRepliesByParentId(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        PostCommentModel postCommentModel = new PostCommentModel();
+
+        if(!baseController.checkParam("parent_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "parent_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }else {
+            try{
+                postCommentModel.setParentId(Integer.parseInt(req.getParameter("parent_id")));
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "parent_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+        if(baseController.checkParam("last_reply_id",req,true))
+        {
+            try{
+                postCommentModel.setLastReplyId(Integer.parseInt(req.getParameter("last_reply_id")));
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "last_reply_id is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+
+        if(baseController.checkParam("limit", req, true)) {
+            try{
+                postCommentModel.limit = Integer.parseInt(req.getParameter("limit").trim());
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "limit is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }else{
+            postCommentModel.limit = 3;
+        }
+
+        System.out.println("Limit :"+ postCommentModel.limit);
+
+        if(!baseController.checkParam("offset", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }else {
+            try{
+                postCommentModel.offset = Integer.parseInt(req.getParameter("offset").trim());
+                System.out.print("offset block");
+            }catch (Exception ex){
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "offset is not in valid format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+        System.out.println("Offset :" + postCommentModel.offset);
+
+        if(postCommentModel.getPostCommentReplyByParentId().size() >0){
+            baseController.serviceResponse.responseStat.msg = "Reply Found !";
+            baseController.serviceResponse.responseData = postCommentModel.getPostCommentReplyByParentId();
+            return baseController.getResponse();
+        }
+        baseController.serviceResponse.responseStat.msg = "No Reply Found !";
+        baseController.serviceResponse.responseStat.status = false;
         return baseController.getResponse();
     }
 

@@ -27,6 +27,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     private String picture_path;
     private int location_id;
     private String wall_post_mood;
+    private int comment_count;
     private String created_date;
     private Gson gson;
     public WallPostModel(){
@@ -61,6 +62,15 @@ public class WallPostModel extends ImageTalkBaseModel{
 
     public boolean setOwner_id(int owner_id) {
         this.owner_id = owner_id;
+        return true;
+    }
+
+    public int getCommentCount() {
+        return comment_count;
+    }
+
+    public boolean setCommentCount(int comment_count) {
+        this.comment_count = comment_count;
         return true;
     }
 
@@ -746,6 +756,20 @@ public class WallPostModel extends ImageTalkBaseModel{
         return wallpostIdList;
 
 
+
+    }
+
+    public boolean updateCommentCount(){
+
+        String updateQuery = "Update wall_post set comment_count=" +
+                             "(SELECT count(id) as commentCount FROM post_comment where post_id="+this.getId()+")" +
+                             "where wall_post.id="+this.getId();
+        this.setQuery(updateQuery);
+        if(this.updateData(updateQuery))
+        {
+            return true;
+        }
+        return false;
 
     }
 }
