@@ -11,13 +11,13 @@ public class WallPost {
     public int id;
     public  String description;
     public String wallPostMood;
+    public int commentCount;
     public AppCredential owner;
     public  String picPath;
     public ArrayList<AppCredential> tagList;
     public ArrayList<Liker> likerList;
     public int tagCount;
     public int likeCount;
-    public int commentCount;
     public boolean isLiked;
     public boolean isFavorite;
     public int type;
@@ -29,6 +29,7 @@ public class WallPost {
         this.id = 0;
         this.description = "";
         this.wallPostMood = "";
+        this.commentCount = 0;
         this.owner = new AppCredential();
         this.picPath = "";
         this.tagList = new ArrayList<AppCredential>();

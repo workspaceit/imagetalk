@@ -195,7 +195,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
 
     public  ArrayList<PostComment> getByPostId(){
         ArrayList<PostComment> postCommentList = new ArrayList<PostComment>();
-        String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
+        String query = "SELECT " +this.tableName+".id as postCommentId,"+this.tableName+".comment,"+this.tableName+".comment_reply_count,"+this.tableName+".pic_path as commentPicPath,"+this.tableName+".created_date as postCommentCDate,"+
                 " app_login_credential.id as app_login_credentialId, app_login_credential.text_status, app_login_credential.phone_number, app_login_credential.created_date as app_lCdate," +
                 " user_inf.id as user_infId, user_inf.f_name, user_inf.l_name, user_inf.pic_path as proPic, user_inf.address_id, user_inf.created_date as user_infCdate," +
                 " location.id as locationId, location.lat, location.lng, location.formatted_address, location.country, location.created_date as locationCDate,job.*" +
@@ -219,6 +219,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 PostComment postComment = new PostComment();
                 postComment.id = this.resultSet.getInt("postCommentId");
                 postComment.comment = this.resultSet.getString("comment");
+                postComment.commentReplyCount = this.resultSet.getInt("comment_reply_count");
                 postComment.picPath = this.resultSet.getString("commentPicPath");
                 postComment.createdDate = Long.toString(this.resultSet.getTimestamp("postCommentCDate").getTime());
 
@@ -435,7 +436,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
             query += " LIMIT "+this.offset+" ,"+this.limit+" ";
         //}
 
-        System.out.println("Comment Reply query ::"+query);
+        //System.out.println("Comment Reply query ::"+query);
         this.setQuery(query);
         this.getData();
         try {
@@ -511,6 +512,37 @@ public class PostCommentModel extends ImageTalkBaseModel {
 
         postComment.commentReplies = postCommentModel.getPostCommentReplyByParentId();
         return postComment;
+
+    }
+
+    public boolean updateCommentReplyCount(){
+
+        int commentReplyCount = 0;
+        String countQuery = "SELECT count(id) as commentReplyCount FROM post_comment as b where b.parent_id="+this.getParentId();
+
+        this.setQuery(countQuery);
+        this.getData();
+
+        try{
+
+            while (this.resultSet.next()) {
+                commentReplyCount = resultSet.getInt("commentReplyCount");
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        //System.out.println("Comment Reply Count is working "+commentReplyCount);
+
+        String updateQuery = "Update post_comment set post_comment.comment_reply_count="+commentReplyCount+
+                             " where post_comment.id="+this.getParentId();
+
+        this.setQuery(updateQuery);
+        if(this.updateData(updateQuery))
+        {
+            return true;
+        }
+        return false;
 
     }
 

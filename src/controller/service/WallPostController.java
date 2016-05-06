@@ -1201,6 +1201,11 @@ public class WallPostController extends HttpServlet {
         }
 
 
+        if(!postCommentModel.updateCommentReplyCount()){
+            baseController.serviceResponse.responseStat.msg = "Unable to update comment reply count";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
 
         baseController.serviceResponse.responseStat.msg = "Comment Reply posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();

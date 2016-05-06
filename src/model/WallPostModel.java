@@ -280,7 +280,7 @@ public class WallPostModel extends ImageTalkBaseModel{
     public ArrayList<WallPost> getAllRecent(){
         ArrayList<WallPost> wallPostList = new ArrayList<WallPost>();
 
-        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.wall_post_mood,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
+        String query = "SELECT wall_post.id,wall_post.owner_id,wall_post.type as postType,wall_post.description,wall_post.wall_post_mood,wall_post.comment_count,wall_post.picture_path,wall_post.location_id,wall_post.created_date as wall_postCdate, " +
 
                 " (select count(id) from post_like where post_like.post_id = wall_post.id ) as likeCount," +
                 " (select count(id) from post_comment where post_comment.post_id = wall_post.id ) as commentCount," +
@@ -299,7 +299,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " where wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
 
         query += " order by  wall_post.id  DESC ";
-        System.out.println(query);
+        //System.out.println(query);
         //System.out.println("app cred id in wallpost: "+ this.getCurrentUserId());
         if(this.limit >0){
             this.offset = this.offset * this.limit;
@@ -314,6 +314,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.id = this.resultSet.getInt("wall_post.id");
                 wallPost.description = this.resultSet.getString("description");
                 wallPost.wallPostMood = this.resultSet.getString("wall_post_mood");
+                wallPost.commentCount = this.resultSet.getInt("comment_count");
                 wallPost.type = this.resultSet.getInt("postType");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
                 wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());

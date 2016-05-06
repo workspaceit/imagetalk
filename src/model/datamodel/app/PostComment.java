@@ -11,6 +11,8 @@ public class PostComment {
     public int           id;
     public String        comment;
     public int           postId;
+    public int postCommentCount;
+    public int  commentReplyCount;
     public AppCredential commenter;
     public String        picPath;
     public ArrayList<PostCommentReply> commentReplies;
@@ -20,6 +22,8 @@ public class PostComment {
         this.id = 0;
         this.comment = "";
         this.postId = 0;
+        this.postCommentCount = 0;
+        this.commentReplyCount = 0;
         this.commenter = new AppCredential();
         this.picPath = "";
         this.commentReplies = new ArrayList<PostCommentReply>();
