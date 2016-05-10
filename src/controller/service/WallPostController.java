@@ -1,12 +1,12 @@
 package controller.service;
 
 import com.google.gson.*;
+
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
 import model.*;
 import model.datamodel.app.*;
 import model.datamodel.photo.Pictures;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -135,7 +135,8 @@ public class WallPostController extends HttpServlet {
 
         String imgBase64 = "";
         String fileRelativePath = "";
-        ArrayList<Integer> taggedList = new ArrayList<Integer>();
+        //ArrayList<Integer> taggedList = new ArrayList<Integer>();
+        ArrayList<TagJson> taggedListFromJson = new ArrayList<TagJson>();
 
         if(!baseController.checkParam("type", req, true)){
             baseController.serviceResponse.responseStat.msg = "type required";
@@ -162,8 +163,50 @@ public class WallPostController extends HttpServlet {
             }
 
 
+        if(baseController.checkParam("tagged_list", req, true)) {
 
-        if(baseController.checkParam("tagged_list", req, true)){
+            String tag = req.getParameter("tagged_list");
+
+            Gson gson = new com.google.gson.Gson();
+
+            try {
+                com.google.gson.JsonObject tagged = gson.fromJson(tag, JsonElement.class).getAsJsonObject();
+
+                System.out.println("JSon object  :" + tagged.toString());
+
+                TagJson[] tagList = gson.fromJson(tagged.get("tagged_id_list"), TagJson[].class);
+
+                //System.out.println("x : "+ tagList[0].tag_message);
+
+                for (int i = 0; i < tagList.length; i++) {
+                    AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+                    appLoginCredentialModel.setId(Integer.parseInt(tagList[i].tag_id));
+                    if(appLoginCredentialModel.isIdExist()) {
+                        taggedListFromJson.add(tagList[i]);
+                    }
+                    else{
+                        System.out.println("this is id doesn't exists ");
+                    }
+
+                }
+            }catch (Exception ex)
+            {
+                System.out.println(ex);
+                baseController.serviceResponse.responseStat.msg = "tagged_list not in format";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+        }
+
+        /*if(taggedList.contains(baseController.appCredential.id)){
+            baseController.serviceResponse.responseStat.msg = "You are not allowed to tag you self";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }*/
+
+
+
+        /*if(baseController.checkParam("tagged_list", req, true)){
 
             String tagged_listStr = req.getParameter("tagged_list");
             System.out.println("At tagged_list  ");
@@ -185,13 +228,9 @@ public class WallPostController extends HttpServlet {
                 baseController.serviceResponse.responseStat.status = false;
                 return baseController.getResponse();
             }
-        }
+        }*/
 
-        if(taggedList.contains(baseController.appCredential.id)){
-            baseController.serviceResponse.responseStat.msg = "You are not allowed to tag you self";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
+
 
         /*===============  Insert location here ==============*/
         LocationModel locationModel = new LocationModel();
@@ -282,12 +321,24 @@ public class WallPostController extends HttpServlet {
         /* ============== Insert Tagged user =============== */
 
         TagListModel tagListModel = new TagListModel();
-        for(Integer tagged :  taggedList){
+
+        for(int i=0;i<taggedListFromJson.size();i++)
+        {
+            tagListModel.setPost_id(wallPostModel.getId());
+            tagListModel.setTag_id(Integer.parseInt(taggedListFromJson.get(i).tag_id));
+            tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_x));
+            tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_y));
+            tagListModel.setTagMessage(taggedListFromJson.get(i).tag_message);
+            tagListModel.insert();
+        }
+
+        /*for(Integer tagged :  taggedList){
             tagListModel.setTag_id(tagged.intValue());
             tagListModel.setPost_id(wallPostModel.getId());
 
             tagListModel.insert();
-        }
+        }*/
+
         /*===================================================*/
         baseController.serviceResponse.responseStat.msg = "Wall post created";
         baseController.serviceResponse.responseData = wallPostModel.getById();
@@ -856,115 +907,60 @@ public class WallPostController extends HttpServlet {
 
     }
     private String test(HttpServletRequest req){
+
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
-        if(!baseController.checkParam("phone_number", req, true)) {
-            baseController.serviceResponse.responseStat.msg = "Phone number required";
+        ArrayList<TagJson> taggedListFromJson = new ArrayList<TagJson>();
+
+        if(!baseController.checkParam("tagged_list", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "tagged_list required";
             baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
             return baseController.getResponse();
         }
-        if(!baseController.checkParam("token",req,true)) {
-            baseController.serviceResponse.responseStat.msg = "Token required";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
+        String tag = req.getParameter("tagged_list");
+
+        Gson gson = new com.google.gson.Gson();
+        com.google.gson.JsonObject tagged = gson.fromJson(tag,JsonElement.class).getAsJsonObject();
+        System.out.println("JSon object  :"+ tagged.toString());
+
+        TagJson[] tagList = gson.fromJson(tagged.get("tagged_id_list"),TagJson[].class);
+
+
+        for(int i=0; i<tagList.length;i++)
+        {
+            System.out.println("x : "+ tagList[i].tag_id);
+            taggedListFromJson.add(tagList[i]);
         }
-        if(!baseController.checkParam("first_name",req,true)) {
-            baseController.serviceResponse.responseStat.msg = "Name required";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
-        ActivationModel activationModel = new ActivationModel();
+        TagListModel tagListModel = new TagListModel();
 
-        if(!activationModel.setPhoneNumber(req.getParameter("phone_number"))){
-            baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
+        System.out.println("taggedListFromJSON" + taggedListFromJson.get(0).tag_id);
 
-        System.out.println("'" + req.getParameter("token")+"'");
-        System.out.println("'"+req.getParameter("phone_number")+"'");
-        activationModel.setActivationCode(req.getParameter("token"));
-
-        if(!activationModel.isTokenValid()){
-            baseController.serviceResponse.responseStat.msg = "Token miss matched";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
-
-        UserInfModel userInfModel = new UserInfModel();
-        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        String imgBase64 = "";
-
-        userInfModel.setF_name(req.getParameter("first_name"));
-        userInfModel.setL_name(req.getParameter("last_name"));
-
-         /*  transaction started */
-
-        //  userInfModel.startTransaction();
-        userInfModel.insertData();
-        if(userInfModel.getId()==0){
-            baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
-        //  appLoginCredentialModel.startTransaction();
-        appLoginCredentialModel.setU_id(userInfModel.getId());
-        appLoginCredentialModel.setPhone_number(activationModel.getPhoneNumber());
-        if(appLoginCredentialModel.isNumberExist()){
-            baseController.serviceResponse.responseStat.msg = "Number already used";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
-         /*  transaction started */
-
-
-        appLoginCredentialModel.insert();
-        System.out.println("02");
-        if(appLoginCredentialModel.getId()==0){
-            //       userInfModel.rollBack();
-            baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
-        if(baseController.checkParam("photo",req,true)) {
-            imgBase64 = req.getParameter("photo");
-            Pictures pictures = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
-            Gson gson = new Gson();
-            String fileName =gson.toJson(pictures);
-            if(fileName==null || fileName == ""){
-
-                 /* All transaction rollback */
-
-                //    userInfModel.rollBack();
-                //    appLoginCredentialModel.rollBack();
-
-                baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
-                baseController.serviceResponse.responseStat.status = false;
-                //this.pw.print(this.this.ba.getResponse());
-                return baseController.getResponse();
+        for(int i=0;i<taggedListFromJson.size();i++)
+        {
+            tagListModel.setTag_id(Integer.parseInt(taggedListFromJson.get(i).tag_id));
+            tagListModel.setPost_id(420);
+            tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_x));
+            tagListModel.setOriginY(Double.parseDouble(taggedListFromJson.get(i).origin_y));
+            tagListModel.setTagMessage(taggedListFromJson.get(i).tag_message);
+            if(tagListModel.insert()>0)
+            {
+                System.out.println("Tag Id:" +Integer.parseInt(taggedListFromJson.get(i).tag_id));
+                System.out.println("value of X :" +Double.parseDouble(taggedListFromJson.get(i).origin_y));
+                System.out.println("value of y"+ Double.parseDouble(taggedListFromJson.get(i).origin_x));
+                System.out.println("tag message"+taggedListFromJson.get(i).tag_message);
             }
-
-            userInfModel.setPicPath(fileName);
-            if(!userInfModel.updatePicPath()){
-                /* All transaction rollback */
-
-                //    userInfModel.rollBack();
-                //    appLoginCredentialModel.rollBack();
-
-                baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
-                baseController.serviceResponse.responseStat.status = false;
-                //this.pw.print(this.this.ba.getResponse());
-                return baseController.getResponse();
+            else{
+                System.out.println("Tag Id:" +Integer.parseInt(taggedListFromJson.get(i).tag_id));
+                System.out.println("value of X :" +Double.parseDouble(taggedListFromJson.get(i).origin_y));
+                System.out.println("value of y"+ Double.parseDouble(taggedListFromJson.get(i).origin_x));
+                System.out.println("tag message"+taggedListFromJson.get(i).tag_message);
             }
         }
-        /* Commit database transaction */
-
-        //  userInfModel.commitTransaction();
-        // appLoginCredentialModel.commitTransaction();
 
 
-        baseController.serviceResponse.responseStat.msg = "Registration success";
-        baseController.serviceResponse.responseData = appLoginCredentialModel.getAppCredentialById();
-        //this.pw.print(this.this.ba.getResponse());
+
+
+
         return baseController.getResponse();
     }
     private String favourWallPost(HttpServletRequest req){

@@ -15,6 +15,9 @@ public class TagListModel extends ImageTalkBaseModel{
     private int id;
     private int tag_id;
     private int post_id;
+    private double origin_x;
+    private double origin_y;
+    private String tag_message;
     private String created_date;
     private Gson gson;
 
@@ -25,6 +28,9 @@ public class TagListModel extends ImageTalkBaseModel{
         this.id = 0;
         this.tag_id = 0;
         this.post_id = 0;
+        this.origin_x = 0.0;
+        this.origin_y = 0.0;
+        this.tag_message = "";
         this.created_date = "";
 
         this.gson = new Gson();
@@ -45,6 +51,33 @@ public class TagListModel extends ImageTalkBaseModel{
 
     public boolean setTag_id(int tag_id) {
         this.tag_id = tag_id;
+        return true;
+    }
+
+    public double getOriginX() {
+        return origin_x;
+    }
+
+    public boolean setOriginX(double origin_x) {
+        this.origin_x = origin_x;
+        return true;
+    }
+
+    public double getOriginY() {
+        return origin_y;
+    }
+
+    public boolean setOriginY(double origin_y) {
+        this.origin_y = origin_y;
+        return true;
+    }
+
+    public String getTagMessage() {
+        return tag_message;
+    }
+
+    public boolean setTagMessage(String tag_message) {
+        this.tag_message = tag_message;
         return true;
     }
 
@@ -143,7 +176,9 @@ public class TagListModel extends ImageTalkBaseModel{
         return tagList;
     }
     public int insert(){
-        String query = "INSERT INTO tag_list(tag_id, post_id) VALUES ("+this.tag_id+","+this.post_id+")";
+        String query = "INSERT INTO tag_list( tag_id, post_id, origin_x, origin_y, tag_message ) "
+                +"VALUES ("+this.tag_id+","+this.post_id+","+this.origin_x+","+this.origin_y+",'"+this.tag_message+"')";
+        System.out.println(query);
         this.id = this.insertData(query);
         return this.id;
     }
