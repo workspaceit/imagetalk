@@ -327,9 +327,15 @@ public class WallPostController extends HttpServlet {
             tagListModel.setPost_id(wallPostModel.getId());
             tagListModel.setTag_id(Integer.parseInt(taggedListFromJson.get(i).tag_id));
             tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_x));
-            tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_y));
+            tagListModel.setOriginY(Double.parseDouble(taggedListFromJson.get(i).origin_y));
             tagListModel.setTagMessage(taggedListFromJson.get(i).tag_message);
-            tagListModel.insert();
+            if(tagListModel.insert()>0)
+            {
+                System.out.println("wallpost id: " +wallPostModel.getId());
+                System.out.println("origin x: " +Double.parseDouble(taggedListFromJson.get(i).origin_x));
+                System.out.println("origin y: " +Double.parseDouble(taggedListFromJson.get(i).origin_y));
+                System.out.println("set message: " +taggedListFromJson.get(i).tag_message);
+            }
         }
 
         /*for(Integer tagged :  taggedList){
