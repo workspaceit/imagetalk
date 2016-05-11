@@ -14,7 +14,7 @@ public class WallPost {
     public int commentCount;
     public AppCredential owner;
     public  String picPath;
-    public ArrayList<AppCredential> tagList;
+    public ArrayList<TagList> tagList;
     public ArrayList<Liker> likerList;
     public int tagCount;
     public int likeCount;
@@ -32,7 +32,7 @@ public class WallPost {
         this.commentCount = 0;
         this.owner = new AppCredential();
         this.picPath = "";
-        this.tagList = new ArrayList<AppCredential>();
+        this.tagList = new ArrayList<TagList>();
         this.likerList = new ArrayList<Liker>();
         this.tagCount = 0;
         this.likeCount = 0;
