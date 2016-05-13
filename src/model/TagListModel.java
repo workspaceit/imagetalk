@@ -103,7 +103,7 @@ public class TagListModel extends ImageTalkBaseModel{
 
         ArrayList<TagList> tagList = new ArrayList<TagList>();
 
-        String query = "SELECT id,tag_id,post_id,origin_x,origin_y,tag_message from tag_list " +
+        String query = "SELECT id,tag_id,post_id,origin_x,origin_y,tag_message,created_date from tag_list " +
                        "where post_id=" + this.post_id;
         this.setQuery(query);
         this.getData();
@@ -116,6 +116,7 @@ public class TagListModel extends ImageTalkBaseModel{
                 tag.originX = this.resultSet.getDouble("origin_x");
                 tag.originY = this.resultSet.getDouble("origin_y");
                 tag.tagMessage = this.resultSet.getString("tag_message");
+                tag.createdDate =this.resultSet.getString("created_date");
 
                 this.setTag_id(this.resultSet.getInt("tag_id"));
 

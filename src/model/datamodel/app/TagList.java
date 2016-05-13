@@ -14,6 +14,7 @@ public class TagList {
     public double originX;
     public double originY;
     public String tagMessage;
+    public String createdDate;
 
     public TagList()
     {
@@ -23,5 +24,6 @@ public class TagList {
         this.originX = 0.0;
         this.originY = 0.0;
         this.tagMessage = "";
+        this.createdDate = "";
     }
 }
