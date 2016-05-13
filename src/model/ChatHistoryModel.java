@@ -1,18 +1,15 @@
 package model;
 
 import com.google.gson.Gson;
-import helper.ImageHelper;
 import model.datamodel.app.Chat;
 import model.datamodel.app.ChatHistory;
 import model.datamodel.app.Contact;
 import model.datamodel.app.Places;
-import model.datamodel.app.socket.chat.ContactShare;
 import model.datamodel.app.socket.chat.PrivateChatPhoto;
 import model.datamodel.app.socket.chat.TextChat;
 import model.datamodel.app.video.VideoDetails;
 import model.datamodel.photo.Pictures;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -714,7 +711,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 chat.mediaPath = (this.resultSet.getObject("chat_history.media_path")==null)? "" : this.resultSet.getString("chat_history.media_path");
                 chat.type = this.resultSet.getInt("chat_history.type");
                 try {
-                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("chat_history.created_date"));
+                    chat.createdDate = (this.resultSet.getObject("chat_history.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("chat_history.created_date"));
                 }catch(Exception e) {
                     chat.createdDate = "";
                     System.out.println(e.getMessage());

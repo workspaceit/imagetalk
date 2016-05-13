@@ -2,7 +2,6 @@ package model;
 
 import com.google.gson.Gson;
 import model.datamodel.app.Job;
-import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
@@ -147,7 +146,7 @@ public class JobModel extends ImageTalkBaseModel {
                 }
                 job.price = this.resultSet.getFloat("price");
                 job.paymentType = this.resultSet.getInt("payment_type");
-                job.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("created_date"));
+                job.createdDate = this.getProcessedDateTime(this.resultSet.getString("created_date"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

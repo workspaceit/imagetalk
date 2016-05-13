@@ -1,9 +1,7 @@
 package model;
 
 import com.google.gson.Gson;
-import model.datamodel.app.AppCredential;
 import model.datamodel.app.Liker;
-import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
 
 import java.sql.SQLException;
@@ -171,7 +169,7 @@ public class PostLikeModel extends  ImageTalkBaseModel {
                 liker.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 liker.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    liker.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    liker.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     liker.job.createdDate = "";

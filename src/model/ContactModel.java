@@ -1,7 +1,6 @@
 package model;
 
 import com.google.gson.Gson;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Contact;
 import model.datamodel.photo.Pictures;
@@ -293,7 +292,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 appCredential.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 appCredential.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    appCredential.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    appCredential.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     appCredential.job.createdDate = "";
@@ -382,7 +381,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -470,7 +469,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -566,7 +565,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -661,7 +660,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -756,7 +755,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -868,7 +867,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -990,7 +989,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";
@@ -1085,7 +1084,7 @@ public class ContactModel extends ImageTalkBaseModel {
                 contact.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 contact.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    contact.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     contact.job.createdDate = "";

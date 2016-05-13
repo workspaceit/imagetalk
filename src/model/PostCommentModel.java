@@ -1,13 +1,9 @@
 package model;
 
 import com.google.gson.Gson;
-import model.ImageTalkBaseModel;
-import model.TagListModel;
 import model.datamodel.app.PostComment;
 import model.datamodel.app.PostCommentReply;
-import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
@@ -221,7 +217,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.comment = this.resultSet.getString("comment");
                 postComment.commentReplyCount = this.resultSet.getInt("comment_reply_count");
                 postComment.picPath = this.resultSet.getString("commentPicPath");
-                postComment.createdDate = Long.toString(this.resultSet.getTimestamp("postCommentCDate").getTime());
+                postComment.createdDate =this.getProcessedDateTime(this.resultSet.getString("postCommentCDate"));
 
                 postComment.commenter.id = this.resultSet.getInt("app_login_credentialId");
                 postComment.commenter.textStatus = this.resultSet.getString("text_status");
@@ -260,7 +256,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 postComment.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     postComment.commenter.job.createdDate = "";
@@ -344,7 +340,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postComment.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 postComment.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    postComment.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     postComment.commenter.job.createdDate = "";
@@ -446,7 +442,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postCommentReply.comment = this.resultSet.getString("comment");
                 postCommentReply.picPath = this.resultSet.getString("commentPicPath");
                 postCommentReply.parentId = this.resultSet.getInt("parentId");
-                postCommentReply.createdDate = Long.toString(this.resultSet.getTimestamp("postCommentCDate").getTime());
+                postCommentReply.createdDate = this.getProcessedDateTime(this.resultSet.getString("postCommentCDate"));
 
                 postCommentReply.commenter.id = this.resultSet.getInt("app_login_credentialId");
                 postCommentReply.commenter.textStatus = this.resultSet.getString("text_status");
@@ -485,7 +481,7 @@ public class PostCommentModel extends ImageTalkBaseModel {
                 postCommentReply.commenter.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 postCommentReply.commenter.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    postCommentReply.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    postCommentReply.commenter.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     postCommentReply.commenter.job.createdDate = "";

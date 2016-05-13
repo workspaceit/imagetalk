@@ -261,6 +261,11 @@ class ImageTalkBaseModel {
         cal.setTimeZone(TimeZone.getTimeZone("UTC"));
         return cal;
     }
+    public String getProcessedDateTime(String dateTime) {
+
+
+        return dateTime;
+    }
     public String getPrcessedTimeStamp(Timestamp timeStamp) {
         String processedTime = "";
         if(timeStamp!=null){
@@ -271,6 +276,7 @@ class ImageTalkBaseModel {
 
         return processedTime;
     }
+
     public String getUTCTimeStamp(String dateStr){
         try{
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");

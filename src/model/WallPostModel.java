@@ -1,13 +1,10 @@
 package model;
 
 import com.google.gson.Gson;
-import model.datamodel.app.Location;
 import model.datamodel.app.WallPost;
 import model.datamodel.photo.Pictures;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.security.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -201,7 +198,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.wallPostMood = this.resultSet.getString("wall_post_mood");
                 wallPost.type = this.resultSet.getInt("postType");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
-                wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.createdDate = this.getProcessedDateTime(this.resultSet.getString("wall_postCdate")); //Long.toString(this.resultSet.getString("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
                 wallPost.isFavorite = (this.resultSet.getInt("isFavorite")==1)?true:false;
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
@@ -256,7 +253,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 wallPost.owner.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     wallPost.owner.job.createdDate = "";
@@ -317,7 +314,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.commentCount = this.resultSet.getInt("comment_count");
                 wallPost.type = this.resultSet.getInt("postType");
                 wallPost.picPath = this.resultSet.getString("wall_post.picture_path");
-                wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate")); //Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.createdDate = this.getProcessedDateTime(this.resultSet.getString("wall_postCdate")); //Long.toString(this.resultSet.getString("wall_postCdate").getTime());
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
                 wallPost.isFavorite = (this.resultSet.getInt("isFavorite")==1)?true:false;
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
@@ -372,7 +369,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 wallPost.owner.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     wallPost.owner.job.createdDate = "";
@@ -427,7 +424,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
                 wallPost.commentCount = this.resultSet.getInt("commentCount");
 
-                wallPost.createdDate = Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.createdDate = this.getProcessedDateTime(this.resultSet.getString("wall_postCdate"));
                 wallPost.isLiked = (this.resultSet.getInt("isLiked")==1)?true:false;
                 wallPost.isFavorite = (this.resultSet.getInt("isFavorite")==1)?true:false;
 
@@ -481,7 +478,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 wallPost.owner.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     wallPost.owner.job.createdDate = "";
@@ -559,7 +556,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.isLiked = (this.resultSet.getInt("isFavorite")==1)?true:false;
                 wallPost.likeCount = this.resultSet.getInt("likeCount");
                 wallPost.commentCount = this.resultSet.getInt("commentCount");
-                wallPost.createdDate = this.getPrcessedTimeStamp(this.resultSet.getTimestamp("wall_postCdate"));
+                wallPost.createdDate = this.getProcessedDateTime(this.resultSet.getString("wall_postCdate"));
 
                 wallPost.owner.id = this.resultSet.getInt("app_login_credentialId");
                 wallPost.owner.textStatus = this.resultSet.getString("text_status");
@@ -582,7 +579,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.user.address.lng = (this.resultSet.getObject("lng")==null)?0:this.resultSet.getDouble("lng");
                 wallPost.owner.user.address.formattedAddress = (this.resultSet.getObject("formatted_address")==null)?"":this.resultSet.getString("formatted_address");
                 wallPost.owner.user.address.countryName = (this.resultSet.getObject("country")==null)?"":this.resultSet.getString("country");
-                wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":Long.toString(this.resultSet.getTimestamp("wall_postCdate").getTime());
+                wallPost.owner.user.address.createdDate = (this.resultSet.getObject("locationCDate")==null)?"":this.getProcessedDateTime(this.resultSet.getString("wall_postCdate"));
 
                 wallPost.places.id = (this.resultSet.getObject("postLoc.id")==null)?0:this.resultSet.getInt("postLoc.id");
                 wallPost.places.placeId = (this.resultSet.getObject("postLoc.place_id")==null)?"":this.resultSet.getString("postLoc.place_id");
@@ -611,7 +608,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 wallPost.owner.job.price = (this.resultSet.getObject("job.price") == null)?0:this.resultSet.getFloat("job.price");
                 wallPost.owner.job.paymentType = (this.resultSet.getObject("job.payment_type") == null)?0:this.resultSet.getInt("job.payment_type");
                 try {
-                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getPrcessedTimeStamp(this.resultSet.getTimestamp("job.created_date"));
+                    wallPost.owner.job.createdDate = (this.resultSet.getObject("job.created_date") == null)?"":this.getProcessedDateTime(this.resultSet.getString("job.created_date"));
                 }catch(Exception e) {
                     System.out.println(e.getMessage());
                     wallPost.owner.job.createdDate = "";
