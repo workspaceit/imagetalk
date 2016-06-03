@@ -33,7 +33,7 @@ public class ContactController extends HttpServlet {
             throws ServletException, IOException {
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         res.setContentType("application/json");
-        baseController = new ImageTalkBaseController();
+        baseController = new ImageTalkBaseController(req);
         PrintWriter pw = res.getWriter();
 
         String url = req.getRequestURI().toString();

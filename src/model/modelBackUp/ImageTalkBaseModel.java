@@ -1,13 +1,11 @@
-package model;
-
-import controller.service.ImageTalkBaseController;
+package model.modelBackUp;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-public class ImageTalkBaseModel {
+class ImageTalkBaseModel {
     static final private String DBDriver = "com.mysql.jdbc.Driver";
     static final private String DBHost = "127.0.0.1";
     static final private String DBPort = "3306";
@@ -18,9 +16,8 @@ public class ImageTalkBaseModel {
     static final private String DBUser = "root";
     static final private String DBPassword = "";
 
-    public final static ThreadLocal<Connection> dbCon = new ThreadLocal<Connection>();
-
     protected String tableName = null;
+
     protected Connection con = null;
     protected Statement stmt = null;
     protected boolean autoCommit = true;
@@ -55,7 +52,7 @@ public class ImageTalkBaseModel {
     public ImageTalkBaseModel() {
         try {
             Class.forName(DBDriver);
-            establisDbCon(); //DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+            con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
             stmt = con.createStatement();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -66,16 +63,6 @@ public class ImageTalkBaseModel {
         this.offset = -1;
 
         this.currentUserId = 0;
-    }
-    public void establisDbCon(){
-        if(dbCon.get() == null){
-            try {
-                dbCon.set(DriverManager.getConnection(DBUrl, DBUser, DBPassword));
-            }catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        con = dbCon.get();
     }
     public void setCurrentUserId(int currentUserId){
         this.currentUserId = currentUserId;
@@ -153,7 +140,7 @@ public class ImageTalkBaseModel {
             if (this.con == null) {
                 //    System.out.println("con Recheck "+con);
                 Class.forName(DBDriver);
-                this.con = dbCon.get();//DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+                this.con = DriverManager.getConnection(DBUrl, DBUser, DBPassword);
             }
             if (this.stmt == null) {
                 //    System.out.println("stmt Recheck "+stmt);
@@ -244,27 +231,27 @@ public class ImageTalkBaseModel {
     }
 
     public void closeConnection() {
-//
-//        try {
-//
-//            if (this.resultSet != null) {
-//                //   System.out.println("resultSet Closed "+resultSet);
-//                this.resultSet.close();
-//            }
-//            if (this.stmt != null) {
-//                //   System.out.println("stmt Closed "+stmt);
-//                this.stmt.close();
-//                this.stmt = null;
-//            }
-//            if (this.con != null && this.autoCommit) {
-//                //   System.out.println("con Closed "+con);
-//                this.con.close();
-//                this.con = null;
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+
+        try {
+
+            if (this.resultSet != null) {
+                //   System.out.println("resultSet Closed "+resultSet);
+                this.resultSet.close();
+            }
+            if (this.stmt != null) {
+                //   System.out.println("stmt Closed "+stmt);
+                this.stmt.close();
+                this.stmt = null;
+            }
+            if (this.con != null && this.autoCommit) {
+                //   System.out.println("con Closed "+con);
+                this.con.close();
+                this.con = null;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
 
     }
