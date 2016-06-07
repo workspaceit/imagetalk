@@ -4,10 +4,7 @@ package controller.service;
  * Created by mi on 8/20/15.
  */
 
-import model.AdminLoginModel;
-import model.AppLoginCredentialModel;
-import model.ContactModel;
-import model.WallPostModel;
+import model.*;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.AuthCredential;
 import model.datamodel.app.Contact;
@@ -81,6 +78,9 @@ public class AppLoginController extends HttpServlet {
                 break;
             case "/app/login/test_session":
                 pw.print(this.testSession(req, res));
+                break;
+            case "/app/login/phone/update":
+                pw.print(this.updatePhone(req));
                 break;
             default:
                 break;
@@ -208,6 +208,18 @@ public class AppLoginController extends HttpServlet {
         this.baseController.removeSession(req);
         this.baseController.serviceResponse.responseStat.status=true;
         this.baseController.serviceResponse.responseStat.msg = "Logout success";
+        return this.baseController.getResponse();
+    }
+
+    public String updatePhone(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController  = new ImageTalkBaseController(req);
+
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setOwner_id(baseController.appCredential.id);
+
+        this.baseController.serviceResponse.responseStat.status=true;
+        this.baseController.serviceResponse.responseStat.msg = "Test success";
         return this.baseController.getResponse();
     }
 }

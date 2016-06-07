@@ -49,6 +49,7 @@ public class UserController extends HttpServlet {
             case "/admin/user/update/type/user":
                 pw.print(this.makeUser(req));
                 break;
+
             default:
                 break;
         }

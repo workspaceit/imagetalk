@@ -9,6 +9,7 @@ public class User {
     public int    id;
     public String firstName;
     public String lastName;
+    public String deviceId;
     public Pictures picPath;
     public Location address;
     public String createdDate;
@@ -17,6 +18,7 @@ public class User {
         this.id = 0;
         this.firstName = null;
         this.lastName = null;
+        this.deviceId = "";
         this.address = new Location();
         this.picPath = new Pictures();
         this.createdDate = "";

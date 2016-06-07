@@ -15,6 +15,7 @@ public class UserInfModel extends ImageTalkBaseModel {
     private int    id;
     private String f_name;
     private String l_name;
+    private String device_id;
     private String address;
     private String created_date;
     private String picPath;
@@ -27,6 +28,7 @@ public class UserInfModel extends ImageTalkBaseModel {
         this.id = 0;
         this.f_name = "";
         this.l_name = "";
+        this.device_id = "";
         this.address = "";
         this.created_date = "";
         this.picPath = "";
@@ -67,6 +69,15 @@ public class UserInfModel extends ImageTalkBaseModel {
 
     public boolean setL_name(String l_name) {
         this.l_name = l_name;
+        return true;
+    }
+
+    public String getDevice_id() {
+        return device_id;
+    }
+
+    public boolean setDeviceId(String device_id) {
+        this.device_id = device_id;
         return true;
     }
 
@@ -236,7 +247,8 @@ public class UserInfModel extends ImageTalkBaseModel {
     }
 
     public int insertData() {
-        String query = "INSERT INTO " + tableName + " (f_name,l_name) VALUES ('" + this.f_name + "', '" + this.l_name + "')";
+        String query = "INSERT INTO " + tableName + " (f_name,l_name,device_id) VALUES ('" + this.f_name + "', '" + this.l_name + "', '"+this.device_id + "')";
+        System.out.println(query);
         this.id = this.insertData(query);
         return  this.id;
     }
@@ -301,5 +313,13 @@ public class UserInfModel extends ImageTalkBaseModel {
     public int deleteById() {
         String sql = "DELETE FROM " + this.tableName + " WHERE id = '" + this.id + "'";
         return this.deleteData(sql);
+    }
+
+    public boolean updateDeviceId(){
+
+        String query = "UPDATE " + this.tableName + " SET `device_id`='" + this.device_id + "' WHERE `id`="+this.id;
+
+        System.out.println(query);
+        return this.updateData(query);
     }
 }

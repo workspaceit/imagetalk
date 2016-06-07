@@ -244,7 +244,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
         AuthCredential authCredential = new AuthCredential();
 
         String query = "select user_inf.id as user_inf_id," +
-                       " user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
+                       " user_inf.device_id as deviceId,user_inf.created_date as user_inf_c_date,user_inf.f_name,user_inf.l_name,user_inf.pic_path," +
                        " location.id as location_id,location.lat,location.lng,location.formatted_address,location.country,location.created_date as location_c_date," +
                        " app_login_credential.id as app_login_credential_id,app_login_credential.text_status,app_login_credential.access_token,app_login_credential.phone_number," +
                        " app_login_credential.created_date as app_login_credential_c_date," +
@@ -267,6 +267,7 @@ public class AppLoginCredentialModel extends ImageTalkBaseModel {
 
                 authCredential.user.id = this.resultSet.getInt("user_inf_id");
                 authCredential.user.firstName = this.resultSet.getString("f_name");
+                authCredential.user.deviceId = this.resultSet.getString("deviceId");
                 authCredential.user.lastName = this.resultSet.getString("l_name");
                 authCredential.user.createdDate = this.getProcessedDateTime(this.resultSet.getString("user_inf_c_date"));
 

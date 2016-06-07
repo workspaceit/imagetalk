@@ -166,6 +166,10 @@ public class UserRegistrationController extends HttpServlet {
             return;
         }
 
+        if (this.baseController.checkParam("device_id",req,true)) {
+            this.userInfModel.setDeviceId(req.getParameter("device_id"));
+        }
+
 
         if(adminLoginModel.isEmailExist(adminLoginModel.email)){
             this.baseController.serviceResponse.responseStat.status = false;

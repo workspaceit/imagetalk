@@ -1,7 +1,10 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
 import helper.ImageHelper;
+import helper.PushNotificationHelper;
 import model.AppLoginCredentialModel;
 import model.ProfileSettingsModel;
 import model.UserInfModel;
@@ -13,10 +16,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import com.notnoop.exceptions.InvalidSSLConfig;
 
 /**
  * Created by mi on 10/15/15.
@@ -71,6 +77,15 @@ public class ProfileControllery extends HttpServlet {
 
             case "/app/profile/set/notification/status":
                 pw.print(this.setNotificationStatus(req));
+                break;
+
+            case "/app/profile/notification/push":
+                pw.print(this.setPushNotification(req));
+                break;
+
+
+            case "/app/profile/update/deviceid":
+                pw.print(this.updateDeviceId(req));
                 break;
 
             default:
@@ -301,4 +316,78 @@ public class ProfileControllery extends HttpServlet {
 
     }
 
+    public String setPushNotification(HttpServletRequest req) {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+       /* try {
+            *//*URL testFile= ProfileControllery.class.getResource("src/foo.txt");
+            String getFile  = testFile.getFile();*//*
+    }catch(Exception ex)
+    {
+        ex.printStackTrace();
+    }
+
+        System.out.println("Working Directory = " +
+                           System.getProperty("user.dir"));*/
+
+
+        /*final InputStream certificate = Thread.currentThread().getContextClassLoader()
+                                              .getResourceAsStream("src/imagetalk.p12");*/
+
+
+        ApnsService service =
+                APNS.newService()
+                    .withCert(PushNotificationHelper.certificatePath, "wsit97480")
+                    .withSandboxDestination()
+                    .build();
+
+        System.setProperty("https.protocols", "TLSv1");
+        String payload = APNS.newPayload().alertBody("Hello Nandi Babu !").sound("default").badge(1).build();
+        //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
+        String token = "4342b4fb13d59b7c52967fce3dd74d724d84eae2f2fc3e64c9a83698518bf379";
+        service.push(token, payload);
+
+        Map<String, Date> inactiveDevices = service.getInactiveDevices();
+        for (String deviceToken : inactiveDevices.keySet()) {
+            Date inactiveAsOf = inactiveDevices.get(deviceToken);
+        }
+
+
+        return baseController.getResponse();
+    }
+
+    public String updateDeviceId(HttpServletRequest req){
+
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        if (!baseController.checkParam("user_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "user_id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        if (!baseController.checkParam("device_id", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "device_id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        UserInfModel userInfModel = new UserInfModel();
+        userInfModel.setId(Integer.parseInt(req.getParameter("user_id")));
+        userInfModel.setDeviceId(req.getParameter("device_id"));
+
+        if(userInfModel.updateDeviceId())
+        {
+            baseController.serviceResponse.responseStat.msg = "successfully updated";
+            baseController.serviceResponse.responseStat.status = true;
+
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.status = false;
+        baseController.serviceResponse.responseStat.msg = "update failed";
+        return baseController.getResponse();
+
+
+    }
 }
