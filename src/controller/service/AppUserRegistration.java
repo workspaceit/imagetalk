@@ -175,6 +175,8 @@ public class AppUserRegistration extends HttpServlet {
             this.pw.print(this.baseController.getResponse());
             return;
         }
+
+
         ActivationModel activationModel = new ActivationModel();
 
         if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
@@ -201,6 +203,10 @@ public class AppUserRegistration extends HttpServlet {
 
         userInfModel.setF_name(this.req.getParameter("first_name"));
         userInfModel.setL_name(this.req.getParameter("last_name"));
+
+        if (this.baseController.checkParam("device_id",req,true)) {
+            userInfModel.setDeviceId(req.getParameter("device_id"));
+        }
 
          /*  transaction started */
 

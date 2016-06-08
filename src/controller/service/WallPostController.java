@@ -4,6 +4,7 @@ import com.google.gson.*;
 
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
+import helper.PushNotificationHelper;
 import model.*;
 import model.datamodel.app.*;
 import model.datamodel.photo.Pictures;
@@ -625,7 +626,9 @@ public class WallPostController extends HttpServlet {
 
     }
     public String likePost(HttpServletRequest req){
+
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        WallPost wallPost = new WallPost();;
         if(!baseController.checkParam("post_id",req, true)){
 
             baseController.serviceResponse.responseStat.msg = "post_id required";
@@ -647,6 +650,7 @@ public class WallPostController extends HttpServlet {
         }
         String msg = "";
         boolean isLiked = false;
+        String likerName = "";
         if(postLikeModel.isAlreadyLiked()){
             if(postLikeModel.delete()==0){
                 baseController.serviceResponse.responseStat.msg = "Database error on delete";
@@ -662,6 +666,16 @@ public class WallPostController extends HttpServlet {
                 //this.pw.print(this.baseController.getResponse());
                 return baseController.getResponse();
             }else{
+
+                WallPostModel wallPostModel = new WallPostModel();
+                wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                wallPost = wallPostModel.getById();
+
+                PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")),likerName);
+
                 msg = "Successfully liked";
                 isLiked = true;
             }
@@ -670,6 +684,7 @@ public class WallPostController extends HttpServlet {
         JsonObject respObj = new JsonObject();
         respObj.addProperty("likeCount", postLikeModel.getLikeCountByPostId());
         respObj.addProperty("isLiked",isLiked);
+        respObj.addProperty("likerName",likerName);
 
         baseController.serviceResponse.responseStat.msg = msg;
         baseController.serviceResponse.responseData = respObj;

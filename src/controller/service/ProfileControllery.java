@@ -319,22 +319,6 @@ public class ProfileControllery extends HttpServlet {
     public String setPushNotification(HttpServletRequest req) {
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
-       /* try {
-            *//*URL testFile= ProfileControllery.class.getResource("src/foo.txt");
-            String getFile  = testFile.getFile();*//*
-    }catch(Exception ex)
-    {
-        ex.printStackTrace();
-    }
-
-        System.out.println("Working Directory = " +
-                           System.getProperty("user.dir"));*/
-
-
-        /*final InputStream certificate = Thread.currentThread().getContextClassLoader()
-                                              .getResourceAsStream("src/imagetalk.p12");*/
-
-
         ApnsService service =
                 APNS.newService()
                     .withCert(PushNotificationHelper.certificatePath, "wsit97480")
@@ -342,9 +326,9 @@ public class ProfileControllery extends HttpServlet {
                     .build();
 
         System.setProperty("https.protocols", "TLSv1");
-        String payload = APNS.newPayload().alertBody("Hello Nandi Babu !").sound("default").badge(1).build();
+        String payload = APNS.newPayload().alertBody(PushNotificationHelper.alertBody).sound("default").badge(PushNotificationHelper.badgeNo).build();
         //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
-        String token = "4342b4fb13d59b7c52967fce3dd74d724d84eae2f2fc3e64c9a83698518bf379";
+        String token = PushNotificationHelper.deviceToken;
         service.push(token, payload);
 
         Map<String, Date> inactiveDevices = service.getInactiveDevices();

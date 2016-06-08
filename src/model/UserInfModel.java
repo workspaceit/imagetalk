@@ -228,6 +228,7 @@ public class UserInfModel extends ImageTalkBaseModel {
                 user.id = this.resultSet.getInt("id");
                 user.firstName = this.resultSet.getString("f_name");
                 user.lastName = this.resultSet.getString("l_name");
+                user.deviceId = this.resultSet.getString("device_id");
                 user.picPath = (this.resultSet.getObject("pic_path") == null) ? new Pictures() : this.gson.fromJson(this.resultSet.getString("pic_path"), Pictures.class);
                 user.createdDate = this.resultSet.getString("created_date");
 
@@ -274,6 +275,7 @@ public class UserInfModel extends ImageTalkBaseModel {
                         " login.created_date as login_c_date,\n" +
                         " user_inf.f_name as user_f_name,\n" +
                         " user_inf.l_name as user_l_name,\n" +
+                       " user_inf.device_id as deviceId,\n" +
                         " user_inf.address as user_address,\n" +
                         " user_inf.created_date as user_c_date\n" +
                         " FROM `login`join user_inf on login.u_id = user_inf.id " +
@@ -322,4 +324,5 @@ public class UserInfModel extends ImageTalkBaseModel {
         System.out.println(query);
         return this.updateData(query);
     }
+
 }
