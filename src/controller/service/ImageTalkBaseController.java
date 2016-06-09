@@ -5,6 +5,7 @@ import model.datamodel.app.AppCredential;
 import model.datamodel.app.Login;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 
@@ -67,6 +68,18 @@ public class ImageTalkBaseController {
 
         System.out.println("*************************************************************");
         System.out.println("Requested Url : "+url);
+        System.out.println("Client IP     : " +req.getRemoteAddr());
+        Date d = new Date();
+        System.out.println("Date          : " +d );
+        System.out.println("*************************************************************");
+        System.out.println();
+        System.out.println();
+    }
+    public void printResponsetDetails(HttpServletRequest req,HttpServletResponse res,String jsonStr){
+        String url = req.getRequestURI().toString();
+
+        System.out.println("*************************************************************");
+        System.out.println("JSON Response : "+jsonStr);
         System.out.println("Client IP     : " +req.getRemoteAddr());
         Date d = new Date();
         System.out.println("Date          : " +d );

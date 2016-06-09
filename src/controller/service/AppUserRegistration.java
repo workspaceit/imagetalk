@@ -36,50 +36,51 @@ public class AppUserRegistration extends HttpServlet {
         res.setContentType("application/json");
         this.baseController = new ImageTalkBaseController();
         this.pw = res.getWriter();
+        this.baseController.printRequestDetails(req);
 
         String url = req.getRequestURI().toString();
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
         }
-
+        String jsonResponseStr = "";
         switch (url) {
             case "/app/register/number":
-                this.initializePhoneNumber();
+                jsonResponseStr = this.initializePhoneNumber();
                 break;
             case "/app/register/user":
-                this.registerUser();
+                jsonResponseStr = this.registerUser();
                 break;
             case "/app/register/verifytoken":
-                this.verifyToken();
+                jsonResponseStr = this.verifyToken();
                 break;
             case "/app/register/test":
-                this.test();
+                jsonResponseStr = this.test();
                 break;
             default:
                 break;
         }
+        this.baseController.printResponsetDetails(req,res,jsonResponseStr);
+        this.pw.print(jsonResponseStr);
         this.pw.close();
     }
     public boolean sendTokenViaSms(String phoneNumber,String token){
         // Have to implement after sms api received
         return true;
     }
-    public void initializePhoneNumber(){
+    public String initializePhoneNumber(){
 
         ActivationModel activationModel = new ActivationModel();
         if (!this.baseController.checkParam("phone_number",this.req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Phone number required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
             this.baseController.serviceResponse.responseStat.msg = "Phone number format incorrect";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
@@ -87,15 +88,13 @@ public class AppUserRegistration extends HttpServlet {
         if(appLoginCredentialModel.isNumberExist()){
             this.baseController.serviceResponse.responseStat.msg = "Number already used";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         // For testing inside assignToken function token is set to '1234'
         if(!activationModel.assignToken()){
             this.baseController.serviceResponse.responseStat.msg = "Error on database operation";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         boolean tokenSent = this.sendTokenViaSms(activationModel.getPhoneNumber(),activationModel.getActivationCode());
@@ -103,35 +102,31 @@ public class AppUserRegistration extends HttpServlet {
         if(!tokenSent){
             this.baseController.serviceResponse.responseStat.msg = "Unable to send the token in given phone number";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
 
 
         this.baseController.serviceResponse.responseStat.msg = "Token is sent";
-        this.pw.print(this.baseController.getResponse());
-        return;
+
+        return this.baseController.getResponse();
     }
-    private void verifyToken(){
+    private String verifyToken(){
         ActivationModel activationModel = new ActivationModel();
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Phone number required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         if(!this.baseController.checkParam("token", this.req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Token required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
             this.baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         activationModel.setActivationCode(this.req.getParameter("token"));
@@ -139,41 +134,36 @@ public class AppUserRegistration extends HttpServlet {
         if(!activationModel.isTokenValid()){
             this.baseController.serviceResponse.responseStat.msg = "Token miss matched";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         this.baseController.serviceResponse.responseStat.msg = "Phone number is verified";
-        this.pw.print(this.baseController.getResponse());
-        return;
+        return this.baseController.getResponse();
     }
-    private void test(){
+    private String test(){
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
 
 
         this.baseController.serviceResponse.responseStat.msg = "";
         this.baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialByKeyword("");
-        this.pw.print(this.baseController.getResponse());
+        return this.baseController.getResponse();
     }
-    private void registerUser(){
+    private String registerUser(){
 
         System.out.println("At registration ");
         if(!this.baseController.checkParam("phone_number", this.req, true)) {
             this.baseController.serviceResponse.responseStat.msg = "Phone number required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         if(!this.baseController.checkParam("token",this.req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Token required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         if(!this.baseController.checkParam("first_name",this.req,true)) {
             this.baseController.serviceResponse.responseStat.msg = "Name required";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
 
@@ -182,8 +172,7 @@ public class AppUserRegistration extends HttpServlet {
         if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
             this.baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         System.out.println("'" + this.req.getParameter("token")+"'");
@@ -193,8 +182,7 @@ public class AppUserRegistration extends HttpServlet {
         if(!activationModel.isTokenValid()){
             this.baseController.serviceResponse.responseStat.msg = "Token miss matched";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
 
         UserInfModel userInfModel = new UserInfModel();
@@ -215,8 +203,7 @@ public class AppUserRegistration extends HttpServlet {
         if(userInfModel.getId()==0){
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on userInfModel";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
       //  appLoginCredentialModel.startTransaction();
         appLoginCredentialModel.setU_id(userInfModel.getId());
@@ -224,8 +211,7 @@ public class AppUserRegistration extends HttpServlet {
         if(appLoginCredentialModel.isNumberExist()){
             this.baseController.serviceResponse.responseStat.msg = "Number already used";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
          /*  transaction started */
 
@@ -236,8 +222,7 @@ public class AppUserRegistration extends HttpServlet {
      //       userInfModel.rollBack();
             this.baseController.serviceResponse.responseStat.msg = "Internal server error on appLoginCredentialModel";
             this.baseController.serviceResponse.responseStat.status = false;
-            this.pw.print(this.baseController.getResponse());
-            return;
+            return this.baseController.getResponse();
         }
         if(this.baseController.checkParam("photo",this.req,true)) {
             imgBase64 = this.req.getParameter("photo");
@@ -253,8 +238,7 @@ public class AppUserRegistration extends HttpServlet {
 
                 this.baseController.serviceResponse.responseStat.msg = "Unable to save the Image";
                 this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                return this.baseController.getResponse();
             }
 
             userInfModel.setPicPath(fileName);
@@ -266,8 +250,7 @@ public class AppUserRegistration extends HttpServlet {
 
                 this.baseController.serviceResponse.responseStat.msg = "Internal server error on picture path update";
                 this.baseController.serviceResponse.responseStat.status = false;
-                this.pw.print(this.baseController.getResponse());
-                return;
+                return this.baseController.getResponse();
             }
         }
         /* Commit database transaction */
@@ -281,8 +264,7 @@ public class AppUserRegistration extends HttpServlet {
 
         this.baseController.serviceResponse.responseStat.msg = "Registration success";
         this.baseController.serviceResponse.responseData =authCredential;
-        this.pw.print(this.baseController.getResponse());
-        return;
+        return this.baseController.getResponse();
 
     }
 
