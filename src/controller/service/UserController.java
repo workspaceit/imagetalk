@@ -53,6 +53,7 @@ public class UserController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
     public String makeTeamLead(HttpServletRequest req){

@@ -84,6 +84,7 @@ public class ChatController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
 

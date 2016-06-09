@@ -91,6 +91,7 @@ public class ProfileControllery extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
     private String changeTextStatus(HttpServletRequest req){

@@ -57,7 +57,7 @@ public class NotificationController extends HttpServlet {
                 break;
             default:break;
         }
-
+        baseController.closeDbConnection();
     }
 
     private String addNotifications(HttpServletRequest req) {

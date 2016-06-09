@@ -60,6 +60,7 @@ public class UserRegistrationController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         this.out.close();
     }
 

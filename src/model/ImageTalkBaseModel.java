@@ -55,7 +55,7 @@ public class ImageTalkBaseModel {
     public ImageTalkBaseModel() {
         try {
             Class.forName(DBDriver);
-            establisDbCon(); //DriverManager.getConnection(DBUrl, DBUser, DBPassword);
+            establishDbCon(); //DriverManager.getConnection(DBUrl, DBUser, DBPassword);
             stmt = con.createStatement();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -67,7 +67,15 @@ public class ImageTalkBaseModel {
 
         this.currentUserId = 0;
     }
-    public void establisDbCon(){
+    public static void dbConnectionClose(){
+        Connection con = dbCon.get();
+        try {
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void establishDbCon(){
         if(dbCon.get() == null){
             try {
                 dbCon.set(DriverManager.getConnection(DBUrl, DBUser, DBPassword));

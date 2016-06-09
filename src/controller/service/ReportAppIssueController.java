@@ -66,6 +66,7 @@ public class ReportAppIssueController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
 

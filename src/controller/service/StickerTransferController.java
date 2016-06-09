@@ -33,7 +33,7 @@ public class StickerTransferController extends HttpServlet {
 
         res.setContentType("application/json");
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -44,6 +44,7 @@ public class StickerTransferController extends HttpServlet {
                 this.readPicture(req,res);
                 break;
         }
+
 
     }
     private void readPicture(HttpServletRequest req,HttpServletResponse res){

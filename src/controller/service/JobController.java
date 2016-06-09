@@ -77,7 +77,7 @@ public class JobController extends HttpServlet {
                 break;
         }
 
-
+        baseController.closeDbConnection();
     }
 
     private String updateJobs(HttpServletRequest req) {

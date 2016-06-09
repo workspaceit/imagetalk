@@ -44,7 +44,7 @@ public class WalletController extends HttpServlet {
             return;
         }
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -58,6 +58,7 @@ public class WalletController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
 

@@ -70,7 +70,7 @@ public class AppStickersController extends HttpServlet {
             default:
                 break;
         }
-
+        baseController.closeDbConnection();
         pw.close();
     }
 

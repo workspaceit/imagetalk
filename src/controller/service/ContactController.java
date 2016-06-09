@@ -85,6 +85,7 @@ public class ContactController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
     private String findmatchContact(HttpServletRequest req){

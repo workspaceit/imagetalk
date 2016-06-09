@@ -28,9 +28,8 @@ import java.util.HashMap;
 import java.util.Properties;
 
 public class AppLoginController extends HttpServlet {
-    ImageTalkBaseController baseController;
 
-    LocalResponseClass localResponseObj;
+    
     class LocalResponseClass{
         AuthCredential authCredential;
         ArrayList<Contact> contacts;
@@ -58,11 +57,11 @@ public class AppLoginController extends HttpServlet {
             throws ServletException,IOException
     {
         res.setContentType("application/json");
-        this.baseController = new ImageTalkBaseController();
-        this.localResponseObj = new LocalResponseClass();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        LocalResponseClass localResponseObj  = new LocalResponseClass();
         PrintWriter pw=res.getWriter();
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
 
         if(url.endsWith("/")){
             url = url.substring(0, url.length()-1);
@@ -85,9 +84,8 @@ public class AppLoginController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
-
-
     }
 
     private String testSession(HttpServletRequest req,HttpServletResponse res)
@@ -95,15 +93,15 @@ public class AppLoginController extends HttpServlet {
         Login login = new Login();
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         if(!baseController.isAppSessionValid(req)){
-            this.baseController.serviceResponse.responseStat.status=false;
-            this.baseController.serviceResponse.responseStat.msg = "Session Expired";
-            this.baseController.serviceResponse.responseStat.isLogin=false;
-            return this.baseController.getResponse();
+            baseController.serviceResponse.responseStat.status=false;
+            baseController.serviceResponse.responseStat.msg = "Session Expired";
+            baseController.serviceResponse.responseStat.isLogin=false;
+            return baseController.getResponse();
         }
 
-        this.baseController.serviceResponse.responseStat.status=true;
-        this.baseController.serviceResponse.responseData = this.baseController.appCredential;
-        return this.baseController.getResponse();
+        baseController.serviceResponse.responseStat.status=true;
+        baseController.serviceResponse.responseData = baseController.appCredential;
+        return baseController.getResponse();
 
     }
 
@@ -113,7 +111,8 @@ public class AppLoginController extends HttpServlet {
     {
 
         String accessToken = req.getParameter("access_token");
-
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        LocalResponseClass localResponseObj  = new LocalResponseClass();
 
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         appLoginCredentialModel.setAccess_token(accessToken);
@@ -121,22 +120,22 @@ public class AppLoginController extends HttpServlet {
         if(authCredential.id>0 && authCredential.accessToken!=null && authCredential.accessToken!=""){
 
             if(!appLoginCredentialModel.isActive()){
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.baseController.serviceResponse.responseStat.isLogin = false;
-                this.baseController.serviceResponse.responseStat.msg = "Account is not activated";
-                return this.baseController.getResponse();
+                baseController.serviceResponse.responseStat.status = false;
+                baseController.serviceResponse.responseStat.isLogin = false;
+                baseController.serviceResponse.responseStat.msg = "Account is not activated";
+                return baseController.getResponse();
             }
             if(appLoginCredentialModel.isBanned()){
-                this.baseController.serviceResponse.responseStat.status = false;
-                this.baseController.serviceResponse.responseStat.isLogin = false;
-                this.baseController.serviceResponse.responseStat.msg = "Account is Banned";
-                return this.baseController.getResponse();
+                baseController.serviceResponse.responseStat.status = false;
+                baseController.serviceResponse.responseStat.isLogin = false;
+                baseController.serviceResponse.responseStat.msg = "Account is Banned";
+                return baseController.getResponse();
             }
 
             ContactModel contactModel = new ContactModel();
             contactModel.setOwner_id(authCredential.id);
-            this.localResponseObj.authCredential =authCredential;
-            this.localResponseObj.contacts = contactModel.getContactByOwnerId();
+            localResponseObj.authCredential =authCredential;
+            localResponseObj.contacts = contactModel.getContactByOwnerId();
 
             HashMap<String,Integer> countResponse =  new HashMap();
 
@@ -151,26 +150,27 @@ public class AppLoginController extends HttpServlet {
             // Updating Last Login Time
             appLoginCredentialModel.updateLastLogin();
 
-            this.localResponseObj.extra = countResponse;
-            this.baseController.serviceResponse.responseData =  this.localResponseObj;
-            this.baseController.setAppSession(req, authCredential);
+            localResponseObj.extra = countResponse;
+            baseController.serviceResponse.responseData =  localResponseObj;
+            baseController.setAppSession(req, authCredential);
         }else{
-            this.baseController.serviceResponse.responseStat.status = false;
-            this.baseController.serviceResponse.responseStat.msg = "Access token is wrong";
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = "Access token is wrong";
         }
 
-        return this.baseController.getResponse();
+        return baseController.getResponse();
     }
     private String forgetPasword(HttpServletRequest req,HttpServletResponse res){
 
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         AdminLoginModel adminLoginModel = new AdminLoginModel();
         String email = req.getParameter("email");
         String password  = adminLoginModel.getPasswordByEmail(email);
 
         if (password==null){
-            this.baseController.serviceResponse.responseStat.status=false;
-            this.baseController.serviceResponse.responseStat.msg = "Email is not found in the system";
-            return this.baseController.getResponse();
+            baseController.serviceResponse.responseStat.status=false;
+            baseController.serviceResponse.responseStat.msg = "Email is not found in the system";
+            return baseController.getResponse();
 
         }
 
@@ -200,15 +200,16 @@ public class AppLoginController extends HttpServlet {
 
         }
 
-        this.baseController.serviceResponse.responseStat.status=true;
-        this.baseController.serviceResponse.responseStat.msg = "Email is sent to "+email;
-        return this.baseController.getResponse();
+        baseController.serviceResponse.responseStat.status=true;
+        baseController.serviceResponse.responseStat.msg = "Email is sent to "+email;
+        return baseController.getResponse();
     }
     public String adminLogout(HttpServletRequest req) {
-        this.baseController.removeSession(req);
-        this.baseController.serviceResponse.responseStat.status=true;
-        this.baseController.serviceResponse.responseStat.msg = "Logout success";
-        return this.baseController.getResponse();
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        baseController.removeSession(req);
+        baseController.serviceResponse.responseStat.status=true;
+        baseController.serviceResponse.responseStat.msg = "Logout success";
+        return baseController.getResponse();
     }
 
     public String updatePhone(HttpServletRequest req)
@@ -218,8 +219,8 @@ public class AppLoginController extends HttpServlet {
         WallPostModel wallPostModel = new WallPostModel();
         wallPostModel.setOwner_id(baseController.appCredential.id);
 
-        this.baseController.serviceResponse.responseStat.status=true;
-        this.baseController.serviceResponse.responseStat.msg = "Test success";
-        return this.baseController.getResponse();
+        baseController.serviceResponse.responseStat.status=true;
+        baseController.serviceResponse.responseStat.msg = "Test success";
+        return baseController.getResponse();
     }
 }

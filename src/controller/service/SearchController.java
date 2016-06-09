@@ -70,6 +70,7 @@ public class SearchController extends HttpServlet {
             default:
                 break;
         }
+        baseController.closeDbConnection();
         pw.close();
     }
     private String getLocationByLattLng(HttpServletRequest req) {

@@ -1,6 +1,7 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import model.ImageTalkDbCon;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Login;
 
@@ -31,6 +32,9 @@ public class ImageTalkBaseController {
 
         // Initilize App Credential Id
         isAppSessionValid(req);
+    }
+    public void closeDbConnection(){
+        ImageTalkDbCon.closeConnection();
     }
     public String getResponse() {
         return this.gson.toJson(this.serviceResponse);
