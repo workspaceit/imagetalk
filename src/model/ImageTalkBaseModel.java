@@ -71,6 +71,7 @@ public class ImageTalkBaseModel {
         Connection con = dbCon.get();
         try {
             con.close();
+            dbCon.set(null);
         } catch (SQLException e) {
             e.printStackTrace();
         }

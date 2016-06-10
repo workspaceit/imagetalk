@@ -20,9 +20,7 @@ import java.io.PrintWriter;
  */
 public class AppUserRegistration extends HttpServlet {
 
-    PrintWriter pw;
-    HttpServletRequest req;
-    HttpServletResponse res;
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -31,14 +29,13 @@ public class AppUserRegistration extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        this.req = req;
-        this.res = res;
+       
         res.setContentType("application/json");
         ImageTalkBaseController baseController = new ImageTalkBaseController();
-        this.pw = res.getWriter();
+        PrintWriter pw = res.getWriter();
         baseController.printRequestDetails(req);
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -46,40 +43,40 @@ public class AppUserRegistration extends HttpServlet {
         String jsonResponseStr = "";
         switch (url) {
             case "/app/register/number":
-                jsonResponseStr = this.initializePhoneNumber();
+                jsonResponseStr = this.initializePhoneNumber(req, res);
                 break;
             case "/app/register/user":
-                jsonResponseStr = this.registerUser();
+                jsonResponseStr = this.registerUser(req, res);
                 break;
             case "/app/register/verifytoken":
-                jsonResponseStr = this.verifyToken();
+                jsonResponseStr = this.verifyToken(req, res);
                 break;
             case "/app/register/test":
-                jsonResponseStr = this.test();
+                jsonResponseStr = this.test(req, res);
                 break;
             default:
                 break;
         }
         baseController.printResponsetDetails(req,res,jsonResponseStr);
         baseController.closeDbConnection();
-        this.pw.print(jsonResponseStr);
-        this.pw.close();
+        pw.print(jsonResponseStr);
+        pw.close();
     }
     public boolean sendTokenViaSms(String phoneNumber,String token){
         // Have to implement after sms api received
         return true;
     }
-    public String initializePhoneNumber(){
+    public String initializePhoneNumber(HttpServletRequest req, HttpServletResponse res){
 
         ActivationModel activationModel = new ActivationModel();
         ImageTalkBaseController baseController = new ImageTalkBaseController();
-        if (!baseController.checkParam("phone_number",this.req,true)) {
+        if (!baseController.checkParam("phone_number",req,true)) {
             baseController.serviceResponse.responseStat.msg = "Phone number required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
 
-        if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
+        if(!activationModel.setPhoneNumber(req.getParameter("phone_number"))){
             baseController.serviceResponse.responseStat.msg = "Phone number format incorrect";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
@@ -113,26 +110,26 @@ public class AppUserRegistration extends HttpServlet {
 
         return baseController.getResponse();
     }
-    private String verifyToken(){
+    private String verifyToken(HttpServletRequest req, HttpServletResponse res){
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         ActivationModel activationModel = new ActivationModel();
-        if(!baseController.checkParam("phone_number", this.req, true)) {
+        if(!baseController.checkParam("phone_number", req, true)) {
             baseController.serviceResponse.responseStat.msg = "Phone number required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        if(!baseController.checkParam("token", this.req, true)) {
+        if(!baseController.checkParam("token", req, true)) {
             baseController.serviceResponse.responseStat.msg = "Token required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
+        if(!activationModel.setPhoneNumber(req.getParameter("phone_number"))){
             baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
 
-        activationModel.setActivationCode(this.req.getParameter("token"));
+        activationModel.setActivationCode(req.getParameter("token"));
 
         if(!activationModel.isTokenValid()){
             baseController.serviceResponse.responseStat.msg = "Token miss matched";
@@ -142,7 +139,7 @@ public class AppUserRegistration extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "Phone number is verified";
         return baseController.getResponse();
     }
-    private String test(){
+    private String test(HttpServletRequest req, HttpServletResponse res){
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
 
@@ -151,20 +148,20 @@ public class AppUserRegistration extends HttpServlet {
         baseController.serviceResponse.responseData =  appLoginCredentialModel.getAppCredentialByKeyword("");
         return baseController.getResponse();
     }
-    private String registerUser(){
+    private String registerUser(HttpServletRequest req, HttpServletResponse res){
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         System.out.println("At registration ");
-        if(!baseController.checkParam("phone_number", this.req, true)) {
+        if(!baseController.checkParam("phone_number", req, true)) {
             baseController.serviceResponse.responseStat.msg = "Phone number required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        if(!baseController.checkParam("token",this.req,true)) {
+        if(!baseController.checkParam("token",req,true)) {
             baseController.serviceResponse.responseStat.msg = "Token required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        if(!baseController.checkParam("first_name",this.req,true)) {
+        if(!baseController.checkParam("first_name",req,true)) {
             baseController.serviceResponse.responseStat.msg = "Name required";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
@@ -173,15 +170,15 @@ public class AppUserRegistration extends HttpServlet {
 
         ActivationModel activationModel = new ActivationModel();
 
-        if(!activationModel.setPhoneNumber(this.req.getParameter("phone_number"))){
+        if(!activationModel.setPhoneNumber(req.getParameter("phone_number"))){
             baseController.serviceResponse.responseStat.msg = "Phone number format miss matched";
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
 
-        System.out.println("'" + this.req.getParameter("token")+"'");
-        System.out.println("'"+this.req.getParameter("phone_number")+"'");
-        activationModel.setActivationCode(this.req.getParameter("token"));
+        System.out.println("'" + req.getParameter("token")+"'");
+        System.out.println("'"+req.getParameter("phone_number")+"'");
+        activationModel.setActivationCode(req.getParameter("token"));
 
         if(!activationModel.isTokenValid()){
             baseController.serviceResponse.responseStat.msg = "Token miss matched";
@@ -193,8 +190,8 @@ public class AppUserRegistration extends HttpServlet {
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         String imgBase64 = "";
 
-        userInfModel.setF_name(this.req.getParameter("first_name"));
-        userInfModel.setL_name(this.req.getParameter("last_name"));
+        userInfModel.setF_name(req.getParameter("first_name"));
+        userInfModel.setL_name(req.getParameter("last_name"));
 
         if (baseController.checkParam("device_id",req,true)) {
             userInfModel.setDeviceId(req.getParameter("device_id"));
@@ -228,8 +225,8 @@ public class AppUserRegistration extends HttpServlet {
             baseController.serviceResponse.responseStat.status = false;
             return baseController.getResponse();
         }
-        if(baseController.checkParam("photo",this.req,true)) {
-            imgBase64 = this.req.getParameter("photo");
+        if(baseController.checkParam("photo",req,true)) {
+            imgBase64 = req.getParameter("photo");
             Pictures pictures = ImageHelper.saveProfilePicture(imgBase64, userInfModel.getId());
             Gson gson = new Gson();
             String fileName =gson.toJson(pictures);
