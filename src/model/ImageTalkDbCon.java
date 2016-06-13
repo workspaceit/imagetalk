@@ -5,6 +5,6 @@ package model;
  */
 public class ImageTalkDbCon {
     public static void closeConnection(){
-
+        ImageTalkBaseModel.dbConnectionClose();
     }
 }
