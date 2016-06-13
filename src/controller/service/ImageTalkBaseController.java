@@ -1,6 +1,7 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import model.ImageTalkBaseModel;
 import model.ImageTalkDbCon;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Login;
@@ -149,5 +150,12 @@ public class ImageTalkBaseController {
             return (login.type == 1)?true:false;
         }
         return false;
+    }
+    public void setModelError(ImageTalkBaseModel.ModelError obj){
+        if(obj!=null){
+            this.serviceResponse.responseStat.msg  = obj.getMsg();
+            this.serviceResponse.responseStat.status = false;
+        }
+
     }
 }

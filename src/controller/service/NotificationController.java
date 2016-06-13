@@ -185,35 +185,16 @@ public class NotificationController extends HttpServlet {
         }
 
         NotificationModel notificationModel = new NotificationModel();
+        notificationModel.setLimit(req.getParameter("limit").trim());
+        notificationModel.setOffset(req.getParameter("offset").trim());
 
-        try{
-            if (Integer.parseInt(req.getParameter("limit").trim()) <= 0){
-                baseController.serviceResponse.responseStat.msg = "limit must be greater zero required";
-                baseController.serviceResponse.responseStat.status = false;
-                return baseController.getResponse();
-            }
-            notificationModel.setLimit(Integer.parseInt(req.getParameter("limit").trim()));
-        }catch (NumberFormatException ex){
-            System.out.println(ex);
-            baseController.serviceResponse.responseStat.msg = "limit int required";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-
-        }
-        try{
-            if (Integer.parseInt(req.getParameter("offset").trim()) < 0){
-                baseController.serviceResponse.responseStat.msg = "offset must be positive value required";
-                baseController.serviceResponse.responseStat.status = false;
-                return baseController.getResponse();
-            }
-
-            notificationModel.offset = Integer.parseInt(req.getParameter("offset").trim());
-        }catch (NumberFormatException ex){
-            System.out.println(ex);
-            baseController.serviceResponse.responseStat.msg = "offset int required";
-            baseController.serviceResponse.responseStat.status = false;
+        if(notificationModel.hasError()){
+            baseController.setModelError(notificationModel.getFirstError());
+            System.out.println(notificationModel.getFirstError().getMsg());
+            System.out.println(notificationModel.getFirstError().getParam());
             return baseController.getResponse();
         }
+
 
         notificationModel.setOwnerId(baseController.appCredential.id);
 

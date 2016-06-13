@@ -4,6 +4,7 @@ import controller.service.ImageTalkBaseController;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -26,11 +27,15 @@ public class ImageTalkBaseModel {
     protected boolean autoCommit = true;
     private String query = null;
     public ResultSet resultSet = null;
+
     public BaseErrorManager errorObj;
     public BaseOperationManager operationStatus;
+
     private int currentUserId;
     public int limit;
     public int offset;
+
+    private ArrayList<ModelError> errorQueue;
 
     public class BaseErrorManager {
         public String msg;
@@ -41,7 +46,6 @@ public class ImageTalkBaseModel {
             this.errStatus = false;
         }
     }
-
     public class BaseOperationManager {
         public String msg;
         public boolean status;
@@ -51,6 +55,26 @@ public class ImageTalkBaseModel {
             this.status = true;
         }
     }
+    public class ModelError {
+        private String msg;
+        private String param;
+
+        public ModelError() {
+            this.msg = "";
+            this.param = "";
+        }
+        private void setError(String param,String msg){
+            this.msg = msg;
+            this.param = param;
+        }
+        public String getMsg(){
+            return this.msg;
+        }
+        public String getParam(){
+            return this.param;
+        }
+    }
+
 
     public ImageTalkBaseModel() {
         try {
@@ -62,14 +86,56 @@ public class ImageTalkBaseModel {
         }
         this.errorObj = new BaseErrorManager();
         this.operationStatus = new BaseOperationManager();
+
+        this.errorQueue = new ArrayList<ModelError>();
         this.limit = -1;
         this.offset = -1;
 
         this.currentUserId = 0;
     }
-    public void setLimit(int limit){
-        this.limit = (limit>20)?20:limit;
+    public void setError(String param,String msg){
+        ModelError modelError = new ModelError();
+        modelError.setError(param,msg);
+        this.errorQueue.add(modelError);
     }
+    public boolean hasError(){
+        return (this.errorQueue.size()>0)?true:false;
+    }
+    public ModelError getFirstError(){
+        return  this.errorQueue.get(0);
+    }
+    public void setLimit(Object limit){
+        try{
+            this.limit = Integer.parseInt((String)limit);
+            if (this.limit <= 0){
+                this.setError("limit","limit must be greater zero required");
+                return;
+            }
+
+        }catch (ClassCastException ex){
+            System.out.println(ex.getMessage());
+            this.setError("limit", "limit int required");
+            this.limit = -1;
+            return;
+        }
+        this.limit = (this.limit>20)?20:this.limit;
+    }
+    public void setOffset(Object offset){
+        try{
+            this.offset = Integer.parseInt((String)offset);
+            if (this.offset < 0){
+                this.setError("offset","offset must be positive value");
+                return;
+            }
+
+        }catch (ClassCastException ex){
+            System.out.println(ex.getMessage());
+            this.setError("offset", "offset int required");
+            this.offset = -1;
+            return;
+        }
+    }
+
     public static void dbConnectionClose(){
         if(dbCon.get()==null){
             return;

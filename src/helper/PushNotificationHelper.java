@@ -53,23 +53,28 @@ public class PushNotificationHelper {
         PushNotificationHelper.alertBody = "Your post is liked by "+likerName;
         PushNotificationHelper.badgeNo = 1;
 
+        try{
+            ApnsService service =
+                    APNS.newService()
+                            .withCert(PushNotificationHelper.certificatePath, "wsit97480")
+                            .withSandboxDestination()
+                            .build();
 
-        ApnsService service =
-                APNS.newService()
-                    .withCert(PushNotificationHelper.certificatePath, "wsit97480")
-                    .withSandboxDestination()
-                    .build();
+            System.setProperty("https.protocols", "TLSv1");
+            String payload = APNS.newPayload().alertBody(PushNotificationHelper.alertBody).sound("default").badge(PushNotificationHelper.badgeNo).build();
+            //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
+            String token = deviceId;
+            service.push(token, payload);
 
-        System.setProperty("https.protocols", "TLSv1");
-        String payload = APNS.newPayload().alertBody(PushNotificationHelper.alertBody).sound("default").badge(PushNotificationHelper.badgeNo).build();
-        //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
-        String token = deviceId;
-        service.push(token, payload);
-
-        Map<String, Date> inactiveDevices = service.getInactiveDevices();
-        for (String deviceToken : inactiveDevices.keySet()) {
-            Date inactiveAsOf = inactiveDevices.get(deviceToken);
+            Map<String, Date> inactiveDevices = service.getInactiveDevices();
+            for (String deviceToken : inactiveDevices.keySet()) {
+                Date inactiveAsOf = inactiveDevices.get(deviceToken);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return;
         }
+
 
     }
 }
