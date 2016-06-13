@@ -7,32 +7,30 @@ public class Notification {
     public int id;
     public AppCredential person;
     public String actionTag;
-    public String sourceTag;
+    public String sourceClass;
     public Object source;
     public boolean isRead;
     String createdDate;
-    private static String[] actionTagNames = {"likepost","addpost"};
-    private static String[] sourceTagNames = {"wallpost","comment"};
 
     public Notification() {
         this.id = 0;
         this.person = new AppCredential();
         this.actionTag = "";
-        this.sourceTag = "";
+        this.sourceClass = "";
         this.source = new Object();
         this.isRead = false;
         this.createdDate = "";
     }
-    public void setActionTagToLikePost(){
+    /*public void setActionTagToLikePost(){
         this.actionTag = actionTagNames[0];
     }
     public void setActionTagToAddPost(){
         this.actionTag = actionTagNames[1];
     }
     public void setSourceTagToWallpost(){
-        this.sourceTag = sourceTagNames[0];
+        this.sourceClass = sourceTagNames[0];
     }
     public void setSourceTagToComment(){
-        this.sourceTag = sourceTagNames[1];
-    }
+        this.sourceClass = sourceTagNames[1];
+    }*/
 }

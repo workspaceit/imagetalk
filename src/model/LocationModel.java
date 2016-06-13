@@ -147,7 +147,7 @@ public class LocationModel extends ImageTalkBaseModel {
 
         String query = "SELECT id, SQRT(POW(69.1 * (lat - "+ this.lat+"), 2) +" +
                        "POW(69.1 * ("+this.lng+" - lng) * COS(lat / 57.3), 2)) AS distance " +
-                       "FROM location HAVING distance < 0.5 ORDER BY distance";
+                       "FROM location HAVING distance < 0.3 ORDER BY distance DESC";
 
         this.setQuery(query);
         this.getData();

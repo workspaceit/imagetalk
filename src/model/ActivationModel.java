@@ -64,6 +64,7 @@ public class ActivationModel extends ImageTalkBaseModel{
             query = "UPDATE " +super.tableName+" SET "+
             " phone_number='"+this.phone_number+"',activation_code='" +this.activation_code+"'"+
             " where id ="+this.id;
+            System.out.println(query);
             if(!this.updateData(query)){
                 return false;
             }
@@ -77,6 +78,7 @@ public class ActivationModel extends ImageTalkBaseModel{
                     "'" + this.activation_code + "'" +
                     ")";
 
+            System.out.println(query);
             this.id = this.insertData(query);
             if (this.id == 0) {
                 return false;

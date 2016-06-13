@@ -2,6 +2,9 @@ package controller.service;
 
 import com.google.gson.Gson;
 import model.NotificationModel;
+import model.WallPostModel;
+import model.WalletModel;
+import model.datamodel.app.Notification;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +58,11 @@ public class NotificationController extends HttpServlet {
             case "/app/user/notification/add":
                 pw.print(this.addNotifications(req));
                 break;
+
+            case "/app/user/notification/test":
+                pw.print(this.insertNotification(req));
+                break;
+
             default:break;
         }
         baseController.closeDbConnection();
@@ -62,7 +70,7 @@ public class NotificationController extends HttpServlet {
 
     private String addNotifications(HttpServletRequest req) {
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
-        String msg;
+        /*String msg;
         String tag;
         int is_read;
         String data_object;
@@ -125,11 +133,40 @@ public class NotificationController extends HttpServlet {
             baseController.serviceResponse.responseStat.status = false;
             baseController.serviceResponse.responseStat.msg = "Internal server error";
             return baseController.getResponse();
-        }
+        }*/
         baseController.serviceResponse.responseStat.msg = "Notification added successfully";
         baseController.serviceResponse.responseStat.status = true;
         return baseController.getResponse();
 
+    }
+
+    private String insertNotification(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        NotificationModel notificationModel = new NotificationModel();
+
+        //notification.person = baseController.appCredential;
+
+        notificationModel.setSource_id(999);
+        WallPostModel wallPostModel = new WallPostModel();
+
+
+        notificationModel.setOwner_id(777);
+        notificationModel.setPerson_app_id(baseController.appCredential.id);
+        //notificationModel.setSource_class("Wallpost");
+        //notificationModel.setAction_tag("Like");
+        //notificationModel.insert();
+        /*notificationModel.setIs_read(0);
+        notificationModel.setData_object("data object Json");*/
+
+        notificationModel.insertPostLike();
+
+
+        baseController.serviceResponse.responseStat.status = true;
+        baseController.serviceResponse.responseStat.msg = "insert test";
+
+        return baseController.getResponse();
     }
 
 }

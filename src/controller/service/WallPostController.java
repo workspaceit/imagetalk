@@ -675,7 +675,27 @@ public class WallPostController extends HttpServlet {
 
                 PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
                 likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
-                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")),likerName);
+                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+
+
+                NotificationModel notificationModel = new NotificationModel();
+
+                notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+
+                wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                wallPost = wallPostModel.getById();
+
+                notificationModel.setOwner_id(wallPost.owner.id);
+                notificationModel.setPerson_app_id(baseController.appCredential.id);
+                //notificationModel.setSource_class("Wallpost");
+                //notificationModel.setAction_tag("Like");
+                //notificationModel.insert();
+        /*notificationModel.setIs_read(0);
+        notificationModel.setData_object("data object Json");*/
+
+                notificationModel.insertPostLike();
+
 
                 msg = "Successfully liked";
                 isLiked = true;
