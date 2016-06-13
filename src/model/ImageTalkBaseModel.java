@@ -67,7 +67,13 @@ public class ImageTalkBaseModel {
 
         this.currentUserId = 0;
     }
+    public void setLimit(int limit){
+        this.limit = (limit>20)?20:limit;
+    }
     public static void dbConnectionClose(){
+        if(dbCon.get()==null){
+            return;
+        }
         Connection con = dbCon.get();
         try {
             con.close();

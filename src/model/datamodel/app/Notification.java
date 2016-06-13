@@ -10,7 +10,7 @@ public class Notification {
     public String sourceClass;
     public Object source;
     public boolean isRead;
-    String createdDate;
+    public String createdDate;
 
     public Notification() {
         this.id = 0;

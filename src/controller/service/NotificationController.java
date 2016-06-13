@@ -41,7 +41,7 @@ public class NotificationController extends HttpServlet {
 
         this.gson = new Gson();
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -58,7 +58,9 @@ public class NotificationController extends HttpServlet {
             case "/app/user/notification/add":
                 pw.print(this.addNotifications(req));
                 break;
-
+            case "/app/user/notification/get/recent":
+                pw.print(this.getRecentNotification(req));
+                break;
             case "/app/user/notification/test":
                 pw.print(this.insertNotification(req));
                 break;
@@ -66,6 +68,7 @@ public class NotificationController extends HttpServlet {
             default:break;
         }
         baseController.closeDbConnection();
+        pw.close();
     }
 
     private String addNotifications(HttpServletRequest req) {
@@ -152,7 +155,7 @@ public class NotificationController extends HttpServlet {
         WallPostModel wallPostModel = new WallPostModel();
 
 
-        notificationModel.setOwner_id(777);
+        notificationModel.setOwnerId(777);
         notificationModel.setPerson_app_id(baseController.appCredential.id);
         //notificationModel.setSource_class("Wallpost");
         //notificationModel.setAction_tag("Like");
@@ -165,6 +168,56 @@ public class NotificationController extends HttpServlet {
 
         baseController.serviceResponse.responseStat.status = true;
         baseController.serviceResponse.responseStat.msg = "insert test";
+
+        return baseController.getResponse();
+    }
+    private String getRecentNotification(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        if (!baseController.checkParam("limit", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "limit required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        if (!baseController.checkParam("offset", req, true)) {
+            baseController.serviceResponse.responseStat.msg = "offset required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        NotificationModel notificationModel = new NotificationModel();
+
+        try{
+            if (Integer.parseInt(req.getParameter("limit").trim()) <= 0){
+                baseController.serviceResponse.responseStat.msg = "limit must be greater zero required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+            notificationModel.setLimit(Integer.parseInt(req.getParameter("limit").trim()));
+        }catch (NumberFormatException ex){
+            System.out.println(ex);
+            baseController.serviceResponse.responseStat.msg = "limit int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+
+        }
+        try{
+            if (Integer.parseInt(req.getParameter("offset").trim()) < 0){
+                baseController.serviceResponse.responseStat.msg = "offset must be positive value required";
+                baseController.serviceResponse.responseStat.status = false;
+                return baseController.getResponse();
+            }
+
+            notificationModel.offset = Integer.parseInt(req.getParameter("offset").trim());
+        }catch (NumberFormatException ex){
+            System.out.println(ex);
+            baseController.serviceResponse.responseStat.msg = "offset int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        notificationModel.setOwnerId(baseController.appCredential.id);
+
+        baseController.serviceResponse.responseData  = notificationModel.getRecentNotification();
 
         return baseController.getResponse();
     }

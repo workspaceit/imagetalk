@@ -2,8 +2,12 @@ package model;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import model.datamodel.app.Liker;
 import model.datamodel.app.Notification;
 import model.datamodel.app.WallPost;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +27,6 @@ public class NotificationModel extends ImageTalkBaseModel {
     private int is_read;
     private String data_object;
     private String created_date;
-    Notification notification;
     private static String[] actionTagNames = {"likepost","addpost"};
     private static String[] sourceTagNames = {"wallpost","comment"};
 
@@ -40,7 +43,6 @@ public class NotificationModel extends ImageTalkBaseModel {
         action_tag = "";
         is_read = 0;
         data_object = "";
-        notification = new Notification();
         created_date = "";
 
         gson = new Gson();
@@ -56,7 +58,7 @@ public class NotificationModel extends ImageTalkBaseModel {
     }
 
 
-    public void setOwner_id(int owner_id) {
+    public void setOwnerId(int owner_id) {
         this.owner_id = owner_id;
     }
 
@@ -112,50 +114,73 @@ public class NotificationModel extends ImageTalkBaseModel {
         return data_object;
     }
 
+    public ArrayList<Notification> getRecentNotification(){
+        ArrayList<Notification> recentNotifications = new ArrayList<Notification>();
+        String query =  " SELECT * FROM  `notification` WHERE owner_id=" +this.owner_id;
+
+        query += " order by id DESC ";
+        this.offset = this.offset * this.limit;
+        query += " LIMIT "+this.offset+" ,"+this.limit+" ";
+
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                Notification notification = new Notification();
+
+                String tempDataObject = this.resultSet.getString("data_object");
+                if(tempDataObject!=null && tempDataObject!=""){
+                    try{
+                        notification = this.gson.fromJson(tempDataObject,Notification.class);
+                    }catch (Exception ex){
+                        System.out.println(ex.getMessage());
+                        continue;
+                    }
+                }
+                notification.id  = this.resultSet.getInt("id");
+                notification.createdDate  = this.resultSet.getString("created_date");
+                recentNotifications.add(notification);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return recentNotifications;
+    }
 
     public void insertPostLike()
     {
         WallPostModel wallPostModel = new WallPostModel();
-        //Notification notification = new Notification();
+        wallPostModel.setId(this.source_id);
+
+        Notification notification = new Notification();
+
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
         appLoginCredentialModel.setId(this.person_app_id);
+
         notification.person = appLoginCredentialModel.getAppCredentialById();
         notification.actionTag = NotificationModel.actionTagNames[0];
         notification.sourceClass = NotificationModel.sourceTagNames[0];
         notification.isRead = false;
-
-        wallPostModel.setId(this.source_id);
         notification.source = wallPostModel.getById();
 
+        this.setSource_class(notification.sourceClass);
+        this.setAction_tag(notification.actionTag);
+        this.data_object = this.gson.toJson(notification);
 
-         insert();
+        notification.id = this.insert();
+
     }
 
     public int insert()
     {
-        //AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
-        //Notification notification = new Notification();
-        //appLoginCredentialModel.setId(this.person_app_id);
-        //notification.person = appLoginCredentialModel.getAppCredentialById();
-
-        /*Gson gson = new com.google.gson.Gson();
-        com.google.gson.JsonObject tagged = gson.fromJson(tag,JsonElement.class).getAsJsonObject();*/
-
-        Gson gson = new Gson();
-        String JsonObj = gson.toJson(notification);
-
-        this.setSource_class(notification.sourceClass);
-        this.setAction_tag(notification.actionTag);
-
-        this.setData_object(JsonObj);
 
         String query = "INSERT INTO " + this.tableName + " (`owner_id`,`person_app_id`,`source_id`,`source_class`,`action_tag`,`is_read`,`data_object`,`created_date`) " +
                 "VALUES("+this.owner_id +","+this.person_app_id+","+this.source_id+",'"+this.source_class+"','"+this.action_tag +"',"+this.is_read+",'"+this.data_object+"','"+this.getUtcDateTime() +"')";
 
-        //this.getUtcDateTime();
-        System.out.print(query);
+
         this.id = this.insertData(query);
         return this.id;
-        //return  JsonObj;
     }
 }
