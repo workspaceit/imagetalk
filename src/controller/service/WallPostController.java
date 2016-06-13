@@ -673,9 +673,9 @@ public class WallPostController extends HttpServlet {
 
                 wallPost = wallPostModel.getById();
 
-//                PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
-//                likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
-//                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+                PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
 
 
 
