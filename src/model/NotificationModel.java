@@ -52,9 +52,19 @@ public class NotificationModel extends ImageTalkBaseModel {
         return id;
     }
 
-    public boolean setId(int id) {
-        this.id = id;
-        return true;
+    public void setId(Object id){
+        if(!this.setReqParamObj("notification_id",id)){
+            return;
+        }
+        try{
+            this.id = Integer.parseInt((String)id);
+        }catch (ClassCastException ex){
+            System.out.println(ex.getMessage());
+            this.setError("id", "id int required");
+            this.id = 0;
+            return;
+        }
+
     }
 
 
@@ -129,7 +139,7 @@ public class NotificationModel extends ImageTalkBaseModel {
                 Notification notification = new Notification();
 
                 String tempDataObject = this.resultSet.getString("data_object");
-                if(tempDataObject!=null && tempDataObject!=""){
+                if(tempDataObject!=null && !tempDataObject.equals("")){
                     try{
                         notification = this.gson.fromJson(tempDataObject,Notification.class);
                     }catch (Exception ex){
@@ -139,6 +149,7 @@ public class NotificationModel extends ImageTalkBaseModel {
                 }
                 notification.id  = this.resultSet.getInt("id");
                 notification.createdDate  = this.resultSet.getString("created_date");
+                notification.isRead = (this.resultSet.getInt("is_read")==0)?false:true;
                 recentNotifications.add(notification);
             }
         } catch (SQLException e) {
@@ -172,7 +183,10 @@ public class NotificationModel extends ImageTalkBaseModel {
         notification.id = this.insert();
 
     }
-
+    public boolean updateToRead(){
+        String query = "UPDATE " + this.tableName + "  SET is_read=1 WHERE owner_id = "+this.owner_id +" and id="+this.id;
+        return this.updateData(query);
+    }
     public int insert()
     {
 

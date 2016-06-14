@@ -93,6 +93,25 @@ public class ImageTalkBaseModel {
 
         this.currentUserId = 0;
     }
+    public boolean setReqParamObj(String params,Object obj){
+        if(obj==null){
+            this.setError(params,params+" is required");
+            return false;
+        }
+        try{
+            String tmpStr = (String)obj;
+            if(tmpStr.equals("")){
+                this.setError(params,params+" is required");
+            }
+
+        }catch (ClassCastException ex){
+            System.out.println(ex.getMessage());
+            this.setError(params,params+" is required");
+            return false;
+        }
+        return true;
+
+    }
     public void setError(String param,String msg){
         ModelError modelError = new ModelError();
         modelError.setError(param,msg);
@@ -104,6 +123,7 @@ public class ImageTalkBaseModel {
     public ModelError getFirstError(){
         return  this.errorQueue.get(0);
     }
+
     public void setLimit(Object limit){
         try{
             this.limit = Integer.parseInt((String)limit);

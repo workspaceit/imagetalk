@@ -61,6 +61,9 @@ public class NotificationController extends HttpServlet {
             case "/app/user/notification/get/recent":
                 pw.print(this.getRecentNotification(req));
                 break;
+            case "/app/user/notification/set/read":
+                pw.print(this.setNotificationIsRead(req));
+                break;
             case "/app/user/notification/test":
                 pw.print(this.insertNotification(req));
                 break;
@@ -200,6 +203,30 @@ public class NotificationController extends HttpServlet {
 
         baseController.serviceResponse.responseData  = notificationModel.getRecentNotification();
 
+        return baseController.getResponse();
+    }
+    private String setNotificationIsRead(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+
+        NotificationModel notificationModel = new NotificationModel();
+        notificationModel.setId(req.getParameter("notification_id"));
+        notificationModel.setOwnerId(baseController.appCredential.id);
+
+        if(notificationModel.hasError()){
+            baseController.setModelError(notificationModel.getFirstError());
+            System.out.println(notificationModel.getFirstError().getMsg());
+            System.out.println(notificationModel.getFirstError().getParam());
+            return baseController.getResponse();
+        }
+
+        if(!notificationModel.updateToRead()){
+            baseController.serviceResponse.responseStat.msg = "You are not the owner of this notification_id";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        baseController.serviceResponse.responseStat.msg = "Successfully updated";
         return baseController.getResponse();
     }
 
