@@ -490,7 +490,7 @@ public class WallPostController extends HttpServlet {
         return baseController.getResponse();
     }
     private String getOthersPost(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
         WallPostModel wallPostModel = new WallPostModel();
 
