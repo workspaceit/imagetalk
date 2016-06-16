@@ -61,6 +61,7 @@ public class PushNotificationHelper {
                             .build();
 
             System.setProperty("https.protocols", "TLSv1");
+            System.out.println("push test");
             String payload = APNS.newPayload().alertBody(PushNotificationHelper.alertBody).sound("default").badge(PushNotificationHelper.badgeNo).build();
             //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
             String token = deviceId;
