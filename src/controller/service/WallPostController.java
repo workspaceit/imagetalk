@@ -185,6 +185,36 @@ public class WallPostController extends HttpServlet {
                     appLoginCredentialModel.setId(Integer.parseInt(tagList[i].tag_id));
                     if(appLoginCredentialModel.isIdExist()) {
                         taggedListFromJson.add(tagList[i]);
+
+
+                        //**********wallpost tag notification *******///
+                        WallPostModel wallPostModel = new WallPostModel();
+
+                        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                        WallPost wallPost = new WallPost();
+
+                        wallPost = wallPostModel.getById();
+
+                        String likerName;
+
+                        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                        pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+
+                        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                        wallPost = wallPostModel.getById();
+
+
+                        NotificationModel notificationModel = new NotificationModel();
+
+                        notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+                        notificationModel.setOwnerId(wallPost.owner.id);
+                        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+                        notificationModel.insertPostTag();
+
                     }
                     else{
                         System.out.println("this is id doesn't exists ");
@@ -619,6 +649,35 @@ public class WallPostController extends HttpServlet {
         //wallPostModel.setCommentCount(postCommentModel.getCountByPostId());
 
         //System.out.println("comment count :"+wallPostModel.getCommentCount());
+
+
+
+        ////////////////****** Post Comment Notification ***********////////
+
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        WallPost wallPost = new WallPost();
+
+        wallPost = wallPostModel.getById();
+
+        String likerName;
+
+        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+        pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        wallPost = wallPostModel.getById();
+
+
+        NotificationModel notificationModel = new NotificationModel();
+
+        notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+        notificationModel.setOwnerId(wallPost.owner.id);
+        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+        notificationModel.insertPostComment();
 
         baseController.serviceResponse.responseStat.msg = "Comment posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();
