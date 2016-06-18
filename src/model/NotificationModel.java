@@ -27,7 +27,7 @@ public class NotificationModel extends ImageTalkBaseModel {
     private int is_read;
     private String data_object;
     private String created_date;
-    private static String[] actionTagNames = {"likepost","addpost"};
+    private static String[] actionTagNames = {"likepost","addpost","commentPost","tag"};
     private static String[] sourceTagNames = {"wallpost","comment"};
 
     private Gson gson;
@@ -183,6 +183,59 @@ public class NotificationModel extends ImageTalkBaseModel {
         notification.id = this.insert();
 
     }
+
+    //post comment notification
+
+    public void insertPostComment()
+    {
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(this.source_id);
+
+        Notification notification = new Notification();
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setId(this.person_app_id);
+
+        notification.person = appLoginCredentialModel.getAppCredentialById();
+        notification.actionTag = NotificationModel.actionTagNames[2];
+        notification.sourceClass = NotificationModel.sourceTagNames[0];
+        notification.isRead = false;
+        notification.source = wallPostModel.getById();
+
+        this.setSource_class(notification.sourceClass);
+        this.setAction_tag(notification.actionTag);
+        this.data_object = this.gson.toJson(notification);
+
+        notification.id = this.insert();
+
+    }
+
+
+    public void insertPostTag()
+    {
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(this.source_id);
+
+        Notification notification = new Notification();
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setId(this.person_app_id);
+
+        notification.person = appLoginCredentialModel.getAppCredentialById();
+        notification.actionTag = NotificationModel.actionTagNames[3];
+        notification.sourceClass = NotificationModel.sourceTagNames[0];
+        notification.isRead = false;
+        notification.source = wallPostModel.getById();
+
+        this.setSource_class(notification.sourceClass);
+        this.setAction_tag(notification.actionTag);
+        this.data_object = this.gson.toJson(notification);
+
+        notification.id = this.insert();
+
+    }
+
+
     public boolean updateToRead(){
         String query = "UPDATE " + this.tableName + "  SET is_read=1 WHERE owner_id = "+this.owner_id +" and id="+this.id;
         return this.updateData(query);

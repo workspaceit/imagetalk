@@ -2,6 +2,8 @@ package controller.service;
 
 import com.google.gson.*;
 
+import com.notnoop.apns.APNS;
+import com.notnoop.apns.ApnsService;
 import controller.thirdparty.google.geoapi.GoogleGeoApi;
 import helper.ImageHelper;
 import helper.PushNotificationHelper;
@@ -18,7 +20,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.DeflaterInputStream;
 
 /**
@@ -82,6 +86,10 @@ public class WallPostController extends HttpServlet {
             case "/app/wallpost/test":
                 pw.print(this.test(req));
                 break;
+            case "/app/wallpost/test/push":
+                pw.print(this.testPush(req));
+                break;
+
             case "/app/wallpost/create/comment":
                 pw.print(this.creatComment(req));
                 break;
@@ -185,6 +193,36 @@ public class WallPostController extends HttpServlet {
                     appLoginCredentialModel.setId(Integer.parseInt(tagList[i].tag_id));
                     if(appLoginCredentialModel.isIdExist()) {
                         taggedListFromJson.add(tagList[i]);
+
+
+                        //**********wallpost tag notification *******///
+                        WallPostModel wallPostModel = new WallPostModel();
+
+                        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                        WallPost wallPost = new WallPost();
+
+                        wallPost = wallPostModel.getById();
+
+                        String likerName;
+
+                        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                        pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+                        PushNotificationHelper.alertBody = likerName+" Tagged you in a post";
+                        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                        wallPost = wallPostModel.getById();
+
+
+                        NotificationModel notificationModel = new NotificationModel();
+
+                        notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+                        notificationModel.setOwnerId(wallPost.owner.id);
+                        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+                        notificationModel.insertPostTag();
+
                     }
                     else{
                         System.out.println("this is id doesn't exists ");
@@ -620,6 +658,37 @@ public class WallPostController extends HttpServlet {
 
         //System.out.println("comment count :"+wallPostModel.getCommentCount());
 
+
+
+        ////////////////****** Post Comment Notification ***********////////
+
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        WallPost wallPost = new WallPost();
+
+        wallPost = wallPostModel.getById();
+
+        System.out.println("wallpost comment count :" + wallPost.commentCount);
+        String likerName;
+
+        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+        pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+        PushNotificationHelper.alertBody = likerName+"commented on your post";
+
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        wallPost = wallPostModel.getById();
+
+
+        NotificationModel notificationModel = new NotificationModel();
+
+        notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+        notificationModel.setOwnerId(wallPost.owner.id);
+        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+        notificationModel.insertPostComment();
+
         baseController.serviceResponse.responseStat.msg = "Comment posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();
         //this.pw.print(this.baseController.getResponse());
@@ -676,7 +745,7 @@ public class WallPostController extends HttpServlet {
                 PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
                 likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
                 pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
-
+                PushNotificationHelper.alertBody = "Your post is liked by "+likerName;
 
 
                 wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
@@ -959,7 +1028,7 @@ public class WallPostController extends HttpServlet {
 
         Gson gson = new com.google.gson.Gson();
         com.google.gson.JsonObject tagged = gson.fromJson(tag,JsonElement.class).getAsJsonObject();
-        System.out.println("JSon object  :"+ tagged.toString());
+        System.out.println("JSon object  :" + tagged.toString());
 
         TagJson[] tagList = gson.fromJson(tagged.get("tagged_id_list"),TagJson[].class);
 
@@ -1405,6 +1474,33 @@ public class WallPostController extends HttpServlet {
         baseController.serviceResponse.responseStat.msg = "No Reply Found !";
         baseController.serviceResponse.responseStat.status = false;
         return baseController.getResponse();
+    }
+
+    public String testPush(HttpServletRequest req){
+        try{
+            ApnsService service =
+                    APNS.newService()
+                        .withCert("/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagePush.p12", "wsit97480")
+                        .withProductionDestination()
+                        .build();
+
+            System.setProperty("https.protocols", "TLSv1");
+            System.out.println("push  ..... test");
+            String payload = APNS.newPayload().alertBody("hfghffgfhf").sound("default").badge(1).build();
+            //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
+            String token = "866d0ea33cb36a2d65965a550acf4df98aed59f572952eaff5ded4356a3198da";
+            service.push(token, payload);
+
+            Map<String, Date> inactiveDevices = service.getInactiveDevices();
+            for (String deviceToken : inactiveDevices.keySet()) {
+                Date inactiveAsOf = inactiveDevices.get(deviceToken);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        System.out.println("push  ..... ");
+
+        return "waer";
     }
 
 }

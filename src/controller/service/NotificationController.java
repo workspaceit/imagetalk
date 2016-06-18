@@ -65,6 +65,9 @@ public class NotificationController extends HttpServlet {
             case "/app/user/notification/set/read":
                 pw.print(this.setNotificationIsRead(req));
                 break;
+            case "/app/user/notification/delete":
+                pw.print(this.deleteNotification(req));
+                break;
             case "/app/user/notification/test":
                 pw.print(this.insertNotification(req));
                 break;
@@ -229,6 +232,16 @@ public class NotificationController extends HttpServlet {
         }
 
         baseController.serviceResponse.responseStat.msg = "Successfully updated";
+        return baseController.getResponse();
+    }
+
+    private String deleteNotification(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+
+
+        baseController.serviceResponse.responseStat.msg = "Successfully deleted notification";
         return baseController.getResponse();
     }
 
