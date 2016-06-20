@@ -1138,6 +1138,34 @@ public class ContactModel extends ImageTalkBaseModel {
         return true;
     }
 
+    public boolean addSingleContact(){
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+            appLoginCredentialModel.setId(this.contact_id);
+            if(this.contact_id == this.owner_id){
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "You are not allowed to add yourself in contact";
+                return false;
+            }
+            if(!appLoginCredentialModel.isIdExist()){
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Contact id ' "+this.contact_id +" ' not found in system";
+                return false;
+            }
+            if(this.isExist()){
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Already in contact list, id "+this.contact_id;
+                return false;
+            }
+            if(this.insert()==0){
+                this.errorObj.errStatus = false;
+                this.errorObj.msg = "Internal server error";
+                return false;
+            }
+
+        return true;
+    }
+
     public boolean addReverseContact(){
         this.startTransaction();
         AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
@@ -1175,6 +1203,40 @@ public class ContactModel extends ImageTalkBaseModel {
         return true;
     }
 
+    public boolean addReverseSingleContact(){
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        int tempOwnerId = this.owner_id;
+        this.setOwner_id(this.contact_id);
+        this.setContact_id(tempOwnerId);
+
+        appLoginCredentialModel.setId(this.contact_id);
+        if(this.contact_id == this.owner_id){
+
+            this.errorObj.errStatus = false;
+            this.errorObj.msg = "You are not allowed to add yourself in contact";
+            return false;
+        }
+        if(!appLoginCredentialModel.isIdExist()){
+
+            this.errorObj.errStatus = false;
+            this.errorObj.msg = "Contact id ' "+this.contact_id +" ' not found in system";
+            return false;
+        }
+        if(this.isExist()){
+
+            this.errorObj.errStatus = false;
+            this.errorObj.msg = "Already in contact list, id "+this.contact_id;
+            return false;
+        }
+        if(this.insert()==0){
+            this.errorObj.errStatus = false;
+            this.errorObj.msg = "Internal server error";
+            return false;
+        }
+
+        return true;
+    }
 
     public boolean removeContact(){
         this.startTransaction();

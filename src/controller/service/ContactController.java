@@ -1,10 +1,14 @@
 package controller.service;
 
 import com.google.gson.Gson;
+import helper.PushNotificationHelper;
 import model.AppLoginCredentialModel;
 import model.ContactModel;
+import model.NotificationModel;
+import model.WallPostModel;
 import model.datamodel.app.AppCredential;
 import model.datamodel.app.Contact;
+import model.datamodel.app.WallPost;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -54,6 +58,9 @@ public class ContactController extends HttpServlet {
                 break;
             case "/app/contact/add":
                 pw.print(this.addContacts(req));
+                break;
+            case "/app/contact/add/single":
+                pw.print(this.addSingleContact(req));
                 break;
             case "/app/contact/remove":
                 pw.print(this.removeContacts(req));
@@ -122,7 +129,7 @@ public class ContactController extends HttpServlet {
         baseController.serviceResponse.responseData = respObj ;
 
         System.out.println("respObj Size" + respObj.size());
-        System.out.println("respObj str"+respObj.toString());
+        System.out.println("respObj str" + respObj.toString());
         return baseController.getResponse();
 
     }
@@ -167,6 +174,106 @@ public class ContactController extends HttpServlet {
         return baseController.getResponse();
 
     }
+
+    private String addSingleContact(HttpServletRequest req)
+    {
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        if(!baseController.checkParam("app_login_credential_id", req, true)) {
+
+            baseController.serviceResponse.responseStat.msg = "app_login_credential_id required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        ContactModel contactModel = new ContactModel();
+
+        contactModel.setContact_id(Integer.parseInt(req.getParameter("app_login_credential_id")));
+
+        contactModel.setOwner_id(baseController.appCredential.id);
+        //contactModel.setContactIdList(contactIdList);
+
+        if(!contactModel.addSingleContact()){
+            baseController.serviceResponse.responseStat.status = false;
+            baseController.serviceResponse.responseStat.msg = contactModel.errorObj.msg;
+            return baseController.getResponse();
+        }
+        contactModel.addReverseSingleContact();
+
+        //Contact Add notification
+        String likerName;
+
+        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+        PushNotificationHelper.alertBody = likerName+ " Added you to his friend List";
+        pushNotificationHelper.contactAddNotification(baseController.appCredential.user.id);
+
+
+        NotificationModel notificationModel = new NotificationModel();
+        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+        notificationModel.insertAddContact();
+
+        /*********************** sending notification to all friends *************************/
+
+        contactModel.setOwner_id(baseController.appCredential.id);
+
+        ArrayList<Contact> contactList = new ArrayList<Contact>();
+
+        contactList = contactModel.getContactByOwnerId();
+
+        String name,friendName;
+
+        for(int i=0;i<contactList.size();i++){
+
+            name = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+            friendName = contactList.get(i).user.firstName+ " "+ contactList.get(i).user.lastName;
+
+            PushNotificationHelper.alertBody = name+ " and "+friendName+" now friend's";
+            pushNotificationHelper.contactAddNotification(contactList.get(i).user.id);
+
+            notificationModel.setPerson_app_id(contactList.get(i).id);
+
+            notificationModel.insertAddContact();
+        }
+
+        /*****************contacts of that person who is added**********************/
+
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+
+        AppCredential appCredential= new AppCredential();
+
+        appLoginCredentialModel.setId(Integer.parseInt(req.getParameter("app_login_credential_id")));
+
+        appCredential = appLoginCredentialModel.getAppCredentialById();
+
+        contactModel.setOwner_id(appCredential.id);
+
+        contactList = contactModel.getContactByOwnerId();
+
+
+        for(int i=0;i<contactList.size();i++){
+
+            if(contactList.get(i).id != baseController.appCredential.id) {
+                name = appCredential.user.firstName + " " + appCredential.user.lastName;
+                friendName = contactList.get(i).user.firstName + " " + contactList.get(i).user.lastName;
+
+                PushNotificationHelper.alertBody = name + " and " + friendName + " now friend's";
+                pushNotificationHelper.contactAddNotification(contactList.get(i).user.id);
+
+                notificationModel.setPerson_app_id(contactList.get(i).id);
+
+                notificationModel.insertAddContact();
+            }
+        }
+
+        baseController.serviceResponse.responseStat.msg = "Contact is added successfully";
+        return baseController.getResponse();
+
+    }
+
+
     private String removeContacts(HttpServletRequest req){
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
         ArrayList<Integer> contactIdList = new ArrayList();

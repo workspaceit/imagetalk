@@ -271,6 +271,7 @@ public class ImageTalkBaseModel {
         this.query = query;
         int id = 0;
         try {
+            System.out.println("at insert");
             stmt.executeUpdate(this.query, Statement.RETURN_GENERATED_KEYS);
             ResultSet rs = stmt.getGeneratedKeys();
 

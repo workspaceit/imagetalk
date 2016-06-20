@@ -1310,6 +1310,37 @@ public class WallPostController extends HttpServlet {
             return baseController.getResponse();
         }
 
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        WallPost wallPost = new WallPost();
+
+        wallPost = wallPostModel.getById();
+
+        //System.out.println("wallpost comment count :" + wallPost.commentCount);
+        String likerName;
+
+        PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+        likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+        PushNotificationHelper.alertBody = likerName+" Replied in you comment";
+        if(wallPost.owner.id != baseController.appCredential.id) {
+            pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+        }
+
+        wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+        wallPost = wallPostModel.getById();
+
+
+        NotificationModel notificationModel = new NotificationModel();
+
+        notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
+        notificationModel.setOwnerId(wallPost.owner.id);
+        notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+        if(wallPost.owner.id != baseController.appCredential.id) {
+            notificationModel.insertCommentReply();
+        }
+
         baseController.serviceResponse.responseStat.msg = "Comment Reply posted";
         baseController.serviceResponse.responseData = postCommentModel.getByPostId();
         //this.pw.print(this.baseController.getResponse());

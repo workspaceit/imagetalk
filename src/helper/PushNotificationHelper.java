@@ -78,4 +78,50 @@ public class PushNotificationHelper {
 
 
     }
+
+    public void contactAddNotification(int userId){
+
+
+
+        UserInfModel userInfModel = new UserInfModel();
+        User user= new User();
+
+        userInfModel.setId(userId);
+
+        user = userInfModel.getById();
+
+        String deviceId = user.deviceId;
+
+        System.out.println("user Id : " + userId);
+        if(deviceId == "" || deviceId ==null)
+        {
+            return;
+        }
+
+        //PushNotificationHelper.alertBody = "Your post is liked by "+likerName;
+        PushNotificationHelper.badgeNo = 1;
+
+        try{
+            ApnsService service =
+                    APNS.newService()
+                        .withCert(PushNotificationHelper.certificatePath, "wsit97480")
+                        .withProductionDestination()
+                        .build();
+
+            System.setProperty("https.protocols", "TLSv1");
+            System.out.println("push test");
+            String payload = APNS.newPayload().alertBody(PushNotificationHelper.alertBody).sound("default").badge(PushNotificationHelper.badgeNo).build();
+            //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
+            String token = deviceId;
+            service.push(token, payload);
+
+            Map<String, Date> inactiveDevices = service.getInactiveDevices();
+            for (String deviceToken : inactiveDevices.keySet()) {
+                Date inactiveAsOf = inactiveDevices.get(deviceToken);
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return;
+        }
+    }
 }

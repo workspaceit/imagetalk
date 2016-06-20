@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import helper.ImageHelper;
 import model.ActivationModel;
 import model.AppLoginCredentialModel;
+import model.ContactModel;
 import model.UserInfModel;
 import model.datamodel.app.AuthCredential;
+import model.datamodel.app.Contact;
 import model.datamodel.photo.Pictures;
 
 import javax.servlet.ServletException;
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Created by mi on 10/1/15.
@@ -260,6 +263,25 @@ public class AppUserRegistration extends HttpServlet {
        // appLoginCredentialModel.commitTransaction();
         AuthCredential authCredential = new AuthCredential();
         authCredential = appLoginCredentialModel.getAppCredentialById();
+
+        String keyword = "";
+        ContactModel contactModel = new ContactModel();
+        contactModel.setKeyword(keyword);
+        contactModel.setOwner_id(authCredential.id);
+        contactModel.setLimit(50);
+        contactModel.setOffset(0);
+
+        System.out.println("user app cred id after registration :" + authCredential.id);
+
+        ArrayList<Contact> contacts = new ArrayList<Contact>();
+
+        contacts = contactModel.getWhoHasMyContactByOwnerId();
+
+        /*for(int i=0;i<contacts.size();i++)
+        {
+           contacts.get(i).id; // id of the owner of the contact list
+        }*/
+
 
         baseController.setAppSession(req, authCredential);
 

@@ -27,7 +27,7 @@ public class NotificationModel extends ImageTalkBaseModel {
     private int is_read;
     private String data_object;
     private String created_date;
-    private static String[] actionTagNames = {"likepost","addpost","commentPost","tag"};
+    private static String[] actionTagNames = {"likepost","addpost","commentPost","tag","commentReply","addContact"};
     private static String[] sourceTagNames = {"wallpost","comment"};
 
     private Gson gson;
@@ -235,6 +235,49 @@ public class NotificationModel extends ImageTalkBaseModel {
 
     }
 
+    public void insertCommentReply()
+    {
+        WallPostModel wallPostModel = new WallPostModel();
+        wallPostModel.setId(this.source_id);
+
+        Notification notification = new Notification();
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setId(this.person_app_id);
+
+        notification.person = appLoginCredentialModel.getAppCredentialById();
+        notification.actionTag = NotificationModel.actionTagNames[4];
+        notification.sourceClass = NotificationModel.sourceTagNames[0];
+        notification.isRead = false;
+        notification.source = wallPostModel.getById();
+
+        this.setSource_class(notification.sourceClass);
+        this.setAction_tag(notification.actionTag);
+        this.data_object = this.gson.toJson(notification);
+
+        notification.id = this.insert();
+
+    }
+
+    public void insertAddContact()
+    {
+
+        Notification notification = new Notification();
+
+        AppLoginCredentialModel appLoginCredentialModel = new AppLoginCredentialModel();
+        appLoginCredentialModel.setId(this.person_app_id);
+
+        notification.person = appLoginCredentialModel.getAppCredentialById();
+        notification.actionTag = NotificationModel.actionTagNames[5];
+        notification.sourceClass = " ";
+        notification.isRead = false;
+        this.setAction_tag(notification.actionTag);
+        this.data_object = this.gson.toJson(notification);
+
+        notification.id = this.insert();
+
+    }
+
 
     public boolean updateToRead(){
         String query = "UPDATE " + this.tableName + "  SET is_read=1 WHERE owner_id = "+this.owner_id +" and id="+this.id;
@@ -242,10 +285,10 @@ public class NotificationModel extends ImageTalkBaseModel {
     }
     public int insert()
     {
-
         String query = "INSERT INTO " + this.tableName + " (`owner_id`,`person_app_id`,`source_id`,`source_class`,`action_tag`,`is_read`,`data_object`,`created_date`) " +
                 "VALUES("+this.owner_id +","+this.person_app_id+","+this.source_id+",'"+this.source_class+"','"+this.action_tag +"',"+this.is_read+",'"+this.data_object+"','"+this.getUtcDateTime() +"')";
 
+        System.out.println("notification query :" + query);
 
         this.id = this.insertData(query);
         return this.id;
