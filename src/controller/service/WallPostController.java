@@ -737,31 +737,38 @@ public class WallPostController extends HttpServlet {
                 return baseController.getResponse();
             }else{
 
+
                 WallPostModel wallPostModel = new WallPostModel();
-                wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
-
-                wallPost = wallPostModel.getById();
-
-                PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
-                likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
-                pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
-                PushNotificationHelper.alertBody = "Your post is liked by "+likerName;
-
-
-                wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
-
-                wallPost = wallPostModel.getById();
-
-
                 NotificationModel notificationModel = new NotificationModel();
 
+                wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+                wallPost = wallPostModel.getById();
                 notificationModel.setSource_id(Integer.parseInt(req.getParameter("post_id")));
                 notificationModel.setOwnerId(wallPost.owner.id);
                 notificationModel.setPerson_app_id(baseController.appCredential.id);
 
-                notificationModel.insertPostLike();
+                if(notificationModel.isExist())
+                {
+                    baseController.serviceResponse.responseStat.msg = "notification already exist";
+                    baseController.serviceResponse.responseStat.status = false;
+                    baseController.serviceResponse.responseData = notificationModel.isExist();
+                    return baseController.getResponse();
+                }
+
+                //if(!notificationModel.isExist()){
+                    PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                    likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                    pushNotificationHelper.likeNotification(Integer.parseInt(req.getParameter("post_id")), likerName);
+                    PushNotificationHelper.alertBody = "Your post is liked by "+likerName;
 
 
+                    wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
+
+
+                    notificationModel.insertPostLike();
+
+                //}
                 msg = "Successfully liked";
                 isLiked = true;
             }

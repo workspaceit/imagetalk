@@ -278,6 +278,37 @@ public class NotificationModel extends ImageTalkBaseModel {
 
     }
 
+    public boolean isExist(){
+
+        //SELECT COUNT(*) FROM `notification` WHERE action_tag='likepost' AND source_class='wallpost' AND source_id=1313 AND owner_id = 121
+
+        String query = "SELECT COUNT(id) as count FROM `notification` WHERE action_tag='"+NotificationModel.actionTagNames[0]+"' AND source_class='"+
+                       NotificationModel.sourceTagNames[0]+"' AND source_id="+this.source_id+ " AND person_app_id="+this.person_app_id;
+
+        System.out.println("notification quey " + query);
+        int count=0;
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+
+                count = this.resultSet.getInt("count");
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+
+        //System.out.println("count of: "+count);
+        if(count==1){
+            return true;
+        }
+        return false;
+
+    }
+
 
     public boolean updateToRead(){
         String query = "UPDATE " + this.tableName + "  SET is_read=1 WHERE owner_id = "+this.owner_id +" and id="+this.id;
