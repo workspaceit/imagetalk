@@ -47,7 +47,7 @@ public class AdminChatServerController extends HttpServlet{
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json");
 
-        String url = req.getRequestURI().toString();
+        String url = req.getRequestURI();
         ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         PrintWriter pw = resp.getWriter();
