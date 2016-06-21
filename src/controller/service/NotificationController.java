@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -203,8 +204,9 @@ public class NotificationController extends HttpServlet {
 
 
         notificationModel.setOwnerId(baseController.appCredential.id);
-
-        baseController.serviceResponse.responseData  = notificationModel.getRecentNotification();
+        ArrayList<Notification> notifications = notificationModel.getRecentNotification();
+        baseController.serviceResponse.responseStat.status = (notifications.size()>0)?true:false;
+        baseController.serviceResponse.responseData  = notifications;
 
         return baseController.getResponse();
     }
