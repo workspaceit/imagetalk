@@ -750,10 +750,11 @@ public class WallPostController extends HttpServlet {
 
                 if(notificationModel.isExist())
                 {
-                    baseController.serviceResponse.responseStat.msg = "notification already exist";
-                    baseController.serviceResponse.responseStat.status = false;
-                    baseController.serviceResponse.responseData = notificationModel.isExist();
-                    return baseController.getResponse();
+                    if(notificationModel.delete()==0){
+                        baseController.serviceResponse.responseStat.msg = "Database error on delete notification";
+                        baseController.serviceResponse.responseStat.status = false;
+                        return baseController.getResponse();
+                    }
                 }
 
                 //if(!notificationModel.isExist()){
@@ -1518,15 +1519,15 @@ public class WallPostController extends HttpServlet {
         try{
             ApnsService service =
                     APNS.newService()
-                        .withCert("/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagePush.p12", "wsit97480")
-                        .withProductionDestination()
+                        .withCert("/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagetalkPush.p12", "wsit97480")
+                        .withSandboxDestination()
                         .build();
 
-            System.setProperty("https.protocols", "TLSv1");
+            //System.setProperty("https.protocols", "TLSv1");
             System.out.println("push  ..... test");
-            String payload = APNS.newPayload().alertBody("hfghffgfhf").sound("default").badge(1).build();
+            String payload = APNS.newPayload().alertBody("hello !").sound("default").badge(1).build();
             //{"aps":{"alert":"This is test.. (9)","badge":1,"sound":"default"}}
-            String token = "866d0ea33cb36a2d65965a550acf4df98aed59f572952eaff5ded4356a3198da";
+            String token = "5a968b402039a40f57f2b0cf63de34f22fbf2ae0fde442a98d1b5d4f8996f15a";
             service.push(token, payload);
 
             Map<String, Date> inactiveDevices = service.getInactiveDevices();

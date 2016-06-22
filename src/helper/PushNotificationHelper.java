@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class PushNotificationHelper {
 
-    public static String certificatePath = "/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagePush.p12";
+    public static String certificatePath = "/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagetalkPush.p12";
 
     public static String alertBody;
     public static String deviceToken;
@@ -57,7 +57,7 @@ public class PushNotificationHelper {
             ApnsService service =
                     APNS.newService()
                             .withCert(PushNotificationHelper.certificatePath, "wsit97480")
-                            .withProductionDestination()
+                            .withSandboxDestination()
                             .build();
 
             System.setProperty("https.protocols", "TLSv1");

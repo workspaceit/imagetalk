@@ -309,6 +309,11 @@ public class NotificationModel extends ImageTalkBaseModel {
 
     }
 
+    public int delete(){
+        String query ="DELETE FROM `notification` where action_tag = 'likepost' AND source_id="+this.source_id+" " +
+                      "AND person_app_id="+this.person_app_id+" AND owner_id="+this.owner_id;
+        return  this.deleteData(query);
+    }
 
     public boolean updateToRead(){
         String query = "UPDATE " + this.tableName + "  SET is_read=1 WHERE owner_id = "+this.owner_id +" and id="+this.id;
