@@ -1173,21 +1173,23 @@ public class ServiceThread extends Thread {
     }
     private void saveInChatHistory(String chatId,int senderId,int receiverId,String textMsg){
 
-        class DbOperationThread extends Thread{
-            @Override
-            public void run() {
-                ChatHistoryModel chatHistory = new ChatHistoryModel();
-                chatHistory.setChat_id(chatId);
-                chatHistory.setTo(receiverId);
-                chatHistory.setType(ChatHistoryModel.type_txtChat);
-                chatHistory.setFrom(senderId);
-                chatHistory.setChat_text(textMsg);
-                if(chatHistory.insert()<=0){
-                    sendError(chatId,"Unable to handle Smile from IOS device");
-                }
-            }
-        };
-        new DbOperationThread().start();
+//        class DbOperationThread extends Thread{
+//            @Override
+//            public void run() {
+//
+//            }
+//        };
+//        new DbOperationThread().start();
+
+        ChatHistoryModel chatHistory = new ChatHistoryModel();
+        chatHistory.setChat_id(chatId);
+        chatHistory.setTo(receiverId);
+        chatHistory.setType(ChatHistoryModel.type_txtChat);
+        chatHistory.setFrom(senderId);
+        chatHistory.setChat_text(textMsg);
+        if(chatHistory.insert()<=0){
+            sendError(chatId,"Unable to handle Smile from IOS device");
+        }
     }
     private void saveContactShare(String chatId,int senderId,int receiverId,ContactShare contactShare){
 

@@ -352,7 +352,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             this.offset = this.offset * this.limit;
             query += " LIMIT " + this.offset + " ," + this.limit + " ";
         }
-
+        System.out.println(query);
         this.setQuery(query);
         this.getData();
         try{
