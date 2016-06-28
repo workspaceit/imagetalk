@@ -194,9 +194,8 @@ public class WallPostController extends HttpServlet {
                     if(appLoginCredentialModel.isIdExist()) {
                         taggedListFromJson.add(tagList[i]);
 
-
                         //**********wallpost tag notification *******///
-                        WallPostModel wallPostModel = new WallPostModel();
+                        /*WallPostModel wallPostModel = new WallPostModel();
 
                         wallPostModel.setId(Integer.parseInt(req.getParameter("post_id")));
 
@@ -221,8 +220,7 @@ public class WallPostController extends HttpServlet {
                         notificationModel.setOwnerId(wallPost.owner.id);
                         notificationModel.setPerson_app_id(baseController.appCredential.id);
 
-                        notificationModel.insertPostTag();
-
+                        notificationModel.insertPostTag();*/
                     }
                     else{
                         System.out.println("this is id doesn't exists ");
@@ -364,6 +362,34 @@ public class WallPostController extends HttpServlet {
 
         for(int i=0;i<taggedListFromJson.size();i++)
         {
+
+            //**********wallpost tag notification *******///
+
+            wallPostModel.setId(wallPostModel.getId());
+
+            WallPost wallPost = new WallPost();
+
+            wallPost = wallPostModel.getById();
+
+            String likerName;
+
+            PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+            likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+            pushNotificationHelper.likeNotification(wallPostModel.getId(), likerName);
+            PushNotificationHelper.alertBody = likerName+" Tagged you in a post";
+            wallPostModel.setId(wallPostModel.getId());
+
+            wallPost = wallPostModel.getById();
+
+
+            NotificationModel notificationModel = new NotificationModel();
+
+            notificationModel.setSource_id(wallPostModel.getId());
+            notificationModel.setOwnerId(wallPost.owner.id);
+            notificationModel.setPerson_app_id(baseController.appCredential.id);
+
+            notificationModel.insertPostTag();
+
             tagListModel.setPost_id(wallPostModel.getId());
             tagListModel.setTag_id(Integer.parseInt(taggedListFromJson.get(i).tag_id));
             tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_x));
