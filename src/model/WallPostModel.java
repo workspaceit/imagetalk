@@ -724,7 +724,7 @@ public class WallPostModel extends ImageTalkBaseModel{
                 }
                 //end job details
 
-                //wallPost = this.getOtherDependency(wallPost);
+                wallPost = this.getOtherDependency(wallPost);
 
 
                 wallPostList.add(wallPost);
