@@ -365,21 +365,17 @@ public class WallPostController extends HttpServlet {
 
             //**********wallpost tag notification *******///
 
-            wallPostModel.setId(wallPostModel.getId());
-
-            WallPost wallPost = new WallPost();
-
-            wallPost = wallPostModel.getById();
+            WallPost wallPost =wallPostModel.getById();
 
             String likerName;
-
-            PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
-            likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
-            pushNotificationHelper.likeNotification(wallPostModel.getId(), likerName);
-            PushNotificationHelper.alertBody = likerName+" Tagged you in a post";
-            wallPostModel.setId(wallPostModel.getId());
-
-            wallPost = wallPostModel.getById();
+            try{
+                PushNotificationHelper pushNotificationHelper = new PushNotificationHelper();
+                likerName = baseController.appCredential.user.firstName+" "+baseController.appCredential.user.lastName;
+                pushNotificationHelper.likeNotification(wallPostModel.getId(), likerName);
+                PushNotificationHelper.alertBody = likerName+" Tagged you in a post";
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
 
 
             NotificationModel notificationModel = new NotificationModel();
@@ -395,6 +391,8 @@ public class WallPostController extends HttpServlet {
             tagListModel.setOriginX(Double.parseDouble(taggedListFromJson.get(i).origin_x));
             tagListModel.setOriginY(Double.parseDouble(taggedListFromJson.get(i).origin_y));
             tagListModel.setTagMessage(taggedListFromJson.get(i).tag_message);
+
+
             if(tagListModel.insert()>0)
             {
                 System.out.println("wallpost id: " +wallPostModel.getId());
