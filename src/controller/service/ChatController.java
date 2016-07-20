@@ -81,6 +81,10 @@ public class ChatController extends HttpServlet {
             case "/app/user/chat/private/photo/snapshot/confirm":
                 pw.print(this.confirmTakeSnapshot(req));
                 break;
+            case "/app/user/chat/delete/conversation":
+                pw.print(this.deleteAllConversation(req));
+                break;
+
             default:
                 break;
         }
@@ -222,7 +226,52 @@ public class ChatController extends HttpServlet {
         return baseController.getResponse();
 
     }
+    private String deleteAllConversation(HttpServletRequest req){
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
+        ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
+
+        int to;
+
+        if(!baseController.checkParam("to",req,true))
+        {
+            baseController.serviceResponse.responseStat.msg = "receiver id is required";
+            baseController.serviceResponse.responseStat.status = false;
+            //this.pw.print(this.baseController.getResponse());
+            return baseController.getResponse();
+        }
+        else
+        {
+            try{
+                to = Integer.parseInt(req.getParameter("to"));
+            }
+            catch (Exception e)
+            {
+                baseController.serviceResponse.responseStat.msg = "receiver id must be int";
+                baseController.serviceResponse.responseStat.status = false;
+                // this.pw.print(this.baseController.getResponse());
+                e.printStackTrace();
+                return baseController.getResponse();
+            }
+        }
+        chatHistoryModel.setFrom(baseController.appCredential.id);
+        chatHistoryModel.setTo(to);
+        chatHistoryModel.setCurrentUserId(baseController.appCredential.id);
+
+        if(chatHistoryModel.deleteAllConversation()){
+            baseController.serviceResponse.responseStat.msg = "Successfully conversation deleted";
+            baseController.serviceResponse.responseStat.status = true;
+            //this.pw.print(this.baseController.getResponse());
+
+            return baseController.getResponse();
+        }
+        baseController.serviceResponse.responseStat.msg = "Internal server error";
+        baseController.serviceResponse.responseStat.status = true;
+        //this.pw.print(this.baseController.getResponse());
+
+        return baseController.getResponse();
+
+    }
     private String showChat(HttpServletRequest req) {
         ImageTalkBaseController baseController = new ImageTalkBaseController(req);
 
@@ -545,7 +594,7 @@ public class ChatController extends HttpServlet {
         }
 
         baseController.serviceResponse.responseStat.status=false;
-        baseController.serviceResponse.responseStat.msg = "Problem with app credential";
+        baseController.serviceResponse.responseStat.msg = "No chat history found on this id";
         return baseController.getResponse();
 
     }

@@ -340,13 +340,19 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         String query = "DELETE FROM " + this.tableName + "  WHERE `id`="+this.id;
         return this.updateData(query);
     }
+    public boolean deleteAllConversation(){
+        String query = "update chat_history set `deleted_to`=1,`deleted_from`=1 WHERE ( `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+" ) ";
+        return this.updateData(query);
+    }
     public ArrayList<Chat> getChatHistory()
     {
         ArrayList<Chat> chatList = new ArrayList<>();
         String query = "SELECT chat_history.* FROM `chat_history` " +
                 "WHERE ( `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+" ) "+
-                " AND is_deleted = 0 ORDER BY id DESC";
+                " AND is_deleted = 0  ";
 
+        query += " AND ( ( `to`="+this.getCurrentUserId()+" AND `deleted_to`=0 ) OR  ( `from`="+this.getCurrentUserId()+" AND `deleted_from`=0 ) ) ";
+        query += " ORDER BY id DESC ";
         if(this.limit>0)
         {
             this.offset = this.offset * this.limit;
@@ -792,7 +798,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
     public boolean updateDelete(){
 
-        String query = "Select chat_history.to,chat_history.from from chat_history where chat_id="+this.getChat_id();
+        String query = "Select chat_history.to,chat_history.from from chat_history where chat_id="+this.getChat_id()+" and ( chat_history.from="+this.getCurrentUserId()+" or chat_history.to="+this.getCurrentUserId()+" )";
         this.setQuery(query);
         this.getData();
         try {
@@ -809,22 +815,31 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
         /*System.out.println("From id :"+this.from+" To Id:"+this.to);
         System.out.println("Current user : " + this.getCurrentUserId());*/
 
-        if(this.from == getCurrentUserId()){
-            String updateQuery = "Update chat_history set deleted_from=1 where chat_history.from="+this.from;
-            this.setQuery(updateQuery);
-            if(this.updateData(updateQuery))
-            {
-                return true;
-            }
-        }
 
-        if(this.to == getCurrentUserId()){
-            String updateQuery = "Update chat_history set deleted_to=1 where chat_history.to="+this.to;
-            this.setQuery(updateQuery);
-            if(this.updateData(updateQuery))
-            {
-                return true;
-            }
+//        if(this.to == getCurrentUserId()){
+//            String updateQuery = "Update chat_history set deleted_to=1 where chat_id="+this.getChat_id();
+//            this.setQuery(updateQuery);
+//            if(this.updateData(updateQuery))
+//            {
+//                return true;
+//            }
+//        }
+//
+//        if(this.from == getCurrentUserId()){
+//            String updateQuery = "Update chat_history set deleted_from=1 where chat_id="+this.getChat_id();
+//            this.setQuery(updateQuery);
+//            if(this.updateData(updateQuery))
+//            {
+//                return true;
+//            }
+//        }
+
+        String updateQuery = "Update chat_history set deleted_to=1,deleted_from=1 where chat_id="+this.getChat_id();
+
+
+        if(this.updateData(updateQuery))
+        {
+            return true;
         }
 
         return false;
