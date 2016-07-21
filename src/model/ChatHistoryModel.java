@@ -215,7 +215,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 //                "VALUES ('"+this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+")";
 //       // System.out.print(query);
       //  this.id = this.insertData(query);
-        final String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status` ) " +
+        final String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status`,`created_date` ) " +
                 "VALUES (?,?,?,?,?,?,?,?,?)";
 
         //this.closeConnection();
@@ -232,6 +232,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
             ps.setInt((int) 7, this.type);
             ps.setString((int) 8, this.getUtcDateTime());
             ps.setInt((int) 9, 0);
+            ps.setString((int)10,this.getUtcDateTime());
      //       this.chat_id+"',"+this.to+","+this.from+","+"'"+this.chat_text+"','"+this.extra+"','"+this.media_path+"',"+this.type+",'"+this.getUtcDateTime()+"',"+this.read_status+"
            System.out.println("Query "+ps.toString());
             ps.executeUpdate();
