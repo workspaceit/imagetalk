@@ -586,7 +586,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
                 " AND is_deleted = 0  ORDER BY ID DESC LIMIT 1";
 
 
-        System.out.println(query);
+
         this.setQuery(query);
         this.getData();
         try{
@@ -752,9 +752,17 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 
         String query = "SELECT IF (`from` = "+this.from+", `to`, `from`) AS recipients"+
         " FROM "+this.tableName+
-        " WHERE "+this.from+" IN (`from`, `to`)"+
+        " WHERE "+this.from+" IN (`from`, `to`) AND ( ( `to`="+this.getCurrentUserId()+" AND `deleted_to`=0 ) OR  ( `from`="+this.getCurrentUserId()+" AND `deleted_from`=0 ) ) AND is_deleted = 0 "+
         " GROUP BY recipients"+
         " ORDER BY MAX(id) DESC";
+
+//        ArrayList<Chat> chatList = new ArrayList<>();
+//        String query = "SELECT chat_history.* FROM `chat_history` " +
+//                "WHERE ( `from` ="+ this.from+" AND `to` ="+ this.to+" OR `from` = "+this.to+" AND `to` = "+this.from+" ) "+
+//                " AND is_deleted = 0  ";
+//
+//        query += " AND ( ( `to`="+this.getCurrentUserId()+" AND `deleted_to`=0 ) OR  ( `from`="+this.getCurrentUserId()+" AND `deleted_from`=0 ) ) ";
+//        query += " ORDER BY id DESC ";
 
         System.out.println(query);
         this.setQuery(query);

@@ -98,6 +98,7 @@ public class ChatController extends HttpServlet {
 
         ChatHistoryModel chatHistoryModel = new ChatHistoryModel();
         chatHistoryModel.setFrom(baseController.appCredential.id);
+        chatHistoryModel.setCurrentUserId(baseController.appCredential.id);
         ArrayList<ChatHistory> chatWithContactArrayList = chatHistoryModel.getChatsWithContact(baseController.appCredential.id);
 
         if (chatWithContactArrayList.size()==0)
