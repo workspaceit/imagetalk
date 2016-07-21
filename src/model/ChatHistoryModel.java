@@ -216,7 +216,7 @@ public class ChatHistoryModel extends ImageTalkBaseModel {
 //       // System.out.print(query);
       //  this.id = this.insertData(query);
         final String query = "INSERT INTO " + this.tableName + " (`chat_id`,`to`,`from`,`chat_text`, `extra`, `media_path`,`type`,`created_date`,`read_status`,`created_date` ) " +
-                "VALUES (?,?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
         //this.closeConnection();
         try {
