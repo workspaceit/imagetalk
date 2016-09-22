@@ -2,6 +2,7 @@ package controller.admin;
 
 import controller.service.ImageTalkBaseController;
 
+import helper.ImageHelper;
 import model.*;
 import model.datamodel.app.Login;
 import org.apache.commons.fileupload.FileItem;
@@ -47,7 +48,7 @@ public class AdminController extends HttpServlet {
         resp.setContentType("application/json");
 
         String url = req.getRequestURI().toString();
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         this.login = new Login();
         PrintWriter pw = resp.getWriter();
 
@@ -433,10 +434,10 @@ public class AdminController extends HttpServlet {
 
     private String uploadImageByAjax(HttpServletRequest req) {
         boolean isMultipart;
-        String  saveDir     = "ImageTalk_sticker/";
+        String  saveDir     = ImageHelper.getStickerFolder();
 //        String  filePath    = "/home/touch/Projects/j2ee/" + saveDir;
-        String  filePath    = "/home/wsit/Projects/j2ee/" + saveDir;
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        String  filePath    = ImageHelper.getStickerGlobalPath() + saveDir;
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         int     maxFileSize = 250 * 1024 * 1024;
         int     maxMemSize  = 10 * 1024 * 1024;
@@ -518,7 +519,7 @@ public class AdminController extends HttpServlet {
     }
 
     private String startChatPushBackServer(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         if(!isChatServerRunning){
             class testRead extends Thread{
 
@@ -536,7 +537,7 @@ public class AdminController extends HttpServlet {
         return baseController.getResponse();
     }
     private String startThriftServer(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         if(!isThriftServerRunning){
 
             try {
@@ -562,7 +563,7 @@ public class AdminController extends HttpServlet {
         return baseController.getResponse();
     }
     private String isThriftServerRunning(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         if(isThriftServerRunning){
             baseController.serviceResponse.responseStat.status = true;
             baseController.serviceResponse.responseStat.msg = "Server is running";
@@ -573,7 +574,7 @@ public class AdminController extends HttpServlet {
         return baseController.getResponse();
     }
     private String isChatServerRunning(HttpServletRequest req){
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
         if(isChatServerRunning){
             baseController.serviceResponse.responseStat.status = true;
             baseController.serviceResponse.responseStat.msg = "Server is running";

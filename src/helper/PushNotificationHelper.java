@@ -23,7 +23,12 @@ import java.util.Map;
  */
 public class PushNotificationHelper {
 
-    public static String certificatePath = "/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagetalkPush.p12";
+
+    /*  ----------- Server -------------- */
+    public static String certificatePath = "/home/push_certificate/imagetalkPush.p12";
+    /*  ----------- Local -------------- */
+  //  public static String certificatePath = "/home/touch/Projects/j2ee/ImageTalk/src/controller/service/src/imagetalkPush.p12";
+
 
     public static String alertBody;
     public static String deviceToken;

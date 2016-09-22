@@ -19,18 +19,24 @@ import java.io.*;
  */
 public class ImageHelper {
     //server settings for pictures and images
-//    private final static String GLOBAL_PATH = "/home/wsit/Projects/j2ee/imagetalk_picture/";
-//    private final static String STICKER_GLOBAL_PATH = "/home/wsit/Projects/j2ee/";
+    private final static String GLOBAL_PATH = "/home/imagetalk_picture/";
+    private final static String STICKER_FOLDER = "ImageTalk_sticker/";
+    private final static String STICKER_GLOBAL_PATH = "/home/";
 
 //      Local settings for pictures and Images
-    private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
-    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
+//    private final static String GLOBAL_PATH = "/home/mi/Projects/j2ee/imagetalk_picture/";
+//    private final static String STICKER_GLOBAL_PATH = "/home/mi/Projects/j2ee/";
 
     public static String getGlobalPath() {
         return GLOBAL_PATH;
     }
     public static String getStickerGlobalPath() {
         return  STICKER_GLOBAL_PATH;
+    }
+
+
+    public static String getStickerFolder() {
+        return STICKER_FOLDER;
     }
 
     public static void createDirIfNotExist(String path) {
