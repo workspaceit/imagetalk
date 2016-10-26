@@ -17,7 +17,7 @@ public class ImageTalkBaseModel {
 //    static final private String timeZoneParam = "?characterEncoding=UTF-8";
 //    static final private String DBUrl = Url_Prefix + "//" + DBHost + "/" + DBName + timeZoneParam; //Url_Prefix + "//" + DBHost + ":" + DBPort + "/" + DBName;
 //    static final private String DBUser = "root";
-//    static final private String DBPassword = "paxcel@123";
+//    static final private String DBPassword = "wsit97480";
 
     static final private String DBDriver = "com.mysql.jdbc.Driver";
     static final private String DBHost = "127.0.0.1";

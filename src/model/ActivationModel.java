@@ -1,5 +1,7 @@
 package model;
 
+import helper.UtilityHelper;
+
 import java.sql.SQLException;
 
 /**
@@ -51,13 +53,15 @@ public class ActivationModel extends ImageTalkBaseModel{
         return false;
     }
     public boolean assignToken(){
-        int rand = (int)(Math.random()*9000)+1000;
-        this.activation_code = String.valueOf(rand);
+
 
         /*=====| For Testing purpose |==*/
         /*=====/ Remove after sms api integration /===========*/
-            this.activation_code = "1234";
+          //  this.activation_code = "1234";
         /*===================ENDS HERE======================*/
+
+
+        /*~~~~ Set activation_code before using it */
 
         String query = "";
         if(this.isPhoneNumberExist()){

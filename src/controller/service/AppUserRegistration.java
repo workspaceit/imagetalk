@@ -2,6 +2,8 @@ package controller.service;
 
 import com.google.gson.Gson;
 import helper.ImageHelper;
+import helper.SmsHelper;
+import helper.UtilityHelper;
 import model.ActivationModel;
 import model.AppLoginCredentialModel;
 import model.ContactModel;
@@ -32,7 +34,7 @@ public class AppUserRegistration extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-       
+
         res.setContentType("application/json");
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         PrintWriter pw = res.getWriter();
@@ -66,7 +68,12 @@ public class AppUserRegistration extends HttpServlet {
         pw.close();
     }
     public boolean sendTokenViaSms(String phoneNumber,String token){
-        // Have to implement after sms api received
+        try {
+            SmsHelper.sendRegistrationCode(phoneNumber, token);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
         return true;
     }
     public String initializePhoneNumber(HttpServletRequest req, HttpServletResponse res){
@@ -93,12 +100,8 @@ public class AppUserRegistration extends HttpServlet {
             return baseController.getResponse();
         }
         // For testing inside assignToken function token is set to '1234'
-        if(!activationModel.assignToken()){
-            baseController.serviceResponse.responseStat.msg = "Error on database operation";
-            baseController.serviceResponse.responseStat.status = false;
-            return baseController.getResponse();
-        }
 
+        activationModel.setActivationCode(UtilityHelper.getRandomNumber(4));
         boolean tokenSent = this.sendTokenViaSms(activationModel.getPhoneNumber(),activationModel.getActivationCode());
 
         if(!tokenSent){
@@ -107,7 +110,11 @@ public class AppUserRegistration extends HttpServlet {
             return baseController.getResponse();
         }
 
-
+        if(!activationModel.assignToken()){
+            baseController.serviceResponse.responseStat.msg = "Error on database operation";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
 
         baseController.serviceResponse.responseStat.msg = "Token is sent";
 

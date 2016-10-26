@@ -19,7 +19,7 @@ import java.io.*;
  */
 public class ImageHelper {
     //server settings for pictures and images
-    private final static String GLOBAL_PATH = "/home/imagetalk_picture/";
+    private final static String GLOBAL_PATH = "/home/wsit/imagetalk_picture/";
     private final static String STICKER_FOLDER = "ImageTalk_sticker/";
     private final static String STICKER_GLOBAL_PATH = "/home/";
 
