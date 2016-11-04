@@ -1,8 +1,9 @@
 package controller.service;
 
-import model.ReportAppIssueModel;
-import model.UserReviewModel;
-import model.WallPostModel;
+import model.*;
+import model.datamodel.app.ReportType;
+import model.datamodel.app.ReportWallPost;
+import model.datamodel.app.WallPost;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -62,7 +63,9 @@ public class ReportAppIssueController extends HttpServlet {
             case "/report/issue/add":
                 pw.print(this.addReport(req));
                 break;
-
+            case "/report/wall-post":
+                pw.print(this.addWallPostReport(req));
+                break;
             default:
                 break;
         }
@@ -133,5 +136,85 @@ public class ReportAppIssueController extends HttpServlet {
         return baseController.getResponse();
 
     }
+    public String addWallPostReport(HttpServletRequest req){
 
+        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+
+        WallPostModel wallPostModel = new WallPostModel();
+        ReportWallPostModel reportWallPostModel = new ReportWallPostModel();
+        ReportTypeModel reportTypeModel = new ReportTypeModel();
+        ReportWallPost reportWallPost = new ReportWallPost();
+
+        int reportTypeId=0;
+        String description = "";
+        int wallPostId=0;
+
+
+        if(!baseController.checkParam("report_type_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "Report type is missing";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        if(baseController.checkParam("description", req, true)){
+
+            description = req.getParameter("description").trim();
+        }
+        if(!baseController.checkParam("wall_post_id", req, true)){
+
+            baseController.serviceResponse.responseStat.msg = "Wall post missing";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+
+
+
+        try{
+            reportTypeId = Integer.parseInt(req.getParameter("report_type_id"));
+        }catch (NumberFormatException nfe){
+            baseController.serviceResponse.responseStat.msg = "Report type id int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+        try{
+            wallPostId = Integer.parseInt(req.getParameter("wall_post_id"));
+        }catch (NumberFormatException nfe){
+            baseController.serviceResponse.responseStat.msg = "Wall post id int required";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+
+        ReportType reportType =  reportTypeModel.getById(reportTypeId);
+
+        if(reportType.id==0){
+            baseController.serviceResponse.responseStat.msg = "Report type not found";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        wallPostModel.setId(wallPostId);
+        WallPost wallPost = wallPostModel.getById();
+
+        if(wallPost.id==0){
+            baseController.serviceResponse.responseStat.msg = "Wall post id not found";
+            baseController.serviceResponse.responseStat.status = false;
+            return baseController.getResponse();
+        }
+
+        reportWallPost.reportType = reportType;
+        reportWallPost.description = description;
+        reportWallPost.reporter = baseController.appCredential;
+        reportWallPost.wallPost = wallPost;
+
+        reportWallPostModel.insert(reportWallPost);
+
+
+
+
+        baseController.serviceResponse.responseStat.msg = "Successfully Reported";
+        return baseController.getResponse();
+
+    }
 }

@@ -1,5 +1,6 @@
 package model;
 
+import model.datamodel.admin.AdminCredential;
 import model.datamodel.app.Login;
 
 import java.sql.SQLException;
@@ -116,6 +117,28 @@ public class AdminLoginModel extends ImageTalkBaseModel {
             this.closeConnection();
         }
         return login;
+    }
+    public AdminCredential getAdminCredentialById(int id) {
+        String query = "SELECT * FROM " + this.tableName + " AS ul " +
+                "JOIN user_inf AS ui " +
+                "ON ul.u_id = ui.id " ;
+        System.out.println(query);
+        AdminCredential adminCredential = new AdminCredential();
+        this.setQuery(query);
+        this.getData();
+        try {
+            while (this.resultSet.next()) {
+                adminCredential.id = this.resultSet.getInt("ul.id");
+                adminCredential.email = this.resultSet.getString("ul.email");
+                adminCredential.user.firstName = resultSet.getString("ui.f_name");
+                adminCredential.user.lastName = resultSet.getString("ui.l_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            this.closeConnection();
+        }
+        return adminCredential;
     }
 
     public ArrayList<Login> getAllExceptMe(int u_id) {
