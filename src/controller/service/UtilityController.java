@@ -1,6 +1,7 @@
 package controller.service;
 
 import model.CountryModel;
+import model.ReportTypeModel;
 import model.datamodel.app.Login;
 
 import javax.servlet.ServletException;
@@ -47,6 +48,9 @@ public class UtilityController extends HttpServlet {
            case "/utility/get/countries":
                 pw.print(this.getCountries());
                 break;
+            case "/utility/get/report-type":
+                pw.print(this.getReportType());
+                break;
             default:
                 break;
         }
@@ -56,6 +60,12 @@ public class UtilityController extends HttpServlet {
         ImageTalkBaseController baseController = new ImageTalkBaseController();
         CountryModel countryModel = new CountryModel();
         baseController.serviceResponse.responseData = countryModel.getAll();
+        return baseController.getResponse();
+    }
+    private String getReportType(){
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
+        ReportTypeModel reportTypeModel = new ReportTypeModel();
+        baseController.serviceResponse.responseData = reportTypeModel.getAll();
         return baseController.getResponse();
     }
 }

@@ -180,7 +180,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
-                " where wall_post_favorite.owner_id = "+this.owner_id;
+                " where wall_post.is_blocked = 0 and " +
+                " wall_post_favorite.owner_id = "+this.owner_id;
 
         query += " order by  wall_post.id  DESC ";
         if(this.limit >0){
@@ -293,7 +294,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id "+
-                " where wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
+                " where wall_post.is_blocked = 0 and " +
+                " wall_post.id NOT IN (SELECT wall_post_id FROM wall_post_status WHERE owner_id="+this.getCurrentUserId()+")";
 
         query += " order by  wall_post.id  DESC ";
         //System.out.println(query);
@@ -408,7 +410,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
-                " where wall_post.id = "+this.id+" limit 1";
+                " where wall_post.is_blocked = 0 and " +
+                " wall_post.id = "+this.id+" limit 1";
 
 
 
@@ -517,7 +520,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                        " left join location on location.id = user_inf.address_id " +
                        " left join job on job.app_login_credential_id = app_login_credential.id " +
                        " left join location as postLoc on postLoc.id = wall_post.location_id " +
-                       " where wall_post.id = "+this.id+" limit 1";
+                       " where wall_post.is_blocked = 0 and " +
+                       " wall_post.id = "+this.id+" limit 1";
 
 
 
@@ -643,7 +647,8 @@ public class WallPostModel extends ImageTalkBaseModel{
                 " left join location on location.id = user_inf.address_id " +
                 " left join job on job.app_login_credential_id = app_login_credential.id " +
                 " left join location as postLoc on postLoc.id = wall_post.location_id " +
-                " where wall_post.owner_id = "+this.owner_id;
+                " where wall_post.is_blocked = 0 and " +
+                " wall_post.owner_id = "+this.owner_id;
         query += " order by  wall_post.id  DESC ";
 
         if(this.limit >0){
@@ -871,6 +876,30 @@ public class WallPostModel extends ImageTalkBaseModel{
         String updateQuery = "Update wall_post set comment_count=" +
                              "(SELECT count(id) as commentCount FROM post_comment where post_id="+this.getId()+")" +
                              "where wall_post.id="+this.getId();
+        this.setQuery(updateQuery);
+        if(this.updateData(updateQuery))
+        {
+            return true;
+        }
+        return false;
+
+    }
+    public boolean updateIsBlockedTrue(WallPost wallPost){
+
+        String updateQuery = "Update wall_post set is_blocked = 1 " +
+                "where wall_post.id="+wallPost.id;
+        this.setQuery(updateQuery);
+        if(this.updateData(updateQuery))
+        {
+            return true;
+        }
+        return false;
+
+    }
+    public boolean updateIsBlockedFalse(WallPost wallPost){
+
+        String updateQuery = "Update wall_post set is_blocked = 0 " +
+                "where wall_post.id="+wallPost.id;
         this.setQuery(updateQuery);
         if(this.updateData(updateQuery))
         {

@@ -396,7 +396,7 @@ public class AdminController extends HttpServlet {
     private String changeUserStatus(HttpServletRequest req) {
         AppLoginCredentialModel appModel = new AppLoginCredentialModel();
 
-        ImageTalkBaseController baseController = new ImageTalkBaseController(req);
+        ImageTalkBaseController baseController = new ImageTalkBaseController();
 
         int userId        = Integer.parseInt(req.getParameter("user_id"));
         int status        = Integer.parseInt(req.getParameter("user_status"));

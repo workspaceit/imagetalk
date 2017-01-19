@@ -20,6 +20,7 @@ public class WallPost {
     public int likeCount;
     public boolean isLiked;
     public boolean isFavorite;
+    public boolean isBlocked;
     public int type;
     public ArrayList<PostComment> comments;
     public Places places;
@@ -39,9 +40,32 @@ public class WallPost {
         this.commentCount = 0;
         this.isLiked = false;
         this.isFavorite = false;
+        this.isBlocked = false;
         this.type = 0;
         this.comments = new ArrayList<PostComment>();
         this.places = new Places();
         this.createdDate = "";
    }
+
+    @Override
+    public String toString() {
+        return "WallPost{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", wallPostMood='" + wallPostMood + '\'' +
+                ", commentCount=" + commentCount +
+                ", owner=" + owner +
+                ", picPath='" + picPath + '\'' +
+                ", tagList=" + tagList +
+                ", likerList=" + likerList +
+                ", tagCount=" + tagCount +
+                ", likeCount=" + likeCount +
+                ", isLiked=" + isLiked +
+                ", isFavorite=" + isFavorite +
+                ", type=" + type +
+                ", comments=" + comments +
+                ", places=" + places +
+                ", createdDate='" + createdDate + '\'' +
+                '}';
+    }
 }

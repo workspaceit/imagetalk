@@ -14,4 +14,13 @@ public class PictureDetails {
         this.type = "";
         this.size = new PictureSize();
     }
+
+    @Override
+    public String toString() {
+        return "PictureDetails{" +
+                "path='" + path + '\'' +
+                ", type='" + type + '\'' +
+                ", size=" + size +
+                '}';
+    }
 }

@@ -18,4 +18,16 @@ public class AppCredential {
         this.job = new Job();
         this.createdDate = "";
     }
+
+    @Override
+    public String toString() {
+        return "AppCredential{" +
+                "id=" + id +
+                ", textStatus='" + textStatus + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", user=" + user +
+                ", job=" + job +
+                ", createdDate='" + createdDate + '\'' +
+                '}';
+    }
 }

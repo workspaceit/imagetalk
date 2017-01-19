@@ -82,11 +82,11 @@
             <li class="treeview">
                 <a href="#">
                     <i class="fa fa-bullhorn"></i>
-                    <span>Complain list</span>
+                    <span>Report</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i> All</a></li>
+                    <li><a href="<%=baseUrl%>admin/wall-post-report"><i class="fa fa-circle-o"></i> Wall post</a></li>
                 </ul>
             </li>
 

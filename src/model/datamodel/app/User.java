@@ -23,4 +23,17 @@ public class User {
         this.picPath = new Pictures();
         this.createdDate = "";
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", picPath=" + picPath +
+                ", address=" + address +
+                ", createdDate='" + createdDate + '\'' +
+                '}';
+    }
 }

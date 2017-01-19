@@ -241,6 +241,23 @@
         <servlet-name>ADMIN_DASHBOARD</servlet-name>
         <url-pattern>/admin</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>ADMIN_WALL_POST_REPORT</servlet-name>
+        <jsp-file>/admin/wall-post-report.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ADMIN_REPORT</servlet-name>
+        <url-pattern>/admin/report/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ADMIN_REPORT</servlet-name>
+        <servlet-class>controller.admin.AdminWallPostReportController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>ADMIN_WALL_POST_REPORT</servlet-name>
+        <url-pattern>/admin/wall-post-report</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>Sticker_category</servlet-name>

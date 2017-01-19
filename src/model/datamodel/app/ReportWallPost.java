@@ -2,7 +2,7 @@ package model.datamodel.app;
 
 import model.datamodel.admin.AdminCredential;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  * Created by mi on 11/4/16.
@@ -27,5 +27,20 @@ public class ReportWallPost {
         this.description = "";
         this.actionTakenAt = null;
         this.createdDate = null;
+    }
+
+    @Override
+    public String toString() {
+        return "ReportWallPost{" +
+                "id=" + id +
+                ", reportType=" + reportType +
+                ", wallPost=" + wallPost +
+                ", reporter=" + reporter +
+                ", actionTakenBy=" + actionTakenBy +
+                ", actionTaken=" + actionTaken +
+                ", description='" + description + '\'' +
+                ", actionTakenAt=" + actionTakenAt +
+                ", createdDate=" + createdDate +
+                '}';
     }
 }

@@ -37,6 +37,21 @@ public class DateHelper {
 
         return "";
     }
+    public static Timestamp getCurrentUtcTimeStamp() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date = dateFormat.parse(dateFormat.format(new java.util.Date()));
+            java.sql.Timestamp timeStampDate = new Timestamp(date.getTime());
+            return timeStampDate;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+
+
+    }
     public static String getUtcDateTime(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

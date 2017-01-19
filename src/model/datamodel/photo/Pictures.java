@@ -15,4 +15,12 @@ public class Pictures {
         this.original = new PictureDetails();
         this.thumb = new ArrayList<PictureDetails>();
     }
+
+    @Override
+    public String toString() {
+        return "Pictures{" +
+                "original=" + original +
+                ", thumb=" + thumb +
+                '}';
+    }
 }

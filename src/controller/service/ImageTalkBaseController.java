@@ -59,6 +59,7 @@ public class ImageTalkBaseController {
     public boolean isSessionValid(HttpServletRequest req){
         Login login = new Login();
         HttpSession session = req.getSession();
+        System.out.println(session.getAttribute("userSession"));
         login = (Login)session.getAttribute("userSession");
 
         if(login==null){
